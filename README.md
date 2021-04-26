@@ -1,4 +1,4 @@
-# Hotel_Booking
+# Hotels Booking System
 
 ## Требования к программной реализации
 
