@@ -1,8 +1,8 @@
 from django.urls import path
-from Loyalty.loyalty_p.views import about_loyalty, up_loyalty, down_loyalty
+from .views import about_loyalty, up_loyalty, down_loyalty
 
 urlpatterns = [
-    path('loyalty', about_loyalty),  # Посмотреть баланс бонусной программы
-    path('loyalty', up_loyalty), # Повысить лояльность
-    path('loyalty', down_loyalty), # Понизить лояльность
+    path('loyalty/', about_loyalty),  # Посмотреть баланс бонусной программы
+    path('up-loyalty/', up_loyalty),  # Повысить лояльность
+    path('down-loyalty/', down_loyalty),  # Понизить лояльность
 ]
