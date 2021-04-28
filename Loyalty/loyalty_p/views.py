@@ -5,10 +5,14 @@ def about_loyalty(request):
     i = 1
 
 
-def up_loyalty(request):
+def create_loyalty(request):
     i = 1
     return '<h1>efwf</h1>'
 
 
-def down_loyalty(request):
+def edit_loyalty(request):
+    i = 1
+
+
+def delete_loyalty(request):
     i = 1
