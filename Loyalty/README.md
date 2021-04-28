@@ -6,3 +6,12 @@
 3. `POST /api/v1/loyalty/create` – создание баланса при регистрации;
 4. `POST /api/v1/loyalty/edit-loyalty` – запрос повышения понижения лояльности;
 5. `DELETE /api/v1/loyalty/delete` – удаление лояльности (при удалении пользователя).
+
+## Структура таблиц
+```postgresql
+CREATE TABLE UserLoyalty
+(
+    user_uid        SERIAL CONSTRAINT user_uid PRIMARY KEY,
+    discount        INTEGER      NOT NULL,
+    status          VARCHAR(255) NOT NULL,
+);
