@@ -6,7 +6,7 @@ import uuid
 class LoyaltySerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLoyalty
-        fields = '__all__'
+        fields = ['user_uid', 'status', 'discount']
 
     def create(self, validated_data):
         validated_data.pop('role', None)

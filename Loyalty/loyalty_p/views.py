@@ -7,8 +7,8 @@ from .models import UserLoyalty
 from Loyalty.settings import JWT_KEY
 from .serializers import LoyaltySerializer
 from rest_framework import status
+from .models import UserLoyalty
 import jwt
-import uuid
 
 FAILURES = 3
 TIMEOUT = 6
@@ -20,31 +20,70 @@ TIMEOUT = 6
 def create(request):
     try:
         data = auth(request)
-        data.update({'user_uid': data['user_uid'], 'status': 'BRONZE', 'discount': '0'})
+        data.update({'user_uid': data['user_uid'], 'status': 'None', 'discount': '0'})
         serializer = LoyaltySerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return JsonResponse(serializer.data)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['GET'])
-def about(request):
-    i = 1
+def balance(request):
+    try:
+        data = auth(request)
+        userLoyalty = UserLoyalty.objects.filter(user_uid=data['user_uid']).first()
+        serializer = LoyaltySerializer(userLoyalty)
+        return JsonResponse(serializer.data)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['PATCH'])
 def edit(request):
-    i = 1
+    """
+    BRONZE: 7%
+    SILVER: 15%
+    GOLD: 25%
+    request: { "active": "UP" } or { "active": "DOWN" }
+    """
+    status_list = {'None': 0, "BRONZE": 5, "SILVER": 12, "GOLD": 17}
+    status_key = list(status_list.keys())
+    data = auth(request)
+    userLoyalty = UserLoyalty.objects.get(user_uid=data['user_uid'])
+    i = 0
+
+    while i < len(status_key):
+        if status_key[i] == userLoyalty.status:
+            break
+        i += 1
+
+    if request.data['active'] == 'UP':
+        if i < len(status_key) - 1:
+            i += 1
+    elif request.data['active'] == 'DOWN':
+        if i > 0:
+            i -= 1
+    userLoyalty.status = status_key[i]
+    userLoyalty.discount = status_list[status_key[i]]
+
+    userLoyalty.save()
+    return JsonResponse({'detail': 'success edit'}, status=status.HTTP_200_OK)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['DELETE'])
 def delete(request):
-    i = 1
+    try:
+        data = auth(request)
+        userLoyalty = UserLoyalty.objects.get(user_uid=data['user_uid'])
+        userLoyalty.delete()
+        return JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # subsidiary
