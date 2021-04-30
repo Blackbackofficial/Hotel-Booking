@@ -3,7 +3,7 @@ import uuid
 
 
 class UserLoyalty(models.Model):
-    user_uid = models.UUIDField(default=uuid.uuid4, editable=True)
+    user_uid = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)
     status = models.CharField(max_length=10)
     discount = models.IntegerField(default=0)
 
