@@ -44,7 +44,7 @@ def login(request):
     payload = {
         'user_uid': str(user.user_uid),
         'role': str(user.role),
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=50),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=50),
         'iat': datetime.datetime.utcnow()
     }
 
@@ -89,7 +89,7 @@ def refresh(request):
     payload = {
         'user_uid': str(payload['user_uid']),
         'role': str(payload['role']),
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=50),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=50),
         'iat': datetime.datetime.utcnow()
     }
 
@@ -109,6 +109,6 @@ def logout(request):
     response = Response()
     response.delete_cookie('jwt')
     response.data = {
-        'message': 'success'
+        'detail': 'success'
     }
     return response
