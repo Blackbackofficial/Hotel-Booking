@@ -62,7 +62,7 @@ def login(request):
 
 
 @api_view(['GET'])
-def validate(request):
+def verify(request):
     token = request.COOKIES.get('jwt')
 
     if not token:
