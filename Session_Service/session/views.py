@@ -1,14 +1,16 @@
-import datetime
-import jwt
-import requests
 from rest_framework.exceptions import AuthenticationFailed, ValidationError, ParseError
 from rest_framework.response import Response
+from django.core import serializers
 from .models import Users
 from .serializers import UserSerializer
 from Session_Service.settings import SECRET_KEY
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from rest_framework import status
+import json
+import datetime
+import jwt
+import requests
 
 
 # API
@@ -60,7 +62,7 @@ def login(request):
 
 
 @api_view(['GET'])
-def validate(request):
+def verify(request):
     token = request.COOKIES.get('jwt')
 
     if not token:
@@ -104,6 +106,19 @@ def refresh(request):
     return response
 
 
+@api_view(['GET'])
+def users(request):
+    try:
+        data = auth(request)
+        if 'admin' not in data['role']:
+            return Response({'detail': 'You are not admin!'})
+        users = Users.objects.all()
+        users_json = json.loads(serializers.serialize('json', users))
+        return Response(users_json, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['POST'])
 def logout(request):
     response = Response()
@@ -112,3 +127,16 @@ def logout(request):
         'detail': 'success'
     }
     return response
+
+
+# subsidiary
+def auth(request):
+    token = request.COOKIES.get('jwt')
+
+    if not token:
+        raise AuthenticationFailed('Unauthenticated!')
+
+    payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'], options={"verify_exp": False})
+    payload.pop('exp')
+    payload.pop('iat')
+    return payload
