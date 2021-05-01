@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from .models import UserLoyalty
+from .models import Reservations
 import uuid
 
 
-class LoyaltySerializer(serializers.ModelSerializer):
+class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLoyalty
-        fields = ['user_uid', 'status', 'discount']
+        fields = ['hotel_uid', 'user_uid', 'payment_uid', 'date_start', 'date_end', 'comment']
 
     def create(self, validated_data):
         validated_data.pop('role', None)
