@@ -1,4 +1,4 @@
-# Loyalty Service
+# Session Service
 
 ## Описание API
 1. `POST /api/v1/session/register` – регистрация пользователя;
