@@ -1,10 +1,10 @@
 from django.urls import path
-# from .views import register, login, refresh, logout, validate
+from .views import create, pay, reversed, close, status
 
 urlpatterns = [
-    # path('register', register),
-    # path('login', login),
-    # path('validate', validate),
-    # path('refresh', refresh),
-    # path('logout', logout),
+    path('create', create),
+    path('pay', pay),
+    path('reversed', reversed),
+    path('close', close),
+    path('status/{<str:payment_uid>', logout),
 ]

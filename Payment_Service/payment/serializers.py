@@ -3,7 +3,7 @@ from .models import Payment
 import uuid
 
 
-class LoyaltySerializer(serializers.ModelSerializer):
+class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = ['payment_uid', 'status', 'price']

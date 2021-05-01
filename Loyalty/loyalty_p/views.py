@@ -1,13 +1,11 @@
 from rest_framework.exceptions import AuthenticationFailed, ValidationError, ParseError
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
-from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
 from .models import UserLoyalty
 from Loyalty.settings import JWT_KEY
 from .serializers import LoyaltySerializer
 from rest_framework import status
-from .models import UserLoyalty
 import requests
 import jwt
 
