@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from .models import UserLoyalty
 from Booking_Service.settings import JWT_KEY
-from .serializers import LoyaltySerializer
+from .serializers import BookingSerializer
 from rest_framework import status
 import requests
 import jwt
