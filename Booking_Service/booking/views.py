@@ -45,9 +45,8 @@ def create_or_all(request):
             serializer = BookingSerializer(data=new_reservation)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            reservations = str(Reservations.objects.latest('id').booking_uid)
-            new_reservation.update({"booking_uid": reservations})
-            return JsonResponse(new_reservation, status=status.HTTP_200_OK, safe=False)
+            reservations = model_to_dict(Reservations.objects.latest('id'))
+            return JsonResponse(reservations, status=status.HTTP_200_OK, safe=False)
         elif request.method == 'GET':
             reservations = Reservations.objects.filter(user_uid=data["user_uid"])
             users_reservations = json.loads(serializers.serialize('json', reservations))
@@ -74,7 +73,7 @@ def canceled(request, booking_uid):
 @api_view(['POST'])
 def about_one(request, booking_uid):
     try:
-        data = auth(request)
+        auth(request)
         reservations = Reservations.objects.get(booking_uid=booking_uid)
         reservations = model_to_dict(reservations)
         hotel = requests.get("http://localhost:8002/api/v1/hotel/status/{}".format(reservations["hotel_uid"]),
