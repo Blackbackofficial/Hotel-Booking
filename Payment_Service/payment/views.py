@@ -20,7 +20,12 @@ TIMEOUT = 6
 def create(request):
     try:
         data = auth(request)
-        loyBalance = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=request.COOKIES).json()
+        loyBalance = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=request.COOKIES)
+        if loyBalance.status_code != 200:
+            return JsonResponse({'error': 'Error in loyalty'}, status=status.HTTP_400_BAD_REQUEST)
+        loyBalance = loyBalance.json()
+        if loyBalance['discount'] is None:
+            loyBalance['discount'] = 0
         data.update({'status': 'NEW', 'price': request.data["price"]/100*(100-loyBalance['discount'])})
         serializer = PaymentSerializer(data=data)
         serializer.is_valid(raise_exception=True)

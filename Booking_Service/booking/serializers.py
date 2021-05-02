@@ -5,7 +5,7 @@ import uuid
 
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserLoyalty
+        model = Reservations
         fields = ['hotel_uid', 'user_uid', 'payment_uid', 'date_start', 'date_end', 'comment']
 
     def create(self, validated_data):
