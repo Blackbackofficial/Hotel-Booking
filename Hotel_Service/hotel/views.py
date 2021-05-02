@@ -73,15 +73,26 @@ def all_hotels_or_add_hotel(request):
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['PATCH'])
-def change_rooms(request, booking_uid):
+def change_rooms(request, hotel_uid):
+    """
+    PATCH: {
+            "reservation": "Done" or "reservation": "Canceled"
+           }
+    """
     try:
         auth(request)
-        payment_uid = Reservations.objects.get(booking_uid=booking_uid).payment_uid
-        payStatus = requests.post("http://localhost:8002/api/v1/payment/close/{}".format(payment_uid),
-                                  cookies=request.COOKIES)
-        if payStatus.status_code == 200:
-            return JsonResponse(payStatus.json(), status=status.HTTP_200_OK)
-        return JsonResponse({'detail': 'NOT CANCELED'}, status=status.HTTP_400_BAD_REQUEST)
+        hotel = Hotels.objects.get(hotel_uid=hotel_uid)
+        if request.data["reservation"] == "Done":
+            if hotel.rooms > 0:
+                hotel.rooms += 1
+        elif request.data["reservation"] == "Canceled":
+            if hotel.rooms > 0:
+                hotel.rooms -= 1
+        else:
+            return JsonResponse({"detail": "Validation error in 'reservation'"}, status=status.HTTP_400_BAD_REQUEST)
+
+        hotel.save()
+        return JsonResponse({'rooms': '{}'.format(hotel.rooms)}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
