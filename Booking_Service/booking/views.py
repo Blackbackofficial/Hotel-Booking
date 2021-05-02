@@ -6,6 +6,7 @@ from .models import Reservations
 from django.core import serializers
 from Booking_Service.settings import JWT_KEY
 from .serializers import BookingSerializer
+from django.forms.models import model_to_dict
 from rest_framework import status
 import requests
 import json
@@ -60,6 +61,10 @@ def create_or_all(request):
 def canceled(request, booking_uid):
     try:
         data = auth(request)
+        payBalance = requests.post("http://localhost:8002/api/v1/payment/create",
+                                   json={"price": request.data["price"]},
+                                   cookies=request.COOKIES)
+        # завтра подумаю
 
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -70,7 +75,19 @@ def canceled(request, booking_uid):
 def about_one(request, booking_uid):
     try:
         data = auth(request)
-
+        reservations = Reservations.objects.get(booking_uid=booking_uid)
+        reservations = model_to_dict(reservations)
+        hotel = requests.get("http://localhost:8002/api/v1/hotel/status/{}".format(reservations["hotel_uid"]),
+                             cookies=request.COOKIES)
+        if hotel.status_code == 200:
+            hotel = hotel.json()
+            reservations.update(hotel)
+        payBalance = requests.get("http://localhost:8002/api/v1/payment/status/{}".format(reservations["payment_uid"]),
+                                  cookies=request.COOKIES)
+        if payBalance.status_code == 200:
+            payBalance = payBalance.json()
+            reservations.update(payBalance)
+        return JsonResponse(reservations, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
