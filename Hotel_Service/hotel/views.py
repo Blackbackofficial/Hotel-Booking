@@ -2,12 +2,15 @@ from rest_framework.exceptions import AuthenticationFailed, ValidationError, Par
 from django.shortcuts import render
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
-from Payment_Service.settings import JWT_KEY
-from .serializers import PaymentSerializer
+from Hotel_Service.settings import JWT_KEY
+from .serializers import HotelsSerializer
+from django.forms.models import model_to_dict
+from django.core import serializers
 from django.http import JsonResponse
 from rest_framework import status
-from .models import Payment
+from .models import Hotels
 import requests
+import json
 import jwt
 
 FAILURES = 3
@@ -31,22 +34,39 @@ def about_or_delete(request, booking_uid):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['GET', 'PATCH'])
-def all_hotels_or_add_hotel(request, booking_uid):
+@api_view(['GET', 'POST'])
+def all_hotels_or_add_hotel(request):
+    """
+    POST: {
+          "title": "some text",
+          "short_text": "another some text",
+          "rooms": 300,
+          "location": "Moscow, Leninski prospekt 49/2"
+          }
+    """
     try:
-        auth(request)
-        payment_uid = Reservations.objects.get(booking_uid=booking_uid).payment_uid
-        payStatus = requests.post("http://localhost:8002/api/v1/payment/close/{}".format(payment_uid),
-                                  cookies=request.COOKIES)
-        if payStatus.status_code == 200:
-            return JsonResponse(payStatus.json(), status=status.HTTP_200_OK)
-        return JsonResponse({'detail': 'NOT CANCELED'}, status=status.HTTP_400_BAD_REQUEST)
+        data = auth(request)
+        if request.method == 'GET':
+            hotels = Hotels.objects.all()
+            hotels = json.loads(serializers.serialize('json', hotels))
+            return JsonResponse(hotels, status=status.HTTP_200_OK, safe=False)
+        elif request.method == 'POST':
+            if 'admin' not in data['role']:
+                return JsonResponse({'detail': 'You are not admin!'})
+            new_hotel = {"title": request.data["title"], "short_text": request.data["short_text"],
+                         "rooms": request.data["rooms"], "location": request.data["location"]}
+            serializer = HotelsSerializer(data=new_hotel)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            hotel = model_to_dict(Hotels.objects.latest('id'))
+            hotel.pop('photo')  # временно
+            return JsonResponse(hotel, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['POST'])
+@api_view(['PATCH'])
 def change_rooms(request, booking_uid):
     try:
         auth(request)
