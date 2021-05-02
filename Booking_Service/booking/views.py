@@ -50,6 +50,19 @@ def create_or_all(request):
         elif request.method == 'GET':
             reservations = Reservations.objects.filter(user_uid=data["user_uid"])
             users_reservations = json.loads(serializers.serialize('json', reservations))
+            for res in users_reservations:
+                payBalance = requests.get(
+                    "http://localhost:8002/api/v1/payment/status/{}".format(res['fields'].get("payment_uid")),
+                    cookies=request.COOKIES)
+                if payBalance.status_code == 200:
+                    payBalance = payBalance.json()
+                    res['fields'].update(payBalance)
+                hotel = requests.get(
+                    "http://localhost:8002/api/v1/hotel/status/{}".format(res['fields'].get("hotel_uid")),
+                    cookies=request.COOKIES)
+                if hotel.status_code == 200:
+                    hotel = hotel.json()
+                    res['fields'].update(hotel)
             return JsonResponse(users_reservations, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -77,7 +90,7 @@ def about_one(request, booking_uid):
         reservations = Reservations.objects.get(booking_uid=booking_uid)
         reservations = model_to_dict(reservations)
         hotel = requests.get("http://localhost:8002/api/v1/hotel/status/{}".format(reservations["hotel_uid"]),
-                             cookies=request.COOKIES)
+                             cookies=request.COOKIES)  # нужно доделать
         if hotel.status_code == 200:
             hotel = hotel.json()
             reservations.update(hotel)
@@ -92,11 +105,32 @@ def about_one(request, booking_uid):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['POST'])
-def all_hotels(request):  # only user 'admin'
+@api_view(['GET'])
+def all_hotels(request, hotel_uid):  # only user 'admin'
+    """
+    GET: "hotel_uid": "5c325464-7445-4147-bd2d-1598641d2248"
+    Вытаскиваем все бронирования по отелю
+    """
     try:
         data = auth(request)
-
+        if 'admin' not in data['role']:
+            return JsonResponse({'detail': 'You are not admin!'})
+        hotel_reservations = Reservations.objects.filter(hotel_uid=hotel_uid).all()
+        reservations = json.loads(serializers.serialize('json', hotel_reservations))
+        for res in reservations:
+            payBalance = requests.get(
+                "http://localhost:8002/api/v1/payment/status/{}".format(res['fields'].get("payment_uid")),
+                cookies=request.COOKIES)
+            if payBalance.status_code == 200:
+                payBalance = payBalance.json()
+                res['fields'].update(payBalance)
+            hotel = requests.get(
+                "http://localhost:8002/api/v1/hotel/status/{}".format(res['fields'].get("hotel_uid")),
+                cookies=request.COOKIES)
+            if hotel.status_code == 200:
+                hotel = hotel.json()
+                res['fields'].update(hotel)
+        return JsonResponse(reservations, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
