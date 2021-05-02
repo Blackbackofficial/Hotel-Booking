@@ -114,7 +114,7 @@ def reversed(request, booking_uid):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['POST'])
+@api_view(['GET'])
 def about_one(request, booking_uid):
     try:
         auth(request)
