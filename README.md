@@ -90,7 +90,7 @@ body: { login, password }
 **Бизнес сервисы:**
 
 * Гостиницы (Hotel Service)
-*Система бронирования (Booking Service)
+* Система бронирования (Booking Service)
 * Платежная система (Payment Service)
 * Система лояльности (Loyalty Service)
 
@@ -121,7 +121,9 @@ body: { login, password }
 + hotel_uid -> FK to Hotel Service (Hotels::hotel_uid)
 + user_uid -> FK to Session Service (User::user_uid)
 + payment_uid-> FK to Payment Service (Payment::payment_uid)
++ booking_uid
 + date
++ comment
 ```
 
 **Payments (Payment Service):**

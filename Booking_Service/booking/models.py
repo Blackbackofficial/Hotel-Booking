@@ -3,6 +3,7 @@ import uuid
 
 
 class Reservations(models.Model):
+    booking_uid = models.UUIDField(default=uuid.uuid4, unique=True, editable=True)
     hotel_uid = models.UUIDField(default=uuid.uuid4, editable=True)
     user_uid = models.UUIDField(default=uuid.uuid4, editable=True)
     payment_uid = models.UUIDField(default=uuid.uuid4, editable=True, unique=True)

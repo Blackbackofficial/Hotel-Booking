@@ -44,7 +44,9 @@ def create_or_all(request):
             serializer = BookingSerializer(data=new_reservation)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return JsonResponse(serializer.data)
+            reservations = str(Reservations.objects.latest('id').booking_uid)
+            new_reservation.update({"booking_uid": reservations})
+            return JsonResponse(new_reservation, status=status.HTTP_200_OK, safe=False)
         elif request.method == 'GET':
             reservations = Reservations.objects.filter(user_uid=data["user_uid"])
             users_reservations = json.loads(serializers.serialize('json', reservations))
