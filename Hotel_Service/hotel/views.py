@@ -20,15 +20,17 @@ TIMEOUT = 6
 # API
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['GET', 'DELETE'])
-def about_or_delete(request, booking_uid):
+def about_or_delete(request, hotel_uid):
     try:
         auth(request)
-        payment_uid = Reservations.objects.get(booking_uid=booking_uid).payment_uid
-        payStatus = requests.post("http://localhost:8002/api/v1/payment/close/{}".format(payment_uid),
-                                  cookies=request.COOKIES)
-        if payStatus.status_code == 200:
-            return JsonResponse(payStatus.json(), status=status.HTTP_200_OK)
-        return JsonResponse({'detail': 'NOT CANCELED'}, status=status.HTTP_400_BAD_REQUEST)
+        if request.method == 'GET':
+            hotels = Hotels.objects.filter(hotel_uid=hotel_uid)
+            hotels = json.loads(serializers.serialize('json', hotels))
+            return JsonResponse(hotels[0]['fields'], status=status.HTTP_200_OK, safe=False)
+        elif request.method == 'DELETE':
+            hotel = Hotels.objects.get(hotel_uid=hotel_uid)
+            hotel.delete()
+            return JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
