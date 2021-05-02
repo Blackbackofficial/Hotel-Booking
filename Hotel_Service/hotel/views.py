@@ -51,6 +51,10 @@ def all_hotels_or_add_hotel(request):
         if request.method == 'GET':
             hotels = Hotels.objects.all()
             hotels = json.loads(serializers.serialize('json', hotels))
+            for hotel in hotels:
+                fields = hotel["fields"]
+                hotel.clear()
+                hotel.update(fields)
             return JsonResponse(hotels, status=status.HTTP_200_OK, safe=False)
         elif request.method == 'POST':
             if 'admin' not in data['role']:
