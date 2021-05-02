@@ -1,10 +1,10 @@
 from django.urls import path
-# from .views import register, login, refresh, logout, verify, users
+from .views import about_or_delete, all_hotels_or_add_hotel, change_rooms
 
 urlpatterns = [
-    # path('register', register),
-    # path('login', login),
-    # path('validate', verify),
+    path('<str:hotel_uid>', about_or_delete),
+    path('', all_hotels_or_add_hotel),
+    path('<str:hotel_uid>/rooms', change_rooms),
     # path('refresh', refresh),
     # path('logout', logout),
     # path('users', users),
