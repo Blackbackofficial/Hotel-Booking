@@ -1,5 +1,5 @@
 # Loyalty Service
-
+все поменять
 ## Описание API
 1. `GET /api/v1/loyalty/balance` – баланс бонусной программы;
 2. `POST /api/v1/loyalty/create` – создание баланса при регистрации;
