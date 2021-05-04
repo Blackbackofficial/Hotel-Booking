@@ -1,16 +1,19 @@
-# Loyalty Service
+# Hotels Service
 все поменять
 ## Описание API
-1. `GET /api/v1/loyalty/balance` – баланс бонусной программы;
-2. `POST /api/v1/loyalty/create` – создание баланса при регистрации;
-3. `PATCH /api/v1/loyalty/edit-loyalty` – запрос повышения понижения лояльности;
-4. `DELETE /api/v1/loyalty/delete` – удаление лояльности (при удалении пользователя).
+1. `GET /api/v1/hotel/{hotel_uid}` – информация об отеле;
+2. `DELETE /api/v1/hotel/{hotel_uid}` – удалить отель;
+3. `GET /api/v1/hotel` – список отелей;
+4. `POST /api/v1/hotel` – создать отель;
+5. `DELETE /api/v1/hotel/{hotel_uid}/rooms` – изменить информацию о доступности комнат.
 
 ## Структура таблиц
 ```postgresql
-CREATE TABLE UserLoyalty
+CREATE TABLE Hotels
 (
-    user_uid        SERIAL CONSTRAINT user_uid PRIMARY KEY,
-    discount        INTEGER      NOT NULL,
-    status          VARCHAR(255) NOT NULL,
+    hotel_uid       UUID         NOT NULL
+    title           VARCHAR(255) NOT NULL,
+    short_text      VARCHAR(255) NOT NULL,
+    location        VARCHAR(255) NOT NULL,
+    rooms           INTEGER      NOT NULL,
 );

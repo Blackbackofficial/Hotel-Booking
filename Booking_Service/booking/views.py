@@ -74,8 +74,8 @@ def canceled(request, booking_uid):
     try:
         auth(request)
         payment_uid = Reservations.objects.get(booking_uid=booking_uid).payment_uid
-        payStatus = requests.post("http://localhost:8002/api/v1/payment/close/{}".format(payment_uid),
-                                  cookies=request.COOKIES)
+        payStatus = requests.delete("http://localhost:8002/api/v1/payment/close/{}".format(payment_uid),
+                                    cookies=request.COOKIES)
         if payStatus.status_code == 200:
             return JsonResponse(payStatus.json(), status=status.HTTP_200_OK)
         return JsonResponse({'detail': 'NOT CANCELED'}, status=status.HTTP_400_BAD_REQUEST)
