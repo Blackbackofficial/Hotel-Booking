@@ -62,7 +62,7 @@ def reversed(request, payment_uid):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['POST'])
+@api_view(['DELETE'])
 def close(request, payment_uid):
     try:
         auth(request)
