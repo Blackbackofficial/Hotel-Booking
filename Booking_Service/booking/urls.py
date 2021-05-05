@@ -6,6 +6,6 @@ urlpatterns = [
     path('canceled/<str:booking_uid>', canceled),
     path('pay/<str:booking_uid>', pay),
     path('reversed/<str:booking_uid>', reversed),
-    path('<str:booking_uid>', about_one),
+    path('<str:booking_uid>', about_one),  #
     path('hotels/<str:hotel_uid>', all_hotels),  # only admin
 ]
