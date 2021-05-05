@@ -10,6 +10,7 @@
 7. `GET /api/v1/hotels/{hotel_uid}` – информация об отеле;
 8. `DELETE /api/v1/hotels/{hotel_uid}` – удалить определенный отель;
 9. `POST /api/v1/booking` – создание брони;
+10. `GET /api/v1/booking` – все брони пользователя;
    
 10. `GET /api/v1/hotel` – список отелей;
 11. `POST /api/v1/hotel` – создать отель;

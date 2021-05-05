@@ -164,8 +164,8 @@ def one_hotel_or_delete(request, hotel_uid):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['POST'])
-def create_booking(request):
+@api_view(['GET', 'POST'])
+def create_booking_or_all(request):
     """
     POST: {
           "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
@@ -173,6 +173,7 @@ def create_booking(request):
           "date_end": "2021-07-17",
           "comment": "somebody",
           } use JWT for user_uid && "price": == cost
+    GET:  all user's booking JWT
     """
     session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
     if session.status_code != 200:
@@ -180,35 +181,41 @@ def create_booking(request):
             session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                         .format(request.data['hotel_uid']), json=request.data, cookies=session.cookies)
-    if hotel.status_code != 200:
-        return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
-    hotel = hotel.json()
-    request.data.update({"price": hotel["cost"]})
-    booking = requests.post("http://localhost:8003/api/v1/booking/", json=request.data, cookies=session.cookies)
-    if booking.status_code != 200:
-        return JsonResponse(booking.json(), status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'GET':
+        booking = requests.get("http://localhost:8003/api/v1/booking/", cookies=session.cookies)
+        if booking.status_code != 200:
+            return JsonResponse(booking.json(), status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'POST':
+        # узнаем цену отеля
+        hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(request.data['hotel_uid']), json=request.data, cookies=session.cookies)
+        if hotel.status_code != 200:
+            return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
+        hotel = hotel.json()
+        request.data.update({"price": hotel["cost"]})
+        booking = requests.post("http://localhost:8003/api/v1/booking/", json=request.data, cookies=session.cookies)
+        if booking.status_code != 200:
+            return JsonResponse(booking.json(), status=status.HTTP_400_BAD_REQUEST)
 
-    booking_all = requests.get("http://localhost:8003/api/v1/booking/", cookies=session.cookies)
-    if booking.status_code != 200:
-        return JsonResponse(booking.json(), status=status.HTTP_400_BAD_REQUEST)
-    len_booking = booking_all.json()
-    l_status = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=session.cookies)
-    if l_status.status_code != 200:
-        return JsonResponse(l_status.json(), status=status.HTTP_400_BAD_REQUEST)
-    l_status = l_status.json()['status']
+        booking_all = requests.get("http://localhost:8003/api/v1/booking/", cookies=session.cookies)
+        if booking.status_code != 200:
+            return JsonResponse(booking.json(), status=status.HTTP_400_BAD_REQUEST)
+        len_booking = booking_all.json()
+        l_status = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=session.cookies)
+        if l_status.status_code != 200:
+            return JsonResponse(l_status.json(), status=status.HTTP_400_BAD_REQUEST)
+        l_status = l_status.json()['status']
 
-    # Up Loyalty
-    if 20 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
-        loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
-                                 cookies=session.cookies)
-    elif 35 < len(len_booking) < 50 and l_status == 'BRONZE':  # SILVER
-        loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
-                                 cookies=session.cookies)
-    elif 50 < len(len_booking) and l_status == 'SILVER':  # GOLD
-        loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
-                                 cookies=session.cookies)
+        # Up Loyalty
+        if 20 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
+            loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
+                                       cookies=session.cookies)
+        elif 35 < len(len_booking) < 50 and l_status == 'BRONZE':  # SILVER
+            loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
+                                       cookies=session.cookies)
+        elif 50 < len(len_booking) and l_status == 'SILVER':  # GOLD
+            loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
+                                       cookies=session.cookies)
     response = JsonResponse(booking.json(), status=status.HTTP_200_OK, safe=False)
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
