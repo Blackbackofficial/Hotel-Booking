@@ -17,9 +17,13 @@ TIMEOUT = 6
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST'])
 def create(request):
+    """
+    POST: {
+          "user_uid": "b5f342ce-2419-4a17-8800-b921e90b5fbf"
+          }
+    """
     try:
-        data = auth(request)
-        data.update({'user_uid': data['user_uid'], 'status': 'None', 'discount': '0'})
+        data = {"user_uid": request.data["user_uid"], "status": "None", "discount": "0"}
         serializer = LoyaltySerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
