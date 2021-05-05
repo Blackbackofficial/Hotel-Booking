@@ -87,10 +87,10 @@ def change_rooms(request, hotel_uid):
     try:
         auth(request)
         hotel = Hotels.objects.get(hotel_uid=hotel_uid)
-        if request.data["reservation"] == "Done":
+        if request.data["reservation"] == "Canceled":
             if hotel.rooms > 0:
                 hotel.rooms += 1
-        elif request.data["reservation"] == "Canceled":
+        elif request.data["reservation"] == "Done":
             if hotel.rooms > 0:
                 hotel.rooms -= 1
         else:

@@ -12,6 +12,7 @@
 9. `POST /api/v1/booking` – создание брони;
 10. `GET /api/v1/booking` – все брони пользователя;
 11. `GET /api/v1/booking/{booking_uid}` – информация о броне;
+11. `GET /api/v1/booking/hotels/{hotel_uid}` – все брони отеля (только админ);
    
 10. `GET /api/v1/hotel` – список отелей;
 11. `POST /api/v1/hotel` – создать отель;

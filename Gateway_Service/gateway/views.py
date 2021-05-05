@@ -185,7 +185,7 @@ def create_booking_or_all(request):
         booking = requests.get("http://localhost:8003/api/v1/booking/", cookies=session.cookies)
         if booking.status_code != 200:
             return JsonResponse(booking.json(), status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'POST':
+    else:  # POST
         # узнаем цену отеля
         hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                              .format(request.data['hotel_uid']), json=request.data, cookies=session.cookies)
@@ -223,6 +223,12 @@ def create_booking_or_all(request):
                                        cookies=session.cookies)
             if loyaltyUP.status_code != 200:
                 return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
+        #  при бронировании вычитаем комнату
+        hotel = requests.patch("http://localhost:8004/api/v1/hotels/{}/rooms"
+                               .format(request.data['hotel_uid']),
+                               json={"reservation": "Done"}, cookies=session.cookies)
+        if hotel.status_code != 200:
+            return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(booking.json(), status=status.HTTP_200_OK, safe=False)
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
@@ -268,3 +274,23 @@ def all_booking_hotels(request, hotel_uid):
     response = JsonResponse(booking_hotel.json(), status=status.HTTP_200_OK, safe=False)
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
+
+# @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+# @api_view(['GET'])
+# def all_booking_hotels(request, hotel_uid):
+#     """
+#     GET: use JWT && booking_uid "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
+#     """
+#     session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+#     if session.status_code != 200:
+#         if session.status_code == 403:
+#             session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+#         else:
+#             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+#     booking_hotel = requests.get("http://localhost:8003/api/v1/booking/hotels/{}".format(hotel_uid),
+#                                  cookies=session.cookies)
+#     if booking_hotel.status_code != 200:
+#         return JsonResponse(booking_hotel.json(), status=status.HTTP_400_BAD_REQUEST)
+#     response = JsonResponse(booking_hotel.json(), status=status.HTTP_200_OK, safe=False)
+#     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+#     return response
