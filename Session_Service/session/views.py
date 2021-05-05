@@ -121,12 +121,16 @@ def users(request):
 
 @api_view(['POST'])
 def logout(request):
-    response = Response()
-    response.delete_cookie('jwt')
-    response.data = {
-        'detail': 'success'
-    }
-    return response
+    try:
+        auth(request)
+        response = Response()
+        response.delete_cookie('jwt')
+        response.data = {
+            'detail': 'success'
+        }
+        return response
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # subsidiary
