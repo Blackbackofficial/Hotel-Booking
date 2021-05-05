@@ -94,7 +94,8 @@ def add_hotel(request):
           "title": "The Royal Hotel",
           "short_text": "По утрам гостям подают американский завтрак.",
           "rooms": "300",
-          "location": "Leninskiy Prospekt 95, Москва, Россия"
+          "location": "Leninskiy Prospekt 95, Москва, Россия",
+          "cost": 3992
           } only admin
     """
     session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
@@ -156,3 +157,30 @@ def one_hotel_or_delete(request, hotel_uid):
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
 
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+def create_booking(request, hotel_uid):
+    """
+    POST: {
+          "hotel_uid": "b5fc218e-dd20-4254-9445-98e4240a75f4"
+          } use JWT for user_uid
+    """
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+        else:
+            return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'GET':
+        hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(hotel_uid), json=request.data, cookies=session.cookies)
+        response = JsonResponse(hotel.json(), status=status.HTTP_200_OK, safe=False)
+    else:  # DELETE
+        hotel = requests.delete("http://localhost:8004/api/v1/hotels/{}"
+                                .format(hotel_uid), json=request.data, cookies=session.cookies)
+        response = JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT, safe=False)
+    if hotel.status_code != 200 and hotel.status_code != 204:
+        return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+    return response

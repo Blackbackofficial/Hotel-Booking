@@ -47,7 +47,8 @@ def all_hotels_or_add_hotel(request):
           "title": "some text",
           "short_text": "another some text",
           "rooms": 300,
-          "location": "Moscow, Leninski prospekt 49/2"
+          "location": "Moscow, Leninski prospekt 49/2",
+          "cost": 3992
           } only admin
     """
     try:
@@ -64,7 +65,7 @@ def all_hotels_or_add_hotel(request):
             if 'admin' not in data['role']:
                 return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
             new_hotel = {"title": request.data["title"], "short_text": request.data["short_text"],
-                         "rooms": request.data["rooms"], "location": request.data["location"]}
+                         "rooms": request.data["rooms"], "location": request.data["location"], "cost": request.data["cost"]}
             serializer = HotelsSerializer(data=new_hotel)
             serializer.is_valid(raise_exception=True)
             serializer.save()

@@ -9,6 +9,7 @@ class Hotels(models.Model):
     photo = models.ImageField(null=True, blank=True, verbose_name=u"фото", upload_to='static/images/')
     location = models.CharField(max_length=80)
     rooms = models.IntegerField(default=0)
+    cost = models.IntegerField(default=0)
 
     def __str__(self):
         return self.discount
