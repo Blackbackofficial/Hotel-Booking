@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.exceptions import AuthenticationFailed, ValidationError, ParseError
+from rest_framework.exceptions import AuthenticationFailed
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
@@ -66,5 +66,34 @@ def logout(request):
     return response
 
 
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def users(request):
+    """
+    GET: use JWT
+    """
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+        else:
+            return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    users = requests.get("http://localhost:8001/api/v1/session/users", cookies=session.cookies)
+    if users.status_code != 200:
+        return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    response = JsonResponse(users.json(), status=status.HTTP_200_OK, safe=False)
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+    return response
 
 
+# subsidiary
+def auth(request):
+    token = request.COOKIES.get('jwt')
+
+    if not token:
+        raise AuthenticationFailed('Unauthenticated!')
+
+    payload = jwt.decode(token, JWT_KEY, algorithms=['HS256'], options={"verify_exp": True})
+    payload.pop('exp')
+    payload.pop('iat')
+    return payload
