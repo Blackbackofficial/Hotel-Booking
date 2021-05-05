@@ -49,7 +49,10 @@ def register(request):
     session = requests.post("http://localhost:8001/api/v1/session/register", json=request.data)
     if session.status_code != 200:
         return JsonResponse(session.json(), status=status.HTTP_400_BAD_REQUEST)
-    return JsonResponse({'success': 'register'}, status=status.HTTP_200_OK)
+    loyalty = requests.post("http://localhost:8000/api/v1/loyalty/create", json=request.data, cookies=request.COOKIES)
+    if loyalty.status_code != 200:
+        return JsonResponse(loyalty.json(), status=status.HTTP_400_BAD_REQUEST)
+    return JsonResponse({'success': 'register & create loyalty'}, status=status.HTTP_200_OK)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
