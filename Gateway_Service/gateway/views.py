@@ -275,22 +275,23 @@ def all_booking_hotels(request, hotel_uid):
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
 
-# @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-# @api_view(['GET'])
-# def all_booking_hotels(request, hotel_uid):
-#     """
-#     GET: use JWT && booking_uid "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
-#     """
-#     session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
-#     if session.status_code != 200:
-#         if session.status_code == 403:
-#             session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
-#         else:
-#             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-#     booking_hotel = requests.get("http://localhost:8003/api/v1/booking/hotels/{}".format(hotel_uid),
-#                                  cookies=session.cookies)
-#     if booking_hotel.status_code != 200:
-#         return JsonResponse(booking_hotel.json(), status=status.HTTP_400_BAD_REQUEST)
-#     response = JsonResponse(booking_hotel.json(), status=status.HTTP_200_OK, safe=False)
-#     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
-#     return response
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+def pay_booking(request, booking_uid):
+    """
+    POST: use JWT && booking_uid "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
+    """
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+        else:
+            return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    booking_pay = requests.post("http://localhost:8003/api/v1/booking/pay/{}".format(booking_uid),
+                                cookies=session.cookies)
+    if booking_pay.status_code != 200:
+        return JsonResponse(booking_pay.json(), status=status.HTTP_400_BAD_REQUEST)
+    response = JsonResponse(booking_pay.json(), status=status.HTTP_200_OK, safe=False)
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+    return response
