@@ -288,6 +288,12 @@ def pay_booking(request, booking_uid):
             session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    booking_status = requests.get("http://localhost:8003/api/v1/booking/{}".format(booking_uid),
+                                   cookies=session.cookies)
+    if booking_status.status_code != 200:
+        return JsonResponse(booking_status.json(), status=status.HTTP_400_BAD_REQUEST)
+    if booking_status.json()["status"]:
+        return JsonResponse({"error": "Is paid"}, status=status.HTTP_400_BAD_REQUEST)
     booking_pay = requests.post("http://localhost:8003/api/v1/booking/pay/{}".format(booking_uid),
                                 cookies=session.cookies)
     if booking_pay.status_code != 200:
