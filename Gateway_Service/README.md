@@ -12,9 +12,7 @@
 9. `POST /api/v1/booking` – создание брони;
 10. `GET /api/v1/booking` – все брони пользователя;
 11. `GET /api/v1/booking/{booking_uid}` – информация о броне;
-11. `GET /api/v1/booking/hotels/{hotel_uid}` – все брони отеля (только админ);
-   
-10. `GET /api/v1/hotel` – список отелей;
-11. `POST /api/v1/hotel` – создать отель;
-12. `DELETE /api/v1/hotel/{hotel_uid}/rooms` – изменить информацию о доступности комнат.
+12. `GET /api/v1/booking/hotels/{hotel_uid}` – все брони отеля (только админ);
+13. `POST /api/v1/booking/{booking_uid}/pay` – оплатить бронь;
+14. `POST /api/v1/booking/{booking_uid}/close` – отменить/вернуть деньги за бронь;
 
