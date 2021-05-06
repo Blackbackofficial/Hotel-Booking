@@ -289,15 +289,52 @@ def pay_booking(request, booking_uid):
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     booking_status = requests.get("http://localhost:8003/api/v1/booking/{}".format(booking_uid),
-                                   cookies=session.cookies)
+                                  cookies=session.cookies)
     if booking_status.status_code != 200:
         return JsonResponse(booking_status.json(), status=status.HTTP_400_BAD_REQUEST)
-    if booking_status.json()["status"]:
+    if booking_status.json()["status"] == 'PAID':
         return JsonResponse({"error": "Is paid"}, status=status.HTTP_400_BAD_REQUEST)
     booking_pay = requests.post("http://localhost:8003/api/v1/booking/pay/{}".format(booking_uid),
                                 cookies=session.cookies)
     if booking_pay.status_code != 200:
         return JsonResponse(booking_pay.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(booking_pay.json(), status=status.HTTP_200_OK, safe=False)
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+    return response
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+def close_booking(request, booking_uid):
+    """
+    POST: use JWT && booking_uid "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
+    """
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+        else:
+            return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    # узнаем статус
+    booking_status = requests.get("http://localhost:8003/api/v1/booking/{}".format(booking_uid),
+                                  cookies=session.cookies)
+    if booking_status.status_code != 200:
+        return JsonResponse(booking_status.json(), status=status.HTTP_400_BAD_REQUEST)
+    booking_status = booking_status.json()["status"]
+    if booking_status == 'PAID' and booking_status != 'REVERSED' and booking_status != 'CANCELED':
+        booking_r = requests.post("http://localhost:8003/api/v1/booking/reversed/{}".format(booking_uid),
+                                  cookies=session.cookies)
+        if booking_r.status_code != 200:
+            return JsonResponse(booking_r.json(), status=status.HTTP_400_BAD_REQUEST)
+        booking_status = 'REVERSED'
+
+    if booking_status == 'NEW' and booking_status != 'REVERSED' and booking_status != 'CANCELED':
+        booking_r = requests.post("http://localhost:8003/api/v1/booking/canceled/{}".format(booking_uid),
+                                  cookies=session.cookies)
+        if booking_r.status_code != 200:
+            return JsonResponse(booking_r.json(), status=status.HTTP_400_BAD_REQUEST)
+        booking_status = 'CANCELED'
+
+    response = JsonResponse({'success': booking_status}, status=status.HTTP_200_OK, safe=False)
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
