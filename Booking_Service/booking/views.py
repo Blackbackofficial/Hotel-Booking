@@ -63,6 +63,9 @@ def create_or_all(request):
                 if hotel.status_code == 200:
                     hotel = hotel.json()
                     res['fields'].update(hotel)
+                fields = res["fields"]
+                res.clear()
+                res.update(fields)
             return JsonResponse(users_reservations, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)

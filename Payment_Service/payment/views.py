@@ -26,7 +26,7 @@ def create(request):
         loyBalance = loyBalance.json()
         if loyBalance['discount'] is None:
             loyBalance['discount'] = 0
-        data.update({'status': 'NEW', 'price': request.data["price"]/100*(100-loyBalance['discount'])})
+        data.update({'status': 'NEW', 'price': (str(request.data["price"]/100*(100-loyBalance['discount']))).split(".")[0]})
         serializer = PaymentSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
