@@ -46,7 +46,7 @@ def login(request):
     payload = {
         'user_uid': str(user.user_uid),
         'role': str(user.role),
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=50),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5),
         'iat': datetime.datetime.utcnow()
     }
 
@@ -73,7 +73,9 @@ def verify(request):
     except jwt.ExpiredSignatureError:
         raise AuthenticationFailed('Unauthenticated!')
 
-    return JsonResponse({'detail': 'Authenticated'}, status=status.HTTP_200_OK)
+    response = JsonResponse({'detail': 'Authenticated'}, status=status.HTTP_200_OK)
+    response.set_cookie(key='jwt', value=token, httponly=True)
+    return response
 
 
 @api_view(['GET'])
@@ -91,7 +93,7 @@ def refresh(request):
     payload = {
         'user_uid': str(payload['user_uid']),
         'role': str(payload['role']),
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=50),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5),
         'iat': datetime.datetime.utcnow()
     }
 
@@ -114,6 +116,10 @@ def users(request):
             return Response({'detail': 'You are not admin!'})
         users = Users.objects.all()
         users_json = json.loads(serializers.serialize('json', users))
+        for user in users_json:
+            fields = user["fields"]
+            user.clear()
+            user.update(fields)
         return Response(users_json, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -121,12 +127,16 @@ def users(request):
 
 @api_view(['POST'])
 def logout(request):
-    response = Response()
-    response.delete_cookie('jwt')
-    response.data = {
-        'detail': 'success'
-    }
-    return response
+    try:
+        auth(request)
+        response = Response()
+        response.delete_cookie('jwt')
+        response.data = {
+            'detail': 'success'
+        }
+        return response
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # subsidiary

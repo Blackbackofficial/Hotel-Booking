@@ -22,12 +22,16 @@ TIMEOUT = 6
 @api_view(['GET', 'DELETE'])
 def about_or_delete(request, hotel_uid):
     try:
-        auth(request)
+        data = auth(request)
         if request.method == 'GET':
             hotels = Hotels.objects.filter(hotel_uid=hotel_uid)
+            if len(hotels) == 0:
+                return JsonResponse({'error': 'No content'}, status=status.HTTP_400_BAD_REQUEST)
             hotels = json.loads(serializers.serialize('json', hotels))
             return JsonResponse(hotels[0]['fields'], status=status.HTTP_200_OK, safe=False)
-        elif request.method == 'DELETE':
+        else:  # DELETE only admin
+            if 'admin' not in data['role']:
+                return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
             hotel = Hotels.objects.get(hotel_uid=hotel_uid)
             hotel.delete()
             return JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT)
@@ -43,8 +47,9 @@ def all_hotels_or_add_hotel(request):
           "title": "some text",
           "short_text": "another some text",
           "rooms": 300,
-          "location": "Moscow, Leninski prospekt 49/2"
-          }
+          "location": "Moscow, Leninski prospekt 49/2",
+          "cost": 3992
+          } only admin
     """
     try:
         data = auth(request)
@@ -56,11 +61,11 @@ def all_hotels_or_add_hotel(request):
                 hotel.clear()
                 hotel.update(fields)
             return JsonResponse(hotels, status=status.HTTP_200_OK, safe=False)
-        elif request.method == 'POST':
+        elif request.method == 'POST':  # only admin
             if 'admin' not in data['role']:
-                return JsonResponse({'detail': 'You are not admin!'})
+                return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
             new_hotel = {"title": request.data["title"], "short_text": request.data["short_text"],
-                         "rooms": request.data["rooms"], "location": request.data["location"]}
+                         "rooms": request.data["rooms"], "location": request.data["location"], "cost": request.data["cost"]}
             serializer = HotelsSerializer(data=new_hotel)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -82,10 +87,10 @@ def change_rooms(request, hotel_uid):
     try:
         auth(request)
         hotel = Hotels.objects.get(hotel_uid=hotel_uid)
-        if request.data["reservation"] == "Done":
+        if request.data["reservation"] == "Canceled":
             if hotel.rooms > 0:
                 hotel.rooms += 1
-        elif request.data["reservation"] == "Canceled":
+        elif request.data["reservation"] == "Done":
             if hotel.rooms > 0:
                 hotel.rooms -= 1
         else:

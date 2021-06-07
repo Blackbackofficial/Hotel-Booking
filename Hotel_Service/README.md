@@ -1,5 +1,5 @@
 # Hotels Service
-все поменять
+
 ## Описание API
 1. `GET /api/v1/hotel/{hotel_uid}` – информация об отеле;
 2. `DELETE /api/v1/hotel/{hotel_uid}` – удалить отель;
