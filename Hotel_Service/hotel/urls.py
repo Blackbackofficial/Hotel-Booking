@@ -6,3 +6,4 @@ urlpatterns = [
     path('', all_hotels_or_add_hotel),
     path('/<str:hotel_uid>/rooms', change_rooms),
 ]
+
