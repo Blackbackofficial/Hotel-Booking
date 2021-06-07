@@ -196,5 +196,5 @@ body: { login, password }
 1. Посмотреть статистику наполнения отелей: сколько мест на текущий момент свободно. [A][G]
     ```
     header: Authorization: bearer <jwt>
-    GET /reports/hotels-filling
+    GET /reports/hotels-filling 
     ```
