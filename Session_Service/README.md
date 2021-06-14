@@ -7,6 +7,7 @@
 4. `GET /api/v1/session/refresh` – перевыпуск токена.
 5. `GET /api/v1/session/users` – разлогинивание, удаление куки.
 6. `POST /api/v1/session/logout` – разлогинивание, удаление куки.
+7. `GET /api/v1/session/user/{user_uid}` – информация о пользователе.
 
 ## Структура таблиц
 ```postgresql

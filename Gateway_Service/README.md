@@ -15,4 +15,5 @@
 12. `GET /api/v1/booking/hotels/{hotel_uid}` – все брони отеля (только админ);
 13. `POST /api/v1/booking/{booking_uid}/pay` – оплатить бронь;
 14. `POST /api/v1/booking/{booking_uid}/close` – отменить/вернуть деньги за бронь;
+15. `POST /api/v1//reports/booking` – статистика бронирования по пользователям;
 
