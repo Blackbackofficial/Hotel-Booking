@@ -144,11 +144,12 @@ def one_user(request, user_uid):
 @api_view(['POST'])
 def logout(request):
     try:
-        auth(request)
+        data = auth(request)
         response = Response()
         response.delete_cookie('jwt')
         response.data = {
-            'detail': 'success'
+            'detail': 'success',
+            'user_uid': data['user_uid']
         }
         return response
     except Exception as e:

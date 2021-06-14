@@ -7,12 +7,27 @@ from django.forms.models import model_to_dict
 from django.core import serializers
 from django.http import JsonResponse
 from rest_framework import status
+from confluent_kafka import Producer
+import sys
+import os
 import requests
 import json
 import jwt
 
 FAILURES = 3
 TIMEOUT = 6
+
+# Kafka
+conf = {
+    'bootstrap.servers': 'glider-01.srvs.cloudkafka.com:9094, glider-02.srvs.cloudkafka.com:9094, '
+                         'glider-03.srvs.cloudkafka.com:9094',
+    'session.timeout.ms': 6000,
+    'default.topic.config': {'auto.offset.reset': 'smallest'},
+    'security.protocol': 'SASL_SSL',
+    'sasl.mechanisms': 'SCRAM-SHA-256',
+    'sasl.username': '41pfiknb',
+    'sasl.password': '4r-NRj1TnbY-WTt5zVE-zPMhFr8qXFx9'
+}
 
 
 # API
@@ -30,6 +45,9 @@ def login(request):
     if session.status_code != 200:
         return JsonResponse(session.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse({'success': 'logined'}, status=status.HTTP_200_OK)
+    q_session = session.json()
+    q_session.update({"username": request.data["username"]})
+    producer(q_session, '41pfiknb-users')
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
 
@@ -54,11 +72,13 @@ def register(request):
     loyalty = requests.post("http://localhost:8000/api/v1/loyalty/create", json=request.data)
     if loyalty.status_code != 200:
         return JsonResponse(loyalty.json(), status=status.HTTP_400_BAD_REQUEST)
+    q_session.update({"username": request.data["username"], "detail": 'Register'})
+    producer(q_session, '41pfiknb-users')
     return JsonResponse({'success': 'register & create loyalty'}, status=status.HTTP_200_OK)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['POST'])
+@api_view(['GET'])
 def logout(request):
     """
     POST: in the post only JWT
@@ -67,6 +87,11 @@ def logout(request):
     if session.status_code != 200:
         return JsonResponse(session.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse({'success': 'logout'}, status=status.HTTP_200_OK)
+
+    user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(session.json()["user_uid"]),
+                        cookies=request.COOKIES).json()
+    q_session = {"username": user["username"], "detail": 'Logout'}
+    producer(q_session, '41pfiknb-users')
     response.delete_cookie('jwt')
     return response
 
@@ -83,10 +108,10 @@ def users(request):
             session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    users = requests.get("http://localhost:8001/api/v1/session/users", cookies=session.cookies)
-    if users.status_code != 200:
+    _users = requests.get("http://localhost:8001/api/v1/session/users", cookies=session.cookies)
+    if _users.status_code != 200:
         return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    response = JsonResponse(users.json(), status=status.HTTP_200_OK, safe=False)
+    response = JsonResponse(_users.json(), status=status.HTTP_200_OK, safe=False)
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
 
@@ -229,7 +254,34 @@ def create_booking_or_all(request):
                                json={"reservation": "Done"}, cookies=session.cookies)
         if hotel.status_code != 200:
             return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
-    response = JsonResponse(booking.json(), status=status.HTTP_200_OK, safe=False)
+        booking = booking.json()
+        payBalance = requests.get(
+            "http://localhost:8002/api/v1/payment/status/{}".format(booking.get("payment_uid")),
+            cookies=request.COOKIES)
+        if payBalance.status_code == 200:
+            payBalance = payBalance.json()
+            booking.update(payBalance)
+        about_hotel = requests.get(
+            "http://localhost:8004/api/v1/hotels/{}".format(booking.get("hotel_uid")),
+            cookies=request.COOKIES)
+        if about_hotel.status_code == 200:
+            about_hotel = about_hotel.json()
+            booking.update(about_hotel)
+        user = requests.get(
+            "http://localhost:8001/api/v1/session/user/{}".format(booking.get("user_uid")),
+            cookies=request.COOKIES)
+        if user.status_code == 200:
+            user = user.json()
+            booking.update(user)
+        loyalty = requests.get(
+            "http://localhost:8000/api/v1/loyalty/status/{}".format(booking.get("user_uid")),
+            cookies=request.COOKIES)
+        if loyalty.status_code == 200:
+            loyalty = loyalty.json()
+            booking.update(loyalty)
+
+    producer(booking, '41pfiknb-payment')
+    response = JsonResponse(booking, status=status.HTTP_200_OK, safe=False)
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
@@ -338,3 +390,27 @@ def close_booking(request, booking_uid):
     response = JsonResponse({'success': booking_status}, status=status.HTTP_200_OK, safe=False)
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
+
+
+def delivery_callback(err, msg):
+    if err:
+        sys.stderr.write('%% Message failed delivery: %s\n' % err)
+    else:
+        sys.stderr.write('%% Message delivered to %s [%d]\n' % (msg.topic(), msg.partition()))
+
+
+# Queue Kafka
+def producer(data, topic):
+    topic = topic
+
+    p = Producer(**conf)
+
+    line = str(data)
+    try:
+        p.produce(topic, line.rstrip(), callback=delivery_callback)
+    except BufferError:
+        sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try again\n' % len(p))
+    p.poll(0)
+
+    sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
+    p.flush()

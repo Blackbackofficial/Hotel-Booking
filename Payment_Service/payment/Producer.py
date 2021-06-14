@@ -29,13 +29,13 @@ if __name__ == '__main__':
                              (msg.topic(), msg.partition()))
 
 
-    for line in sys.stdin:
-        try:
-            p.produce(topic, line.rstrip(), callback=delivery_callback)
-        except BufferError as e:
-            sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %
-                             len(p))
-        p.poll(0)
+    line = "qdqdwqdqwdqwd"
+    try:
+        p.produce(topic, line.rstrip(), callback=delivery_callback)
+    except BufferError as e:
+        sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %
+                         len(p))
+    p.poll(0)
 
     sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
     p.flush()

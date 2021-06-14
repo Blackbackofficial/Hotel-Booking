@@ -1,10 +1,7 @@
 from django.urls import path
-# from .views import balance, create, edit, delete, balance_static
+from .views import report_by_users, report_by_hotels
 
 urlpatterns = [
-    # path('create', create),  # Создание при регистрации  #
-    # path('edit', edit),  # Понизить/повысить лояльность  #
-    # path('balance', balance),  # Посмотреть баланс бонусной программы  #
-    # path('delete', delete),  # При удалении пользователя
-    # path('status/<str:loyalty_uid>', balance_static),  # кошелёк пользователя
+    path('booking', report_by_users),  # Отчет по пользователям
+    path('hotels-filling', report_by_hotels),  # Отчет по отелям
 ]
