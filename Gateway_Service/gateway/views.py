@@ -442,6 +442,27 @@ def report_user(request):
     return JsonResponse({"detail": "No content in queue"}, status=status.HTTP_204_NO_CONTENT)
 
 
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def report_hotels(request):
+    """
+        GET: use JWT
+    """
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+        else:
+            return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    # достаем отчет по пользователям: логирование, разлогирование, регистрация
+    report = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=session.cookies)
+    if report.status_code == 200:
+        report = report.content.decode('utf8').replace("'", '"')
+        report = json.loads(report)
+        return JsonResponse(report, safe=False, status=status.HTTP_200_OK)
+    return JsonResponse({"detail": "No content in queue or error"}, status=status.HTTP_204_NO_CONTENT)
+
+
 def delivery_callback(err, msg):
     if err:
         sys.stderr.write('%% Message failed delivery: %s\n' % err)

@@ -64,7 +64,7 @@ def report_by_users(request):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['POST'])
+@api_view(['GET'])
 def report_by_hotels(request):
     """
     POST: {
@@ -72,11 +72,13 @@ def report_by_hotels(request):
           }
     """
     try:
-        data = {"user_uid": request.data["user_uid"], "status": "None", "discount": "0"}
-        serializer = LoyaltySerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return JsonResponse(serializer.data)
+        auth(request)
+        hotels = requests.get("http://localhost:8003/api/v1/booking/static", cookies=request.COOKIES)
+        if hotels.status_code == 200:
+            hotels = hotels.content.decode('utf8').replace("'", '"')
+            hotels = json.loads(hotels)
+            return JsonResponse(hotels, safe=False, status=status.HTTP_200_OK)
+        return JsonResponse({"detail": "No content in queue"}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
