@@ -17,4 +17,4 @@
 14. `POST /api/v1/booking/{booking_uid}/close` – отменить/вернуть деньги за бронь;
 15. `GET /api/v1/reports/booking` – статистика бронирования по пользователям; (Kafka)
 16. `GET /api/v1/reports/users` – статистика логирования, разлогирования пользователей; (Kafka)
-17. `GET /api/v1/reports/hotels-filling` – статистика наполнения отелей, разлогирования пользователей; (Kafka)
+17. `GET /api/v1/reports/hotels-filling` – статистика наполнения отелей
