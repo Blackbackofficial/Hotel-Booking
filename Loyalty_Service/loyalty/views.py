@@ -89,6 +89,18 @@ def delete(request):
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def balance_static(request, loyalty_uid):
+    try:
+        auth(request)
+        userLoyalty = UserLoyalty.objects.get(user_uid=loyalty_uid)
+        serializer = LoyaltySerializer(userLoyalty)
+        return JsonResponse(serializer.data)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 # subsidiary
 def auth(request):
     token = request.COOKIES.get('jwt')

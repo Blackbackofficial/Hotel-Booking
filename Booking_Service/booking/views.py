@@ -158,12 +158,73 @@ def all_hotels(request, hotel_uid):  # only user 'admin'
             if payBalance.status_code == 200:
                 payBalance = payBalance.json()
                 res['fields'].update(payBalance)
-            hotel = requests.get(
-                "http://localhost:8002/api/v1/hotel/status/{}".format(res['fields'].get("hotel_uid")),
+            about_hotel = requests.get(
+                "http://localhost:8004/api/v1/hotels/{}".format(res['fields'].get("hotel_uid")),
                 cookies=request.COOKIES)
-            if hotel.status_code == 200:
-                hotel = hotel.json()
-                res['fields'].update(hotel)
+            if about_hotel.status_code == 200:
+                about_hotel = about_hotel.json()
+                res['fields'].update(about_hotel)
+            user = requests.get(
+                "http://localhost:8001/api/v1/session/user/{}".format(res['fields'].get("user_uid")),
+                cookies=request.COOKIES)
+            if user.status_code == 200:
+                user = user.json()
+                res['fields'].update(user)
+            loyalty = requests.get(
+                "http://localhost:8000/api/v1/loyalty/status/{}".format(res['fields'].get("user_uid")),
+                cookies=request.COOKIES)
+            if loyalty.status_code == 200:
+                loyalty = loyalty.json()
+                res['fields'].update(loyalty)
+            safe = res['fields']
+            res.clear()
+            res.update(safe)
+        return JsonResponse(reservations, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def all_hotels_statics(request):  # only user 'admin'
+    """
+    GET: use JWT
+    Вытаскиваем все бронирования по отелю
+    """
+    try:
+        data = auth(request)
+        if 'admin' not in data['role']:
+            return JsonResponse({'detail': 'You are not admin!'})
+        hotel_reservations = Reservations.objects.all()
+        reservations = json.loads(serializers.serialize('json', hotel_reservations))
+        for res in reservations:
+            payBalance = requests.get(
+                "http://localhost:8002/api/v1/payment/status/{}".format(res['fields'].get("payment_uid")),
+                cookies=request.COOKIES)
+            if payBalance.status_code == 200:
+                payBalance = payBalance.json()
+                res['fields'].update(payBalance)
+            about_hotel = requests.get(
+                "http://localhost:8004/api/v1/hotels/{}".format(res['fields'].get("hotel_uid")),
+                cookies=request.COOKIES)
+            if about_hotel.status_code == 200:
+                about_hotel = about_hotel.json()
+                res['fields'].update(about_hotel)
+            user = requests.get(
+                "http://localhost:8001/api/v1/session/user/{}".format(res['fields'].get("user_uid")),
+                cookies=request.COOKIES)
+            if user.status_code == 200:
+                user = user.json()
+                res['fields'].update(user)
+            loyalty = requests.get(
+                "http://localhost:8000/api/v1/loyalty/status/{}".format(res['fields'].get("user_uid")),
+                cookies=request.COOKIES)
+            if loyalty.status_code == 200:
+                loyalty = loyalty.json()
+                res['fields'].update(loyalty)
+            safe = res['fields']
+            res.clear()
+            res.update(safe)
         return JsonResponse(reservations, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)

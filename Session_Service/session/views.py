@@ -5,6 +5,7 @@ from .models import Users
 from .serializers import UserSerializer
 from Session_Service.settings import SECRET_KEY
 from rest_framework.decorators import api_view
+from django.forms.models import model_to_dict
 from django.http import JsonResponse
 from rest_framework import status
 import json
@@ -125,14 +126,30 @@ def users(request):
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+def one_user(request, user_uid):
+    try:
+        data = auth(request)
+        if 'admin' not in data['role']:
+            return Response({'detail': 'You are not admin!'})
+        user = Users.objects.get(user_uid=user_uid)
+        user = model_to_dict(user)
+        rem_list = ['is_superuser', 'is_active', 'is_staff', 'id', 'password', 'groups', 'user_permissions', 'last_login']
+        [user.pop(key) for key in rem_list]
+        return Response(user, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['POST'])
 def logout(request):
     try:
-        auth(request)
+        data = auth(request)
         response = Response()
         response.delete_cookie('jwt')
         response.data = {
-            'detail': 'success'
+            'detail': 'success',
+            'user_uid': data['user_uid']
         }
         return response
     except Exception as e:
