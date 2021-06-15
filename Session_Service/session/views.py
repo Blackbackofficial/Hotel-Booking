@@ -134,7 +134,7 @@ def one_user(request, user_uid):
             return Response({'detail': 'You are not admin!'})
         user = Users.objects.get(user_uid=user_uid)
         user = model_to_dict(user)
-        rem_list = ['is_superuser', 'is_active', 'is_staff', 'id', 'password', 'groups', 'user_permissions']
+        rem_list = ['is_superuser', 'is_active', 'is_staff', 'id', 'password', 'groups', 'user_permissions', 'last_login']
         [user.pop(key) for key in rem_list]
         return Response(user, status=status.HTTP_200_OK)
     except Exception as e:

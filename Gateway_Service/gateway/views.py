@@ -392,6 +392,27 @@ def close_booking(request, booking_uid):
     return response
 
 
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def report_booking(request):
+    """
+        GET: use JWT
+    """
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+        else:
+            return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
+    # достаем отчет по бронированию
+    report = requests.get("http://localhost:8006/api/v1/reports/booking", cookies=session.cookies)
+    if report.status_code == 200:
+        report = report.content.decode('utf8').replace("'", '"')
+        report = json.loads(report)
+        return JsonResponse(report, status=status.HTTP_200_OK)
+    return JsonResponse({"detail": "No content in queue"}, status=status.HTTP_204_NO_CONTENT)
+
+
 def delivery_callback(err, msg):
     if err:
         sys.stderr.write('%% Message failed delivery: %s\n' % err)
