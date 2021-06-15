@@ -33,9 +33,7 @@ conf = {
 @api_view(['GET'])
 def report_by_booking(request):
     """
-    GET: {
-          "user_uid": "b5f342ce-2419-4a17-8800-b921e90b5fbf"
-          }
+    GET: use JWT
     """
     try:
         auth(request)
@@ -52,9 +50,7 @@ def report_by_booking(request):
 @api_view(['GET'])
 def report_by_users(request):
     """
-    GET: {
-          "user_uid": "b5f342ce-2419-4a17-8800-b921e90b5fbf"
-          }
+    GET: use JWT
     """
     try:
         auth(request)

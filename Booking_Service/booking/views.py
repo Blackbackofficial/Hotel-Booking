@@ -149,7 +149,7 @@ def all_hotels(request, hotel_uid):  # only user 'admin'
         data = auth(request)
         if 'admin' not in data['role']:
             return JsonResponse({'detail': 'You are not admin!'})
-        hotel_reservations = Reservations.objects.all()
+        hotel_reservations = Reservations.objects.filter(hotel_uid=hotel_uid).all()
         reservations = json.loads(serializers.serialize('json', hotel_reservations))
         for res in reservations:
             payBalance = requests.get(
@@ -186,9 +186,9 @@ def all_hotels(request, hotel_uid):  # only user 'admin'
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['GET'])
-def all_hotels_statics(request, hotel_uid):  # only user 'admin'
+def all_hotels_statics(request):  # only user 'admin'
     """
-    GET: "hotel_uid": "5c325464-7445-4147-bd2d-1598641d2248"
+    GET: use JWT
     Вытаскиваем все бронирования по отелю
     """
     try:
