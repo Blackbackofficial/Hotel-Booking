@@ -33,13 +33,32 @@ conf = {
 @api_view(['GET'])
 def report_by_booking(request):
     """
-    POST: {
+    GET: {
           "user_uid": "b5f342ce-2419-4a17-8800-b921e90b5fbf"
           }
     """
     try:
         auth(request)
         data = consumer('41pfiknb-payment')
+        if len(data) != 0:
+            dictOfList = {i: data[i] for i in range(0, len(data))}
+            return JsonResponse(dictOfList, status=status.HTTP_200_OK)
+        return JsonResponse(data, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def report_by_users(request):
+    """
+    GET: {
+          "user_uid": "b5f342ce-2419-4a17-8800-b921e90b5fbf"
+          }
+    """
+    try:
+        auth(request)
+        data = consumer('41pfiknb-users')
         if len(data) != 0:
             dictOfList = {i: data[i] for i in range(0, len(data))}
             return JsonResponse(dictOfList, status=status.HTTP_200_OK)
@@ -87,7 +106,6 @@ def bytes_to_json(byte):
 
 # Queue Kafka
 def consumer(topic):
-    byte = ''
     resp = list()
     topics = ['{}'.format(topic)]
 
@@ -97,10 +115,10 @@ def consumer(topic):
         i = 0
         while True:
             msg = c.poll(timeout=1.0)
-            if msg is None and i < 6:
+            if msg is None and i < 10:
                 i += 1
                 continue
-            if i >= 6:
+            if i >= 10:
                 c.close()
                 return resp
             if msg.error():
