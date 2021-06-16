@@ -1,0 +1,112 @@
+{% load static %}
+
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>
+<!--        {% block title %}-->
+<!--            {{ title }}-->
+<!--        {% endblock %}-->
+    </title>
+    <link rel="shortcut icon" href="https://faviconka.ru/ico/1/faviconka.ru_1_104991.ico" type="image/png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+<!--    <link rel="stylesheet" href={% static "style.css" %}>-->
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container col-md-5">
+            <a class="navbar-brand" title="Все вопросы" href="{% url 'index' %}">
+                <img class="py-2 px-2" src="https://faviconka.ru/png/1/faviconka.ru_1_104991.png" alt="Аватар"> Stack Overflow
+            </a>
+        </div>
+
+        <div class="container">
+            <form class="form-inline my-2 my-lg-0 col">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0 top-cover" type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="container avatar-container col-md-4">
+
+<!--            {% if user.is_authenticated %}-->
+<!--                <div class="nav-item">-->
+<!--                    <a class="nav-link" href="{% url 'ask' %}">Задать вопрос</a>-->
+<!--                </div>-->
+
+<!--                <div class="col-2 mr-4 ml-auto">-->
+<!--                    <img class="avatar" src="{{ avatar }}" alt="Аватар">-->
+<!--                </div>-->
+
+
+<!--            {% else %}-->
+<!--                <div class="col-2 mr-4 ml-auto">-->
+<!--                    <img class="avatar" src="{% static "images/avatar.png" %}" alt="Аватар">-->
+<!--                </div>-->
+<!--            {% endif %}-->
+
+            <div class="row">
+                {% if user.is_authenticated %}
+                    <div class="mr-4">
+                        <b>{{user.username}}</b>
+                    </div>
+                {% else %}
+                    <div class="mr-4">
+                        <b>NoName</b>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+<!--                    {% if user.is_authenticated %}-->
+<!--                        <div class="col col-np">-->
+<!--                            <a href="{%url 'settings'%}">Settings</a>-->
+<!--                        </div>-->
+
+<!--                        <div class="col mr-2 col-np">-->
+<!--                            <a href="{%url 'logout'%}">Logout</a>-->
+<!--                        </div>-->
+<!--                    {% else %}-->
+<!--                        <div class="col mr-2 col-np">-->
+<!--                            <a href="{%url 'login'%}">Log in</a>-->
+<!--                        </div>-->
+
+<!--                        <div class="col mr-2 col-np">-->
+<!--                            <a href="{%url 'signup'%}">Register</a>-->
+<!--                        </div>-->
+<!--                    {% endif %}-->
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="row">
+        <div class="col-8 mt-3">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+        <div class="col-3 mt-2">
+            {%block sidebar%}
+                {% include "sidebar.html" %}
+            {%endblock%}
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container text-center">
+        <p class="top-cover">
+            &copy; Copyright Ivan Chernov
+        </p>
+    </div>
+</footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<!--<script src="{% static 'js/ajax.js' %}"></script>-->
+</body>
+</html>

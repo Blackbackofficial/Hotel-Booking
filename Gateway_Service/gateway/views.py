@@ -463,6 +463,23 @@ def report_hotels(request):
     return JsonResponse({"detail": "No content in queue or error"}, status=status.HTTP_204_NO_CONTENT)
 
 
+# VIEW
+def index(request):
+    return render(request, 'index.html')
+
+
+def make_login(request):
+    return render(request, 'base.html')
+
+
+def make_logout(request):
+    return render(request, 'base.html')
+
+
+def registration(request):
+    return render(request, 'base.html')
+
+
 def delivery_callback(err, msg):
     if err:
         sys.stderr.write('%% Message failed delivery: %s\n' % err)
