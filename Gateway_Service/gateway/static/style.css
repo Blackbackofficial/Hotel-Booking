@@ -1,0 +1,27 @@
+.avatar {
+  max-width: 50px;
+  border-radius: 50%;
+}
+
+.font {
+  background: #f6f6f6;
+  border-radius: 15px;
+  box-shadow: 0 2px 13px 1px rgba(122, 122, 122, 0.2);
+}
+
+.answer {
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 2px 13px 1px rgba(177, 177, 177, 0.2);
+}
+
+.flex-box {
+  display: flex;
+  float: right;
+}
+
+.top {
+  width: 200px;
+  border-color: white;
+  padding: .25rem
+}

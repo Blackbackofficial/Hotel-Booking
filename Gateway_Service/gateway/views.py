@@ -4,8 +4,9 @@ from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
 from django.forms.models import model_to_dict
+from .forms import LoginForm
 from django.core import serializers
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
 from confluent_kafka import Producer
 from datetime import datetime
@@ -465,15 +466,53 @@ def report_hotels(request):
 
 # VIEW
 def index(request):
-    return render(request, 'index.html')
+    is_authenticated = False
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+            is_authenticated = True
+        elif session.status_code == 401:
+            pass
+        else:
+            request.delete_cookie('jwt')
+    else:
+        is_authenticated = True
+    data = auth(request)
+    response = render(request, 'index.html', {'data_user': data})
+    if is_authenticated:
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+    else:
+        response.delete_cookie('jwt')
+    return response
 
 
 def make_login(request):
-    return render(request, 'base.html')
+    error = None
+    if request.method == "GET":
+        form = LoginForm()
+    if request.method == "POST":
+        form = LoginForm(data=request.POST)
+        session = requests.post('http://localhost:8005/api/v1/login',
+                                json={"username": request.POST.get('username'),
+                                      "password": request.POST.get('password')})
+        if session.status_code == 200:
+            response = HttpResponseRedirect('/index')
+            response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+            return response
+        else:
+            session = session.content.decode('utf8').replace("'", '"')
+            error = json.loads(session)['detail']
+    return render(request, 'login.html', {'form': form, 'error': error})
 
 
 def make_logout(request):
-    return render(request, 'base.html')
+    session = requests.get("http://localhost:8005/api/v1/logout", cookies=request.COOKIES)
+    if session.status_code == 200:
+        response = HttpResponseRedirect('/index')
+        response.delete_cookie('jwt')
+        return response
+    return render(request, 'index.html')
 
 
 def registration(request):
@@ -502,3 +541,15 @@ def producer(data, topic):
 
     sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
     p.flush()
+
+
+def auth(request):
+    token = request.COOKIES.get('jwt')
+
+    if not token:
+        return
+
+    payload = jwt.decode(token, JWT_KEY, algorithms=['HS256'], options={"verify_exp": False})
+    payload.pop('exp')
+    payload.pop('iat')
+    return payload
