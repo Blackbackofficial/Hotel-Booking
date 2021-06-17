@@ -6,5 +6,5 @@ urlpatterns = [
     path('edit', edit),  # Понизить/повысить лояльность  #
     path('balance', balance),  # Посмотреть баланс бонусной программы  #
     path('delete', delete),  # При удалении пользователя
-    path('status/<str:loyalty_uid>', balance_static),  # кошелёк пользователя
+    path('status/<str:user_uid>', balance_static),  # кошелёк пользователя
 ]

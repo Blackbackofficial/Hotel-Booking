@@ -133,9 +133,7 @@ def users(request):
 @api_view(['GET'])
 def one_user(request, user_uid):
     try:
-        data = auth(request)
-        if 'admin' not in data['role']:
-            return Response({'detail': 'You are not admin!'})
+        auth(request)
         user = Users.objects.get(user_uid=user_uid)
         user = model_to_dict(user)
         rem_list = ['is_superuser', 'is_active', 'is_staff', 'id', 'password', 'groups', 'user_permissions', 'last_login']

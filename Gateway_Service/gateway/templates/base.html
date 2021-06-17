@@ -44,7 +44,9 @@
             <div class="row">
                 {% if request.COOKIES.jwt %}
                     <div class="mr-4">
-                        <b>{{data_user.username}}</b>
+                    <a href="{%url 'balance'%}" style="color: black;">
+                        <b>{{user.username}}</b>
+                        </a>
                     </div>
                 {% else %}
                     <div class="mr-4">

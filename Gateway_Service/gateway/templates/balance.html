@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Баланс
+{% endblock %}
+
+{% block content %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th style="border-color: white;" colspan="3">
+                <h3 style="text-align: center">Sky <b>ID</b></h3>
+            </th>
+        </tr>
+        </thead>
+        <tbody class="font">
+        <tr>
+            <td>
+                <div style="margin: 10px;">
+                    <h3 style="margin-bottom: 20px;">{{ user.last_name }} {{ user.name }}</h3>
+                    <hr style="margin-left: -21px; margin-right: -400px;">
+                    <h4><b>E-mail:</b></h4>
+                    <h4><b>Status:</b></h4>
+                    <h4><b>To next level loyalty:</b></h4>
+                </div>
+            <td>
+            <td>
+            <div style="margin-top: 80px;">
+                <h4>{{ user.email }}</h4>
+                <h4>{{ loyalty.status }}</h4>
+                <h4>{{ loyalty.discount }}</h4>
+            </div>
+            </td>
+        </td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

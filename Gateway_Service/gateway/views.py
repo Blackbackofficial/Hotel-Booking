@@ -40,7 +40,7 @@ conf = {
 # API
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST'])
-def login(request):
+def login(request): #
     """
     POST: {
           "username": "qwerty",
@@ -62,7 +62,7 @@ def login(request):
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST'])
-def register(request):
+def register(request): #
     """
     POST: {
           "role": "admin", вставляется только при админке или "user"
@@ -89,7 +89,7 @@ def register(request):
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['GET'])
-def logout(request):
+def logout(request): #
     """
     POST: in the post only JWT
     """
@@ -468,20 +468,9 @@ def report_hotels(request):
 
 # VIEW
 def index(request):
-    is_authenticated = False
-    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
-    if session.status_code != 200:
-        if session.status_code == 403:
-            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
-            is_authenticated = True
-        elif session.status_code == 401:
-            pass
-        else:
-            request.delete_cookie('jwt')
-    else:
-        is_authenticated = True
+    is_authenticated, request, session = cookies(request)
     data = auth(request)
-    response = render(request, 'index.html', {'data_user': data})
+    response = render(request, 'index.html', {'user': data})
     if is_authenticated:
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     else:
@@ -517,16 +506,22 @@ def make_logout(request):
     return render(request, 'index.html')
 
 
+def balance(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    loyalty = requests.get("http://localhost:8000/api/v1/loyalty/status/{}".format(data['user_uid']),
+                           cookies=request.COOKIES).json()
+    user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(data['user_uid']),
+                        cookies=request.COOKIES).json()
+    response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user})
+    if is_authenticated:
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+    else:
+        response.delete_cookie('jwt')
+    return response
+
+
 def registration(request):
-    """
-    POST: {
-          "role": "admin", вставляется только при админке или "user"
-          "username": "qwerty",
-          "name": "Ivan",
-          "email": "Chenov-Ivan.1997@yandex.ru",
-          "password": "qwerty"
-          }
-    """
     error = None
     form = UserRegistrationForm()
 
@@ -584,3 +579,19 @@ def auth(request):
     payload.pop('exp')
     payload.pop('iat')
     return payload
+
+
+def cookies(request):
+    is_authenticated = False
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+            is_authenticated = True
+        elif session.status_code == 401:
+            pass
+        else:
+            request.delete_cookie('jwt')
+    else:
+        is_authenticated = True
+    return is_authenticated, request, session

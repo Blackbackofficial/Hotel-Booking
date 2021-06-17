@@ -4,9 +4,9 @@
 }
 
 .font {
-  background: #f6f6f6;
-  border-radius: 15px;
-  box-shadow: 0 2px 13px 1px rgba(122, 122, 122, 0.2);
+  /*background: #f6f6f6;*/
+  border-radius: 10px;
+  box-shadow: 0 2px 14px 10px rgba(122, 122, 122, 0.2);
 }
 
 .answer {

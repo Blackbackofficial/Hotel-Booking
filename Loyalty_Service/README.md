@@ -5,7 +5,7 @@
 2. `POST /api/v1/loyalty/create` – создание баланса при регистрации;
 3. `PATCH /api/v1/loyalty/edit-loyalty` – запрос повышения понижения лояльности;
 4. `DELETE /api/v1/loyalty/delete` – удаление лояльности (при удалении пользователя);
-5. `GET /api/v1/loyalty/status/{loyalty_uid}` – баланс бонусной программы.
+5. `GET /api/v1/loyalty/status/{user_uid}` – баланс бонусной программы.
 
 ## Структура таблиц
 ```postgresql
