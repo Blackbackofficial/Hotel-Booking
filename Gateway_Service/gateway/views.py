@@ -4,7 +4,7 @@ from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
 from django.forms.models import model_to_dict
-from .forms import LoginForm
+from .forms import LoginForm, UserRegistrationForm
 from django.core import serializers
 from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
@@ -16,6 +16,7 @@ import os
 import requests
 import json
 import jwt
+import re
 
 FAILURES = 3
 TIMEOUT = 6
@@ -67,7 +68,8 @@ def register(request):
           "role": "admin", вставляется только при админке или "user"
           "username": "qwerty",
           "name": "Ivan",
-          "email": "Chenov-Ivan.1997@yandex.ru",
+          "last_name": "Chernov",
+          "email": "Chernov-Ivan.1997@yandex.ru",
           "password": "qwerty"
           }
     """
@@ -79,8 +81,8 @@ def register(request):
     loyalty = requests.post("http://localhost:8000/api/v1/loyalty/create", json=request.data)
     if loyalty.status_code != 200:
         return JsonResponse(loyalty.json(), status=status.HTTP_400_BAD_REQUEST)
-    q_session.update({"username": request.data["username"], "detail": 'Register',
-                      "date": datetime.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
+    q_session = {"username": request.data["username"], "detail": 'Register',
+                 "date": datetime.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
     producer(q_session, '41pfiknb-users')
     return JsonResponse({'success': 'register & create loyalty'}, status=status.HTTP_200_OK)
 
@@ -516,7 +518,36 @@ def make_logout(request):
 
 
 def registration(request):
-    return render(request, 'base.html')
+    """
+    POST: {
+          "role": "admin", вставляется только при админке или "user"
+          "username": "qwerty",
+          "name": "Ivan",
+          "email": "Chenov-Ivan.1997@yandex.ru",
+          "password": "qwerty"
+          }
+    """
+    error = None
+    form = UserRegistrationForm()
+
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        # validation
+        if form.data['password'] != form.data['password2']:
+            return render(request, 'signup.html', {'form': form, 'error': 'Password mismatch'})
+        if not re.compile("^([A-Za-z0-9]+)+$").match(form.data['username']):
+            return render(request, 'signup.html', {'form': form, 'error': 'No valid login'})
+        session = requests.post('http://localhost:8005/api/v1/register',
+                                json={"username": form.data['username'], "name": form.data['first_name'],
+                                      "last_name": form.data['last_name'], "password": form.data['password'],
+                                      "email": form.data['email']})
+        if session.status_code != 200:
+            session = session.content.decode('utf8').replace("'", '"')
+            if 'email' in session:
+                error = "email is not unique"
+            else:
+                error = "username is not unique"
+    return render(request, 'signup.html', {'form': form, 'error': error})
 
 
 def delivery_callback(err, msg):
