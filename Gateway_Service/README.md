@@ -26,4 +26,6 @@
 3. `GET /login` – вход пользователя
 4. `GET /logout` – выход пользователя 
 5. `GET /balance` – баланс пользователя и лояльность
-2. `GET/POST /add-hotel` – добавление нового отеля (admin)
+6. `GET/POST /add-hotel` – добавление нового отеля (admin)
+7. `GET/POST /delete-hotel` – удаление отеля (admin)
+8. `GET /delete-hotel` – все пользователи (admin)

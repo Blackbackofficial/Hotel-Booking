@@ -32,4 +32,4 @@ class NewHotel(forms.Form):
 
 
 class DeleteHotel(forms.Form):
-    hotel_uid = forms.CharField(label='hotel_uid:', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    hotel_uid = forms.CharField(label='Hotel UUID:', widget=forms.TextInput(attrs={'class': 'form-control'}))

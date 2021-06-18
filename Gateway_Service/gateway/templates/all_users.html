@@ -2,38 +2,31 @@
 {% load static %}
 
 {% block title %}
-    Баланс
+    Пользователи
 {% endblock %}
 
 {% block content %}
+    <h3 style="text-align: center; margin-bottom: 30px; margin-right: -120px">Users</h3>
     <table class="table">
-        <thead>
         <tr>
-            <th style="border-color: white;" colspan="3">
-                <h3 style="text-align: center">Sky <b>ID</b></h3>
-            </th>
+            <th><h5>Name:</h5></th>
+            <th><h5>Surname:</h5></th>
+            <th><h5>Registration:</h5></th>
+            <th><h5>UUID:</h5></th>
+            <th><h5>Role:</h5></th>
+            <th><h5>E-mail:</h5></th>
+            <th><h5>Username:</h5></th>
         </tr>
-        </thead>
-        <tbody class="font">
-        <tr>
-            <td>
-                <div style="margin: 10px;">
-                    <h3 style="margin-bottom: 20px;">{{ user.last_name }} {{ user.name }}</h3>
-                    <hr style="margin-left: -21px; margin-right: -400px;">
-                    <h4><b>E-mail:</b></h4>
-                    <h4><b>Status:</b></h4>
-                    <h4><b>To next level loyalty:</b></h4>
-                </div>
-            <td>
-            <td>
-            <div style="margin-top: 80px;">
-                <h4>{{ user.email }}</h4>
-                <h4>{{ loyalty.status }}</h4>
-                <h4>{{ loyalty.discount }}</h4>
-            </div>
-            </td>
-        </td>
-        </tr>
-        </tbody>
+        {% for users in all_users %}
+            <tr>
+                <td>{{ users.name }}</td>
+                <td>{{ users.last_name }}</td>
+                <td>{{ users.date_joined }}</td>
+                <td>{{ users.user_uid }}</td>
+                <td>{{ users.role }}</td>
+                <td>{{ users.email }}</td>
+                <td>{{ users.username }}</td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}
