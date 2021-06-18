@@ -32,6 +32,11 @@
         <div class="container avatar-container col-md-4">
 
             {% if request.COOKIES.jwt %}
+                {% if user.role == 'admin' %}
+                    <div class="col-3 mr-4 ml-auto">
+                        <a href="{%url 'add_hotel'%}">Add hotel</a>
+                    </div>
+                {% endif %}
                 <div class="col-2 mr-4 ml-auto">
                     <img class="avatar" src="{% static "images/reg.jpg" %}" alt="Аватар">
                 </div>

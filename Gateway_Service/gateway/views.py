@@ -4,7 +4,7 @@ from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
 from django.forms.models import model_to_dict
-from .forms import LoginForm, UserRegistrationForm
+from .forms import LoginForm, UserRegistrationForm, NewHotel
 from django.core import serializers
 from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
@@ -40,7 +40,7 @@ conf = {
 # API
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST'])
-def login(request): #
+def login(request):  #
     """
     POST: {
           "username": "qwerty",
@@ -62,7 +62,7 @@ def login(request): #
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST'])
-def register(request): #
+def register(request):  #
     """
     POST: {
           "role": "admin", вставляется только при админке или "user"
@@ -89,7 +89,7 @@ def register(request): #
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['GET'])
-def logout(request): #
+def logout(request):  #
     """
     POST: in the post only JWT
     """
@@ -471,10 +471,9 @@ def index(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
     response = render(request, 'index.html', {'user': data})
-    if is_authenticated:
-        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
-    else:
-        response.delete_cookie('jwt')
+
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
     return response
 
 
@@ -495,6 +494,30 @@ def make_login(request):
             session = session.content.decode('utf8').replace("'", '"')
             error = json.loads(session)['detail']
     return render(request, 'login.html', {'form': form, 'error': error})
+
+
+def add_hotel_admin(request):
+    error = None
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+
+    if request.method == "GET":
+        form = NewHotel()
+    if request.method == "POST":
+        form = NewHotel(data=request.POST)
+        new_hotel = requests.post('http://localhost:8005/api/v1/hotel',
+                                  json={'title': form.data['title'], 'short_text': form.data['short_text'],
+                                        'rooms': form.data['rooms'], 'cost': form.data['cost'],
+                                        'location': form.data['location']}, cookies=request.COOKIES)
+        error = 'success'
+        if new_hotel.status_code != 200:
+            error = new_hotel.json()['message']
+
+    response = render(request, 'new_hotel.html', {'form': form, 'user': data, 'error': error})
+
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
 
 
 def make_logout(request):
@@ -536,6 +559,7 @@ def registration(request):
                                 json={"username": form.data['username'], "name": form.data['first_name'],
                                       "last_name": form.data['last_name'], "password": form.data['password'],
                                       "email": form.data['email']})
+        error = 'success'
         if session.status_code != 200:
             session = session.content.decode('utf8').replace("'", '"')
             if 'email' in session:
@@ -574,8 +598,10 @@ def auth(request):
 
     if not token:
         return
-
-    payload = jwt.decode(token, JWT_KEY, algorithms=['HS256'], options={"verify_exp": False})
+    try:
+        payload = jwt.decode(token, JWT_KEY, algorithms=['HS256'], options={"verify_exp": False})
+    except jwt.DecodeError:
+        return None
     payload.pop('exp')
     payload.pop('iat')
     return payload
