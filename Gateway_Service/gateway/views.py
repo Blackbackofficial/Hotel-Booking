@@ -4,7 +4,7 @@ from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
 from django.forms.models import model_to_dict
-from .forms import LoginForm, UserRegistrationForm, NewHotel
+from .forms import LoginForm, UserRegistrationForm, NewHotel, DeleteHotel
 from django.core import serializers
 from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
@@ -528,6 +528,31 @@ def admin(request):
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
     response = render(request, 'admin.html', {'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def delete_hotel_admin(request):
+    error = None
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+
+    if request.method == "GET":
+        form = DeleteHotel()
+    if request.method == "POST":
+        form = DeleteHotel(data=request.POST)
+        new_hotel = requests.delete('http://localhost:8005/api/v1/hotels/{}'.format(form.data['hotel_uid']),
+                                  cookies=request.COOKIES)
+        error = 'success'
+        if new_hotel.status_code != 204:
+            try:
+                error = new_hotel.json()['message']
+            except Exception:
+                error = 'Parse error'
+
+    response = render(request, 'delete_hotel.html', {'form': form, 'user': data, 'error': error})
+
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response

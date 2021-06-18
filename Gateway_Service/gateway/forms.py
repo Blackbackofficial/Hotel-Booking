@@ -29,3 +29,7 @@ class NewHotel(forms.Form):
     rooms = forms.IntegerField(label='Количество комнат:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     location = forms.CharField(label='Адрес:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     cost = forms.IntegerField(label="Стоимость номера:", widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+
+class DeleteHotel(forms.Form):
+    hotel_uid = forms.CharField(label='hotel_uid:', widget=forms.TextInput(attrs={'class': 'form-control'}))
