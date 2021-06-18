@@ -4,8 +4,9 @@ from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
 from django.forms.models import model_to_dict
+from .forms import LoginForm, UserRegistrationForm, NewHotel, DeleteHotel
 from django.core import serializers
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
 from confluent_kafka import Producer
 from datetime import datetime
@@ -15,6 +16,7 @@ import os
 import requests
 import json
 import jwt
+import re
 
 FAILURES = 3
 TIMEOUT = 6
@@ -38,7 +40,7 @@ conf = {
 # API
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST'])
-def login(request):
+def login(request):  #
     """
     POST: {
           "username": "qwerty",
@@ -60,13 +62,14 @@ def login(request):
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST'])
-def register(request):
+def register(request):  #
     """
     POST: {
           "role": "admin", вставляется только при админке или "user"
           "username": "qwerty",
           "name": "Ivan",
-          "email": "Chenov-Ivan.1997@yandex.ru",
+          "last_name": "Chernov",
+          "email": "Chernov-Ivan.1997@yandex.ru",
           "password": "qwerty"
           }
     """
@@ -78,15 +81,15 @@ def register(request):
     loyalty = requests.post("http://localhost:8000/api/v1/loyalty/create", json=request.data)
     if loyalty.status_code != 200:
         return JsonResponse(loyalty.json(), status=status.HTTP_400_BAD_REQUEST)
-    q_session.update({"username": request.data["username"], "detail": 'Register',
-                      "date": datetime.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
+    q_session = {"username": request.data["username"], "detail": 'Register',
+                 "date": datetime.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
     producer(q_session, '41pfiknb-users')
     return JsonResponse({'success': 'register & create loyalty'}, status=status.HTTP_200_OK)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['GET'])
-def logout(request):
+def logout(request):  #
     """
     POST: in the post only JWT
     """
@@ -463,6 +466,179 @@ def report_hotels(request):
     return JsonResponse({"detail": "No content in queue or error"}, status=status.HTTP_204_NO_CONTENT)
 
 
+# VIEW
+def index(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    response = render(request, 'index.html', {'user': data})
+
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def make_login(request):
+    error = None
+    if request.method == "GET":
+        form = LoginForm()
+    if request.method == "POST":
+        form = LoginForm(data=request.POST)
+        session = requests.post('http://localhost:8005/api/v1/login',
+                                json={"username": request.POST.get('username'),
+                                      "password": request.POST.get('password')})
+        if session.status_code == 200:
+            response = HttpResponseRedirect('/index')
+            response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+            return response
+        else:
+            session = session.content.decode('utf8').replace("'", '"')
+            error = json.loads(session)['detail']
+    return render(request, 'login.html', {'form': form, 'error': error})
+
+
+def add_hotel_admin(request):
+    error = None
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+
+    if request.method == "GET":
+        form = NewHotel()
+    if request.method == "POST":
+        form = NewHotel(data=request.POST)
+        new_hotel = requests.post('http://localhost:8005/api/v1/hotel',
+                                  json={'title': form.data['title'], 'short_text': form.data['short_text'],
+                                        'rooms': form.data['rooms'], 'cost': form.data['cost'],
+                                        'location': form.data['location']}, cookies=request.COOKIES)
+        error = 'success'
+        if new_hotel.status_code != 200:
+            error = new_hotel.json()['message']
+
+    response = render(request, 'new_hotel.html', {'form': form, 'user': data, 'error': error})
+
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def admin(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    response = render(request, 'admin.html', {'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def delete_hotel_admin(request):
+    error = None
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+
+    if request.method == "GET":
+        form = DeleteHotel()
+    if request.method == "POST":
+        form = DeleteHotel(data=request.POST)
+        new_hotel = requests.delete('http://localhost:8005/api/v1/hotels/{}'.format(form.data['hotel_uid']),
+                                  cookies=request.COOKIES)
+        error = 'success'
+        if new_hotel.status_code != 204:
+            try:
+                error = new_hotel.json()['message']
+            except Exception:
+                error = 'Parse error'
+
+    response = render(request, 'delete_hotel.html', {'form': form, 'user': data, 'error': error})
+
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def all_users(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    _users = requests.get("http://localhost:8005/api/v1/users", cookies=request.COOKIES).json()
+    response = render(request, 'all_users.html', {'all_users': _users, 'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def users_static(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    try:
+        static_users = requests.get("http://localhost:8005/api/v1/reports/users", cookies=request.COOKIES).json()
+        dictlist = list()
+        for key, value in static_users.items():
+            temp = [key, value]
+            dictlist.append(temp)
+    except Exception:
+        dictlist = None
+
+    response = render(request, 'users_static.html', {'all_users': dictlist, 'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def make_logout(request):
+    session = requests.get("http://localhost:8005/api/v1/logout", cookies=request.COOKIES)
+    if session.status_code == 200:
+        response = HttpResponseRedirect('/index')
+        response.delete_cookie('jwt')
+        return response
+    return render(request, 'index.html')
+
+
+def balance(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    loyalty = requests.get("http://localhost:8000/api/v1/loyalty/status/{}".format(data['user_uid']),
+                           cookies=request.COOKIES).json()
+    user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(data['user_uid']),
+                        cookies=request.COOKIES).json()
+    response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def registration(request):
+    error = None
+    form = UserRegistrationForm()
+
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        # validation
+        if form.data['password'] != form.data['password2']:
+            return render(request, 'signup.html', {'form': form, 'error': 'Password mismatch'})
+        if not re.compile("^([A-Za-z0-9]+)+$").match(form.data['username']):
+            return render(request, 'signup.html', {'form': form, 'error': 'No valid login'})
+        session = requests.post('http://localhost:8005/api/v1/register',
+                                json={"username": form.data['username'], "name": form.data['first_name'],
+                                      "last_name": form.data['last_name'], "password": form.data['password'],
+                                      "email": form.data['email']})
+        error = 'success'
+        if session.status_code != 200:
+            session = session.content.decode('utf8').replace("'", '"')
+            error = "email is not unique" if 'email' in session else "username is not unique"
+
+    return render(request, 'signup.html', {'form': form, 'error': error})
+
+
 def delivery_callback(err, msg):
     if err:
         sys.stderr.write('%% Message failed delivery: %s\n' % err)
@@ -485,3 +661,33 @@ def producer(data, topic):
 
     sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
     p.flush()
+
+
+def auth(request):
+    token = request.COOKIES.get('jwt')
+
+    if not token:
+        return
+    try:
+        payload = jwt.decode(token, JWT_KEY, algorithms=['HS256'], options={"verify_exp": False})
+    except jwt.DecodeError:
+        return None
+    payload.pop('exp')
+    payload.pop('iat')
+    return payload
+
+
+def cookies(request):
+    is_authenticated = False
+    session = requests.get("http://localhost:8001/api/v1/session/validate", cookies=request.COOKIES)
+    if session.status_code != 200:
+        if session.status_code == 403:
+            session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
+            is_authenticated = True
+        elif session.status_code == 401:
+            pass
+        else:
+            request.delete_cookie('jwt')
+    else:
+        is_authenticated = True
+    return is_authenticated, request, session

@@ -1,4 +1,4 @@
-from rest_framework.exceptions import AuthenticationFailed, ValidationError, ParseError
+from rest_framework.exceptions import AuthenticationFailed, ValidationError, ParseError, NotAuthenticated
 from rest_framework.response import Response
 from django.core import serializers
 from .models import Users
@@ -46,6 +46,7 @@ def login(request):
 
     payload = {
         'user_uid': str(user.user_uid),
+        'username': str(username),
         'role': str(user.role),
         'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5),
         'iat': datetime.datetime.utcnow()
@@ -66,13 +67,15 @@ def login(request):
 def verify(request):
     token = request.COOKIES.get('jwt')
 
-    if not token:
-        raise AuthenticationFailed('Null token!')
+    if token is None:
+        return JsonResponse({'detail': 'Null token'}, status=status.HTTP_401_UNAUTHORIZED)
 
     try:
         jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
     except jwt.ExpiredSignatureError:
         raise AuthenticationFailed('Unauthenticated!')
+    except jwt.DecodeError:
+        return JsonResponse({'detail': 'Null token'}, status=status.HTTP_401_UNAUTHORIZED)
 
     response = JsonResponse({'detail': 'Authenticated'}, status=status.HTTP_200_OK)
     response.set_cookie(key='jwt', value=token, httponly=True)
@@ -93,6 +96,7 @@ def refresh(request):
 
     payload = {
         'user_uid': str(payload['user_uid']),
+        'username': str(payload['username']),
         'role': str(payload['role']),
         'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5),
         'iat': datetime.datetime.utcnow()
@@ -129,9 +133,7 @@ def users(request):
 @api_view(['GET'])
 def one_user(request, user_uid):
     try:
-        data = auth(request)
-        if 'admin' not in data['role']:
-            return Response({'detail': 'You are not admin!'})
+        auth(request)
         user = Users.objects.get(user_uid=user_uid)
         user = model_to_dict(user)
         rem_list = ['is_superuser', 'is_active', 'is_staff', 'id', 'password', 'groups', 'user_permissions', 'last_login']

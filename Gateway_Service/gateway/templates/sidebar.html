@@ -1,0 +1,15 @@
+{% block sidebar %}
+    <div class="row tags py-2">
+    <p class="mr-3 w-100 h2">Популярные теги:</p>
+    {% for Tag in popular_tag %}
+        <a class="mr-3 h4 w-100" href="{% url 'tag' Tag %}">{{ Tag.name }}</a>
+    {% endfor %}
+    </div>
+
+    <div class="row tags py-2">
+        <p class="mr-3 h2">Лучшие пользователи:</p>
+        {% for User in name_user %}
+            <p class="mr-3 h4 w-100">{{ User.user.username }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

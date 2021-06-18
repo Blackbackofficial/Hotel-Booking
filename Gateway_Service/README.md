@@ -18,3 +18,14 @@
 15. `GET /api/v1/reports/booking` – статистика бронирования по пользователям; (Kafka)
 16. `GET /api/v1/reports/users` – статистика логирования, разлогирования пользователей; (Kafka)
 17. `GET /api/v1/reports/hotels-filling` – статистика наполнения отелей
+
+## Pages Hotel Booking
+
+1. `GET /index` – страница отелей 
+2. `GET/POST /signup` – регистрация пользователя 
+3. `GET /login` – вход пользователя
+4. `GET /logout` – выход пользователя 
+5. `GET /balance` – баланс пользователя и лояльность
+6. `GET/POST /add-hotel` – добавление нового отеля (admin)
+7. `GET/POST /delete-hotel` – удаление отеля (admin)
+8. `GET /delete-hotel` – все пользователи (admin)

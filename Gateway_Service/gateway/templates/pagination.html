@@ -1,0 +1,23 @@
+{% block pagination %}
+    <div>
+        <ul class="pagination my-4 align-content-center">
+            <li class="page-item">
+                <a class="page-link" href="{{ paginator.baseurl }}1"> << </a>
+            </li>
+
+            {% for p in paginator.page_range %}
+                {% if p >= paginator.startdiv %}
+                    {% if p <= paginator.enddiv %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ paginator.baseurl }}{{ p }}">{{ p }}</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            <li class="page-item">
+                <a class="page-link" href="{{ paginator.baseurl }}{{ paginator.num_pages }}"> >> </a>
+            </li>
+        </ul>
+    </div>
+{% endblock %}

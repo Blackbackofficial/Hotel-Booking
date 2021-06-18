@@ -91,10 +91,10 @@ def delete(request):
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['GET'])
-def balance_static(request, loyalty_uid):
+def balance_static(request, user_uid):
     try:
         auth(request)
-        userLoyalty = UserLoyalty.objects.get(user_uid=loyalty_uid)
+        userLoyalty = UserLoyalty.objects.get(user_uid=user_uid)
         serializer = LoyaltySerializer(userLoyalty)
         return JsonResponse(serializer.data)
     except Exception as e:

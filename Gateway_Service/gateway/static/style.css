@@ -1,0 +1,52 @@
+.avatar {
+  max-width: 50px;
+  border-radius: 50%;
+}
+
+.font {
+  /*background: #f6f6f6;*/
+  border-radius: 10px;
+  box-shadow: 0 2px 14px 10px rgba(122, 122, 122, 0.2);
+}
+
+.answer {
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 2px 13px 1px rgba(177, 177, 177, 0.2);
+}
+
+.flex-box {
+  display: flex;
+  float: right;
+}
+
+.top {
+  width: 200px;
+  border-color: white;
+  padding: .25rem
+}
+
+/* grid */
+
+.l-wrap {
+  max-width: 1140px;
+  margin-right: auto;
+  margin-left: auto;
+}
+.grid-item {
+  width: calc((100% - 24px * 3) / 3);
+  margin-right: 20px;
+  margin-top: 24px;
+  padding-left: 12px;
+  padding-right: 12px;
+  float: left;
+}
+/* Demo purposes */
+.grid-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  text-align: center;
+  background: rgba(255, 0, 0, 0.25);
+}
