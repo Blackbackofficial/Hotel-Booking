@@ -17,8 +17,8 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container col-md-5">
-            <a class="navbar-brand" title="Все вопросы" href="{% url 'index' %}">
-                <img class="py-2 px-2" src="https://img.icons8.com/officel/30/000000/share.png" alt="Аватар"> Sky Hotel
+            <a class="navbar-brand" title="Все вопросы" href="{% url 'index' %}" style="font-size: 24px;">
+                <img class="py-2 px-1" src="https://img.icons8.com/officel/30/000000/share.png" alt="Аватар"> Sky Hotel
             </a>
         </div>
 
@@ -34,7 +34,7 @@
             {% if request.COOKIES.jwt %}
                 {% if user.role == 'admin' %}
                     <div class="col-3 mr-4 ml-auto">
-                        <a href="{%url 'add_hotel'%}">Add hotel</a>
+                        <a href="{%url 'admin'%}" role="button" class="btn btn-outline-dark">Admin</a>
                     </div>
                 {% endif %}
                 <div class="col-2 mr-4 ml-auto">

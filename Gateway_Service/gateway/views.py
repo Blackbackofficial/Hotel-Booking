@@ -520,6 +520,19 @@ def add_hotel_admin(request):
     return response
 
 
+def admin(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    response = render(request, 'admin.html', {'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
 def make_logout(request):
     session = requests.get("http://localhost:8005/api/v1/logout", cookies=request.COOKIES)
     if session.status_code == 200:

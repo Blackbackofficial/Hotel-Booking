@@ -22,6 +22,8 @@
 ## Pages Hotel Booking
 
 1. `GET /index` – страница отелей 
-2. `GET/POST /register` – регистрация пользователя 
+2. `GET/POST /signup` – регистрация пользователя 
 3. `GET /login` – вход пользователя
 4. `GET /logout` – выход пользователя 
+5. `GET /balance` – баланс пользователя и лояльность
+2. `GET/POST /add-hotel` – добавление нового отеля (admin)
