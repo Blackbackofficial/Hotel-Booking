@@ -572,6 +572,28 @@ def all_users(request):
     return response
 
 
+def users_static(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    try:
+        static_users = requests.get("http://localhost:8005/api/v1/reports/users", cookies=request.COOKIES).json()
+        dictlist = list()
+        for key, value in static_users.items():
+            temp = [key, value]
+            dictlist.append(temp)
+    except Exception:
+        dictlist = None
+
+    response = render(request, 'users_static.html', {'all_users': dictlist, 'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
 def make_logout(request):
     session = requests.get("http://localhost:8005/api/v1/logout", cookies=request.COOKIES)
     if session.status_code == 200:

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Static users
+{% endblock %}
+
+{% block content %}
+    <h3 style="text-align: center; margin-bottom: 30px;">Static login/register/logout users</h3>
+    {% if all_users %}
+    <table class="table">
+        <tr>
+            <th><h5>Username:</h5></th>
+            <th><h5>Status:</h5></th>
+            <th><h5>Date-time:</h5></th>
+        </tr>
+        {% for user in all_users %}
+            <tr>
+                <td>{{ user.1.username }}</td>
+                <td>{{ user.1.detail }}</td>
+                <td>{{ user.1.date }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <h3 style="text-align: center; margin-bottom: 30px;">No static users</h3>
+    {% endif %}
+{% endblock %}
