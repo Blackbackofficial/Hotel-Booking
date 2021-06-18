@@ -575,10 +575,8 @@ def balance(request):
     user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(data['user_uid']),
                         cookies=request.COOKIES).json()
     response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user})
-    if is_authenticated:
-        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
-    else:
-        response.delete_cookie('jwt')
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
     return response
 
 
@@ -600,10 +598,8 @@ def registration(request):
         error = 'success'
         if session.status_code != 200:
             session = session.content.decode('utf8').replace("'", '"')
-            if 'email' in session:
-                error = "email is not unique"
-            else:
-                error = "username is not unique"
+            error = "email is not unique" if 'email' in session else "username is not unique"
+
     return render(request, 'signup.html', {'form': form, 'error': error})
 
 
