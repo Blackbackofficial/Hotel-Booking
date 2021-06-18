@@ -260,8 +260,7 @@ def create_booking_or_all(request):
             if loyaltyUP.status_code != 200:
                 return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
         #  при бронировании вычитаем комнату
-        hotel = requests.patch("http://localhost:8004/api/v1/hotels/{}/rooms"
-                               .format(request.data['hotel_uid']),
+        hotel = requests.patch("http://localhost:8004/api/v1/hotels/{}/rooms".format(request.data['hotel_uid']),
                                json={"reservation": "Done"}, cookies=session.cookies)
         if hotel.status_code != 200:
             return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
