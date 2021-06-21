@@ -89,8 +89,8 @@ def cities(request):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
-@api_view(['GET'])
-def filter_date(request, date_start, date_end):
+@api_view(['POST'])
+def filter_date(request):
     """
     GET: {
             "date_start": "2013-03-30",
@@ -98,7 +98,8 @@ def filter_date(request, date_start, date_end):
             }
     """
     try:
-        filter_booking = requests.get("http://localhost:8003/api/v1/booking/date/{}/{}".format(date_start, date_end),
+        filter_booking = requests.get("http://localhost:8003/api/v1/booking/date/{}/{}".
+                                      format(request.data["date_start"], request.data["date_end"]),
                                       cookies=request.COOKIES)
         if filter_booking.status_code == 200:
             filter_booking = filter_booking.json()
@@ -118,6 +119,7 @@ def filter_date(request, date_start, date_end):
         return JsonResponse({'message': 'No content'}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['PATCH'])
