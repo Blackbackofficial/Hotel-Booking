@@ -95,7 +95,8 @@ def filter_date(request):
     GET: {
             "date_start": "2013-03-30",
             "date_end": "2021-07-17",
-            }
+            "city": "Moscow"
+         }
     """
     try:
         filter_booking = requests.get("http://localhost:8003/api/v1/booking/date/{}/{}".
@@ -105,11 +106,19 @@ def filter_date(request):
             filter_booking = filter_booking.json()
             hotels = Hotels.objects.all()
             hotels = json.loads(serializers.serialize('json', hotels))
+            if "city" in request.data.keys():
+                for hotel in hotels:
+                    if hotel["fields"]["cities"] != request.data["city"]:
+                        hotel.clear()
+            hotels = [i for i in hotels if i]
             for hotel in hotels:
                 count_rooms = 0
                 fields = hotel["fields"]
                 hotel.clear()
                 hotel.update(fields)
+                # проверка на фильтр города
+                if "city" in request.data.keys():
+                    request = request
                 for booking in filter_booking:
                     if booking['hotel_uid'] in hotel['hotel_uid']:
                         count_rooms += 1
