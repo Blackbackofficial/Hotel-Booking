@@ -78,6 +78,17 @@ def all_hotels_or_add_hotel(request):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def cities(request):
+    try:
+        cities = list(Hotels.objects.all().distinct('cities').values('cities'))
+        json.dumps(cities)
+        return JsonResponse(cities, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['PATCH'])
 def change_rooms(request, hotel_uid):
     """
