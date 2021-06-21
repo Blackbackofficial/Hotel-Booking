@@ -16,4 +16,4 @@ CREATE TABLE Hotels
     short_text      VARCHAR(255) NOT NULL,
     location        VARCHAR(255) NOT NULL,
     rooms           INTEGER      NOT NULL,
-);
+); 
