@@ -9,6 +9,7 @@ from .serializers import BookingSerializer
 from django.forms.models import model_to_dict
 from rest_framework import status
 import requests
+import datetime
 import json
 import jwt
 
@@ -134,6 +135,25 @@ def about_one(request, booking_uid):
             payBalance = payBalance.json()
             reservations.update(payBalance)
         return JsonResponse(reservations, status=status.HTTP_200_OK)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def filter_booking(request, date_start, date_end):
+    try:
+        reservations = list(Reservations.objects.filter(date_start__gte=date_start, date_end__lte=date_end).values())
+        for res in reservations:
+            payBalance = requests.get(
+                "http://localhost:8002/api/v1/payment/status/{}".format(res["payment_uid"]),
+                cookies=request.COOKIES)
+            if payBalance.status_code == 200:
+                payBalance = payBalance.json()
+                if payBalance["status"] == "CANCELED" or payBalance["status"] == "REVERSED":
+                    res.clear()
+        mylist = [i for i in reservations if i]
+        return JsonResponse(mylist, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 

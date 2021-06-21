@@ -89,6 +89,48 @@ def cities(request):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+def filter_date(request):
+    """
+    GET: {
+            "date_start": "2013-03-30",
+            "date_end": "2021-07-17",
+            "city": "Moscow"
+         }
+    """
+    try:
+        filter_booking = requests.get("http://localhost:8003/api/v1/booking/date/{}/{}".
+                                      format(request.data["date_start"], request.data["date_end"]),
+                                      cookies=request.COOKIES)
+        if filter_booking.status_code == 200:
+            filter_booking = filter_booking.json()
+            hotels = Hotels.objects.all()
+            hotels = json.loads(serializers.serialize('json', hotels))
+            if "city" in request.data.keys():
+                for hotel in hotels:
+                    if hotel["fields"]["cities"] != request.data["city"]:
+                        hotel.clear()
+            hotels = [i for i in hotels if i]
+            for hotel in hotels:
+                count_rooms = 0
+                fields = hotel["fields"]
+                hotel.clear()
+                hotel.update(fields)
+                # проверка на фильтр города
+                if "city" in request.data.keys():
+                    request = request
+                for booking in filter_booking:
+                    if booking['hotel_uid'] in hotel['hotel_uid']:
+                        count_rooms += 1
+                hotel.update({"free_rooms": hotel['rooms'] - count_rooms})
+            hotels = hotels
+            return JsonResponse(hotels, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse({'message': 'No content'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['PATCH'])
 def change_rooms(request, hotel_uid):
     """
