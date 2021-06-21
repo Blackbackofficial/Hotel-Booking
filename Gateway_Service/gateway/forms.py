@@ -27,6 +27,7 @@ class NewHotel(forms.Form):
     title = forms.CharField(label='Название:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     short_text = forms.CharField(label='Описание:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     rooms = forms.IntegerField(label='Количество комнат:', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    cities = forms.CharField(label='Город:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     location = forms.CharField(label='Адрес:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     cost = forms.IntegerField(label="Стоимость номера:", widget=forms.TextInput(attrs={'class': 'form-control'}))
 
