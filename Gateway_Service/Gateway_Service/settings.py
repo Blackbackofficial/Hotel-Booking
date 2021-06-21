@@ -75,7 +75,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Gateway_Service.wsgi.application'
 
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#d..
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'gateway',
+        'USER': 'ivan',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

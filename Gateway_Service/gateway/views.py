@@ -469,6 +469,7 @@ def report_hotels(request):
 def index(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
+
     response = render(request, 'index.html', {'user': data})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
