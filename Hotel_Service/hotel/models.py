@@ -8,6 +8,7 @@ class Hotels(models.Model):
     short_text = models.CharField(max_length=255)
     photo = models.ImageField(null=True, blank=True, verbose_name=u"фото", upload_to='static/images/')
     location = models.CharField(max_length=80)
+    cities = models.CharField(max_length=30)
     rooms = models.IntegerField(default=0)
     cost = models.IntegerField(default=0)
 

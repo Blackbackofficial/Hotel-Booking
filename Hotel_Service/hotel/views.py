@@ -65,13 +65,25 @@ def all_hotels_or_add_hotel(request):
             if 'admin' not in data['role']:
                 return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
             new_hotel = {"title": request.data["title"], "short_text": request.data["short_text"],
-                         "rooms": request.data["rooms"], "location": request.data["location"], "cost": request.data["cost"]}
+                         "rooms": request.data["rooms"], "cities": request.data["cities"],
+                         "location": request.data["location"], "cost": request.data["cost"]}
             serializer = HotelsSerializer(data=new_hotel)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             hotel = model_to_dict(Hotels.objects.latest('id'))
             hotel.pop('photo')  # временно
             return JsonResponse(hotel, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['GET'])
+def cities(request):
+    try:
+        cities = list(Hotels.objects.all().distinct('cities').values('cities'))
+        json.dumps(cities)
+        return JsonResponse(cities, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 

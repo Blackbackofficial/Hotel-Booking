@@ -145,7 +145,7 @@ def add_hotel(request):
             session = requests.get("http://localhost:8001/api/v1/session/refresh", cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    hotel = requests.post("http://localhost:8004/api/v1/hotels", json=request.data, cookies=session.cookies)
+    hotel = requests.post("http://localhost:8004/api/v1/hotels/", json=request.data, cookies=session.cookies)
     if hotel.status_code != 200:
         return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(hotel.json(), status=status.HTTP_200_OK, safe=False)
@@ -507,7 +507,7 @@ def add_hotel_admin(request):
         form = NewHotel(data=request.POST)
         new_hotel = requests.post('http://localhost:8005/api/v1/hotel',
                                   json={'title': form.data['title'], 'short_text': form.data['short_text'],
-                                        'rooms': form.data['rooms'], 'cost': form.data['cost'],
+                                        'rooms': form.data['rooms'], 'cost': form.data['cost'], 'cities': form.data['cities'],
                                         'location': form.data['location']}, cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 200:
