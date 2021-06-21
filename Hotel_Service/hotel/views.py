@@ -99,9 +99,23 @@ def filter_date(request):
          }
     """
     try:
-        filter_booking = requests.get("http://localhost:8003/api/v1/booking/date/{}/{}".
-                                      format(request.data["date_start"], request.data["date_end"]),
-                                      cookies=request.COOKIES)
+        if "date_start" and "date_end" in request.data.keys():
+            filter_booking = requests.get("http://localhost:8003/api/v1/booking/date/{}/{}".
+                                          format(request.data["date_start"], request.data["date_end"]),
+                                          cookies=request.COOKIES)
+        else:
+            hotels = Hotels.objects.all()
+            hotels = json.loads(serializers.serialize('json', hotels))
+            if "city" in request.data.keys():
+                for hotel in hotels:
+                    if hotel["fields"]["cities"] != request.data["city"]:
+                        hotel.clear()
+            hotels = [i for i in hotels if i]
+            for hotel in hotels:
+                fields = hotel["fields"]
+                hotel.clear()
+                hotel.update(fields)
+            return JsonResponse(hotels, status=status.HTTP_200_OK, safe=False)
         if filter_booking.status_code == 200:
             filter_booking = filter_booking.json()
             hotels = Hotels.objects.all()
@@ -119,9 +133,10 @@ def filter_date(request):
                 # проверка на фильтр города
                 if "city" in request.data.keys():
                     request = request
-                for booking in filter_booking:
-                    if booking['hotel_uid'] in hotel['hotel_uid']:
-                        count_rooms += 1
+                if "date_start" and "date_end" in request.data.keys():
+                    for booking in filter_booking:
+                        if booking['hotel_uid'] in hotel['hotel_uid']:
+                            count_rooms += 1
                 hotel.update({"free_rooms": hotel['rooms'] - count_rooms})
             hotels = hotels
             return JsonResponse(hotels, status=status.HTTP_200_OK, safe=False)
