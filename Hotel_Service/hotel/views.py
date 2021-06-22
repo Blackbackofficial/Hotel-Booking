@@ -52,7 +52,7 @@ def all_hotels_or_add_hotel(request):
           } only admin
     """
     try:
-        # data = auth(request)
+        data = auth(request)
         if request.method == 'GET':
             hotels = Hotels.objects.all()
             hotels = json.loads(serializers.serialize('json', hotels))
