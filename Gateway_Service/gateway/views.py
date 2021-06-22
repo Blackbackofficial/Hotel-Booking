@@ -629,10 +629,17 @@ def registration(request):
             return render(request, 'signup.html', {'form': form, 'error': 'Password mismatch'})
         if not re.compile("^([A-Za-z0-9]+)+$").match(form.data['username']):
             return render(request, 'signup.html', {'form': form, 'error': 'No valid login'})
+        if len(request.FILES) == 0:
+            return render(request, 'signup.html', {'form': form, 'error': 'No Photo'})
+        # сохраним фото в gateway/static/images/avatars
+        filename = ''.join(choices(ascii_letters + digits, k=10)) + '.jpg'
+        with open(f'gateway/static/images/avatars/{filename}', 'wb') as image:
+            files = request.FILES["avatar"].read()
+            image.write(files)
         session = requests.post('http://localhost:8005/api/v1/register',
                                 json={"username": form.data['username'], "name": form.data['first_name'],
                                       "last_name": form.data['last_name'], "password": form.data['password'],
-                                      "email": form.data['email']})
+                                      "email": form.data['email'], "avatar": f'images/avatars/{filename}'})
         error = 'success'
         if session.status_code != 200:
             session = session.content.decode('utf8').replace("'", '"')
