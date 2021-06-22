@@ -255,33 +255,24 @@ def create_booking_or_all(request):
                                        cookies=session.cookies)
             if loyaltyUP.status_code != 200:
                 return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
-        #  при бронировании вычитаем комнату
-        hotel = requests.patch("http://localhost:8004/api/v1/hotels/{}/rooms".format(request.data['hotel_uid']),
-                               json={"reservation": "Done"}, cookies=session.cookies)
-        if hotel.status_code != 200:
-            return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
         booking = booking.json()
-        payBalance = requests.get(
-            "http://localhost:8002/api/v1/payment/status/{}".format(booking.get("payment_uid")),
-            cookies=request.COOKIES)
+        payBalance = requests.get("http://localhost:8002/api/v1/payment/status/{}".format(booking.get("payment_uid")),
+                                  cookies=request.COOKIES)
         if payBalance.status_code == 200:
             payBalance = payBalance.json()
             booking.update(payBalance)
-        about_hotel = requests.get(
-            "http://localhost:8004/api/v1/hotels/{}".format(booking.get("hotel_uid")),
-            cookies=request.COOKIES)
+        about_hotel = requests.get("http://localhost:8004/api/v1/hotels/{}".format(booking.get("hotel_uid")),
+                                   cookies=request.COOKIES)
         if about_hotel.status_code == 200:
             about_hotel = about_hotel.json()
             booking.update(about_hotel)
-        user = requests.get(
-            "http://localhost:8001/api/v1/session/user/{}".format(booking.get("user_uid")),
-            cookies=request.COOKIES)
+        user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(booking.get("user_uid")),
+                            cookies=request.COOKIES)
         if user.status_code == 200:
             user = user.json()
             booking.update(user)
-        loyalty = requests.get(
-            "http://localhost:8000/api/v1/loyalty/status/{}".format(booking.get("user_uid")),
-            cookies=request.COOKIES)
+        loyalty = requests.get("http://localhost:8000/api/v1/loyalty/status/{}".format(booking.get("user_uid")),
+                               cookies=request.COOKIES)
         if loyalty.status_code == 200:
             loyalty = loyalty.json()
             booking.update(loyalty)
@@ -508,7 +499,8 @@ def add_hotel_admin(request):
             image.write(files)
         new_hotel = requests.post("http://localhost:8004/api/v1/hotels/",
                                   json={'title': form.data['title'], 'short_text': form.data['short_text'],
-                                        'rooms': form.data['rooms'], 'cost': form.data['cost'], 'cities': form.data['cities'],
+                                        'rooms': form.data['rooms'], 'cost': form.data['cost'],
+                                        'cities': form.data['cities'],
                                         'location': form.data['location'], 'file': f'images/{filename}'},
                                   cookies=request.COOKIES)
         error = 'success'
@@ -545,7 +537,7 @@ def delete_hotel_admin(request):
     if request.method == "POST":
         form = DeleteHotel(data=request.POST)
         new_hotel = requests.delete('http://localhost:8005/api/v1/hotels/{}'.format(form.data['hotel_uid']),
-                                  cookies=request.COOKIES)
+                                    cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 204:
             try:
