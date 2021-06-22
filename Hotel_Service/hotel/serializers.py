@@ -6,7 +6,7 @@ import uuid
 class HotelsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hotels
-        fields = ['hotel_uid', 'title', 'short_text', 'location', 'rooms', 'cost', 'cities']
+        fields = ['hotel_uid', 'title', 'short_text', 'location', 'rooms', 'cost', 'cities', 'photo']
 
     def create(self, validated_data):
         validated_data.pop('role', None)

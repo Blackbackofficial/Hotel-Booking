@@ -10,13 +10,9 @@ from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
 from confluent_kafka import Producer
 from datetime import datetime
-import pytz
-import sys
-import os
-import requests
-import json
-import jwt
-import re
+from random import choices
+from string import ascii_letters, digits
+import base64, pytz, sys, os, requests, json, jwt, re
 
 FAILURES = 3
 TIMEOUT = 6
@@ -505,10 +501,16 @@ def add_hotel_admin(request):
         form = NewHotel()
     if request.method == "POST":
         form = NewHotel(data=request.POST)
-        new_hotel = requests.post('http://localhost:8005/api/v1/hotel',
+        # сохраним фото в gateway/static/images/
+        filename = ''.join(choices(ascii_letters + digits, k=10)) + '.jpg'
+        with open(f'gateway/static/images/{filename}', 'wb') as image:
+            files = request.FILES["photo"].read()
+            image.write(files)
+        new_hotel = requests.post("http://localhost:8004/api/v1/hotels/",
                                   json={'title': form.data['title'], 'short_text': form.data['short_text'],
                                         'rooms': form.data['rooms'], 'cost': form.data['cost'], 'cities': form.data['cities'],
-                                        'location': form.data['location']}, cookies=request.COOKIES)
+                                        'location': form.data['location'], 'file': f'images/{filename}'},
+                                  cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 200:
             error = new_hotel.json()['message']

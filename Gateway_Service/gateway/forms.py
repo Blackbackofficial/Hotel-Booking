@@ -30,6 +30,7 @@ class NewHotel(forms.Form):
     cities = forms.CharField(label='Город:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     location = forms.CharField(label='Адрес:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     cost = forms.IntegerField(label="Стоимость номера:", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    photo = forms.ImageField(label='Загрузите аватар', required=False)
 
 
 class DeleteHotel(forms.Form):
