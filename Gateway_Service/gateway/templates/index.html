@@ -2,89 +2,22 @@
 {% load static %}
 
 {% block content %}
-    <div class="row col-md-12">
-        <div class="col-md-5">
-            <h2>{{ title_page }}</h2>
-        </div>
-        {% if hot %}
-            <div class="col-md-3 my-1">
-                <a type="button" class="btn btn-outline-secondary" href="{% url 'hot' %}">{{ hot }}</a>
-            </div>
-        {% endif %}
 
-        {% if new %}
-        <div class="col-md-3 my-1">
-            <a type="button" class="btn btn-outline-secondary" href="{% url 'index' %}">{{ new }}</a>
-        </div>
-        {% endif %}
+    <div class="text-center">
+        <h3 style="font-weight: bold">{{ title }}</h3>
     </div>
 
-    {% for item in posts %}
-        <div class="row question mt-4 mr-3 font">
-            <div class="container">
-                <div class="row mt-2">
-                    <div class="col-2">
-                        <div class="row">
-                            <img class="avatar" style="margin: auto" src="/{{item.author.userprofile.avatar}}" alt="">
-                        </div>
-
-                        <div class="row mt-1">
-                            <div class="center-text" style="margin: auto" id="rating{{item.id}}">
-                                {{item.rating_num}}
-                            </div>
-                        </div>
-
-                        <div class="row mt-1">
-                            <div class="btn-group mx-auto my-auto">
-                                {% if user.is_authenticated %}
-                                <button type="button" answer="like" data-ans="{{ item.id }}"
-                                    {% for likes in like %}
-                                        {% if likes.id_question_id is item.id and likes.value > 0 %} disabled
-                                            {% if likes.value == 1 %}class="btn btn-success likes-button"{% endif %}
-                                            {% if likes.value == 2 %} class="btn btn-danger likes-button"{% endif %}
-                                        {% endif %}
-                                    {% endfor %} class = "btn btn-secondary likes-button">
-                                    <strong>+</strong>
-                                </button>
-                                <button type="button" answer="dislike" data-ans="{{ item.id }}"
-                                    {% for likes in like %}
-                                        {% if likes.id_question_id is item.id and likes.value > 0 %} disabled
-                                            {% if likes.value == 1 %} class="btn btn-success likes-button"{% endif %}
-                                            {% if likes.value == 2 %} class="btn btn-danger likes-button"{% endif %}
-                                        {% endif %}
-                                    {% endfor %} class = "btn btn-secondary likes-button">
-                                    <strong>-</strong>
-                                </button>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="row">
-                            <a href="{% url 'questions' item.id %}" class="h4">{{item.title}}</a>
-                        </div>
-
-                        <div class="row">
-                            <p>
-                                {{item.text}}
-                            </p>
-                        </div>
-
-                        <div class="row">
-                            <div class="col mt-3">
-                                <a href ="{% url 'questions' item.id %}">Answers: ({{item.answer}})</a>
-                            </div>
-                            <div class="col mt-3 my-3">
-                                <span>Tags:</span>
-                                {% for tag in item.tags.all%}
-                                    <a href="{% url 'tag' tag %}" class="question-tag">{{tag}}</a>
-                                {% empty %}
-                                    <span>None</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
+    {% for hotel in allhotels %}
+        <div class = "font my-4 p-2">
+            <a href={% url 'hotel_info' hotel.hotel_uid %}><h3>{{hotel.title}}</h3></a>
+            <p class="d-inline-block text-truncate" style="max-width:800px;">{{hotel.short_text}}</p>
+            <p>Город: {{ hotel.cities }}</p>
+            <div class = "row">
+                <div class = "col-8">
+                    <p>Вместимость: {{hotel.rooms}} номеров</p>
+                </div>
+                <div class = "col-4">
+                    <p class = "text-end">Стоимость за ночь: {{hotel.cost}}</p>
                 </div>
             </div>
         </div>
@@ -93,5 +26,6 @@
     {%block pagination%}
         {% include "pagination.html" %}
     {%endblock%}
+
 {% endblock %}
 

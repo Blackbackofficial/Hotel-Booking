@@ -36,4 +36,20 @@
         </tr>
         </tbody>
     </table>
+    <div class="text-center">
+        <h3 style="color: #e6d16c; font-weight: bold">Мои бронирования</h3>
+    </div>
+{#    {% if user_booking %}#}
+{#        {% for booking in user_booking %}#}
+            <div class = "font my-4 p-2">
+                <a href={% url 'booking_info' {# booking.booking_uid #}%}><h3>Бронирование отеля HotelName</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">01.07.2021 - 08.07.2021</p>
+                <p>Статус: требуется оплата</p>
+            </div>
+{#        {% endfor %}#}
+{#    {% else %}#}
+{#        <div class="row">#}
+{#            <p>У вас нет текущих бронирований</p>#}
+{#        </div>#}
+{#    {% endif %}#}
 {% endblock %}

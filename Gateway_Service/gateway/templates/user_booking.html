@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+        <div class="p-2 my-3">
+        <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Бронирование отеля Hotelname</h4>
+    </div>
+    <div class="alert alert-light font">
+        <table class = "table">
+            <tr>
+                <th scope="col" class="w-25" style="border: none;">Город:</th>
+                <td style="border: none;">London</td>
+            </tr>
+            <tr>
+                <th scope="col" class="w-25">Адрес:</th>
+                <td>Baker street 221B</td>
+            </tr>
+            <tr>
+                <th scope="col" class="w-25">Дата заезда:</th>
+                <td>06.01.1854</td>
+            </tr>
+            <tr>
+                <th scope="col" class="w-25">Дата выезда:</th>
+                <td>04.05.1891</td>
+            </tr>
+            <tr>
+                <th scope="col" class="w-25">Ваш комментарий:</th>
+                <td>None</td>
+            </tr>
+            <tr>
+                <th scope="col" class="w-25">Статус:</th>
+                <td>не оплачено</td>
+            </tr>
+        </table>
+        <form action="{% url 'pay_room' %}" method="post">
+            <input type="hidden" name="booking_id" value="{# booking_uid #}">
+            <input type="submit" class="btn btn-info mr-2" value="Оплатить">
+        </form>
+        <form action="{% url 'del_booking' %}" method="post">
+            <input type="hidden" name="booking_id" value="{# booking_uid #}">
+            <input type="submit" class="btn btn-danger" value="Отменить бронь">
+        </form>
+    </div>
+
+{% endblock %}

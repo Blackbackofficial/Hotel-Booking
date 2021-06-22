@@ -1,15 +1,15 @@
 {% block sidebar %}
-    <div class="row tags py-2">
-    <p class="mr-3 w-100 h2">Популярные теги:</p>
-    {% for Tag in popular_tag %}
-        <a class="mr-3 h4 w-100" href="{% url 'tag' Tag %}">{{ Tag.name }}</a>
-    {% endfor %}
-    </div>
-
-    <div class="row tags py-2">
-        <p class="mr-3 h2">Лучшие пользователи:</p>
-        {% for User in name_user %}
-            <p class="mr-3 h4 w-100">{{ User.user.username }}</p>
-        {% endfor %}
+    <div class = "font my-4 p-2">
+        <p class="mr-3 h2 text-center">Найти отель:</p>
+        <form action="{% url 'search' %}" method="POST">
+            {% csrf_token %}
+            <label>Введите город</label>
+            <input type="text" name="city" id="city" class="form-control bg-light" placeholder="Город"><br>
+            <label>Дата заезда</label>
+            <input type="date" name="date_start" id="date_start" class="form-control bg-light"><br>
+            <label>Дата выезда</label>
+            <input type="date" name="date_end" id="date_end" class="form-control bg-light"><br>
+            <input type="submit" class="btn btn-info" value="Найти">
+        </form>
     </div>
 {% endblock %}

@@ -469,8 +469,9 @@ def report_hotels(request):
 def index(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
-
-    response = render(request, 'index.html', {'user': data})
+    title = "Our hotels"
+    _allhotels = requests.get("http://localhost:8004/api/v1/hotels", cookies=request.COOKIES).json()
+    response = render(request, 'index.html', {'allhotels': _allhotels, 'title':title, 'user': data})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
@@ -494,6 +495,60 @@ def make_login(request):
             session = session.content.decode('utf8').replace("'", '"')
             error = json.loads(session)['detail']
     return render(request, 'login.html', {'form': form, 'error': error})
+
+
+def hotel_info(request, hotel_uid):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                         .format(hotel_uid), cookies=session.cookies).json()
+    response = render(request, 'hotel_info.html', {'hotel_info': hotel, 'user': data})
+
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def add_booking(request):
+    is_authenticated, request, session = cookies(request)
+    user = auth(request)
+
+    # response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+    #     if is_authenticated else response.delete_cookie('jwt')
+    # return response
+    pass
+
+
+def booking_info(request, booking_uid):
+    pass
+
+
+def pay_room(request):
+    pass
+
+
+def del_booking(request):
+    pass
+
+
+def search_hotel_booking(request):
+    is_authenticated, request, session = cookies(request)
+    user = auth(request)
+    if request.method == 'POST':
+        data = request.POST
+        search = requests.post("http://localhost:8004/api/v1/hotels/date",
+                                json={"date_start": data["date_start"],
+                                      "date_end": data["date_end"],
+                                      "city": data["city"]}, cookies=request.COOKIES)
+        if len(search.json()) != 0:
+            title = "Доступные отели в городе "+str(data["city"])+" c "+str(data["date_start"])+" по "+str(data["date_end"])
+            response = render(request, 'index.html', {'allhotels': search.json(), 'title': title, 'user': user})
+        else:
+            title = "По Вашему запросу ничего не найдено"
+            response = render(request, 'index.html', {'title': title, 'user': user})
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+            if is_authenticated else response.delete_cookie('jwt')
+        return response
 
 
 def add_hotel_admin(request):
