@@ -162,6 +162,7 @@ def filter_date(request):
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# не используется
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['PATCH'])
 def change_rooms(request, hotel_uid):
