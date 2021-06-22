@@ -48,6 +48,7 @@ def login(request):
         'user_uid': str(user.user_uid),
         'username': str(username),
         'role': str(user.role),
+        'avatar': str(user.avatar),
         'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5),
         'iat': datetime.datetime.utcnow()
     }
