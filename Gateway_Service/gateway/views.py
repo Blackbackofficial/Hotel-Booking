@@ -509,7 +509,7 @@ def add_hotel_admin(request):
         new_hotel = requests.post("http://localhost:8004/api/v1/hotels/",
                                   json={'title': form.data['title'], 'short_text': form.data['short_text'],
                                         'rooms': form.data['rooms'], 'cost': form.data['cost'], 'cities': form.data['cities'],
-                                        'location': form.data['location'], 'file': f'gateway/static/images/{filename}'},
+                                        'location': form.data['location'], 'file': f'images/{filename}'},
                                   cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 200:
