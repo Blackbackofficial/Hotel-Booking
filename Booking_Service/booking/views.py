@@ -144,8 +144,8 @@ def about_one(request, booking_uid):
 def filter_booking(request, date_start, date_end):
     try:
         reservations = list(Reservations.objects.filter(date_start__gte=date_start, date_end__lte=date_end).values())
-        # if len(reservations) == 0:
-        return JsonResponse({'message': 'No content'}, status=status.HTTP_204_NO_CONTENT)
+        if len(reservations) == 0:
+            return JsonResponse({'message': 'No content'}, status=status.HTTP_204_NO_CONTENT)
         for res in reservations:
             payBalance = requests.get(
                 "http://localhost:8002/api/v1/payment/status/{}".format(res["payment_uid"]),
