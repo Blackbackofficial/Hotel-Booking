@@ -48,6 +48,7 @@ def login(request):
         'user_uid': str(user.user_uid),
         'username': str(username),
         'role': str(user.role),
+        'avatar': str(user.avatar),
         'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5),
         'iat': datetime.datetime.utcnow()
     }
@@ -98,6 +99,7 @@ def refresh(request):
         'user_uid': str(payload['user_uid']),
         'username': str(payload['username']),
         'role': str(payload['role']),
+        'avatar': str(payload['avatar']),
         'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5),
         'iat': datetime.datetime.utcnow()
     }

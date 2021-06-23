@@ -11,13 +11,9 @@ from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
 from confluent_kafka import Producer
 from datetime import datetime
-import pytz
-import sys
-import os
-import requests
-import json
-import jwt
-import re
+from random import choices
+from string import ascii_letters, digits
+import base64, pytz, sys, os, requests, json, jwt, re
 
 FAILURES = 3
 TIMEOUT = 6
@@ -260,33 +256,24 @@ def create_booking_or_all(request):
                                        cookies=session.cookies)
             if loyaltyUP.status_code != 200:
                 return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
-        #  при бронировании вычитаем комнату
-        hotel = requests.patch("http://localhost:8004/api/v1/hotels/{}/rooms".format(request.data['hotel_uid']),
-                               json={"reservation": "Done"}, cookies=session.cookies)
-        if hotel.status_code != 200:
-            return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
         booking = booking.json()
-        payBalance = requests.get(
-            "http://localhost:8002/api/v1/payment/status/{}".format(booking.get("payment_uid")),
-            cookies=request.COOKIES)
+        payBalance = requests.get("http://localhost:8002/api/v1/payment/status/{}".format(booking.get("payment_uid")),
+                                  cookies=request.COOKIES)
         if payBalance.status_code == 200:
             payBalance = payBalance.json()
             booking.update(payBalance)
-        about_hotel = requests.get(
-            "http://localhost:8004/api/v1/hotels/{}".format(booking.get("hotel_uid")),
-            cookies=request.COOKIES)
+        about_hotel = requests.get("http://localhost:8004/api/v1/hotels/{}".format(booking.get("hotel_uid")),
+                                   cookies=request.COOKIES)
         if about_hotel.status_code == 200:
             about_hotel = about_hotel.json()
             booking.update(about_hotel)
-        user = requests.get(
-            "http://localhost:8001/api/v1/session/user/{}".format(booking.get("user_uid")),
-            cookies=request.COOKIES)
+        user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(booking.get("user_uid")),
+                            cookies=request.COOKIES)
         if user.status_code == 200:
             user = user.json()
             booking.update(user)
-        loyalty = requests.get(
-            "http://localhost:8000/api/v1/loyalty/status/{}".format(booking.get("user_uid")),
-            cookies=request.COOKIES)
+        loyalty = requests.get("http://localhost:8000/api/v1/loyalty/status/{}".format(booking.get("user_uid")),
+                               cookies=request.COOKIES)
         if loyalty.status_code == 200:
             loyalty = loyalty.json()
             booking.update(loyalty)
@@ -631,10 +618,17 @@ def add_hotel_admin(request):
         form = NewHotel()
     if request.method == "POST":
         form = NewHotel(data=request.POST)
-        new_hotel = requests.post('http://localhost:8005/api/v1/hotel',
+        # сохраним фото в gateway/static/images/
+        filename = ''.join(choices(ascii_letters + digits, k=10)) + '.jpg'
+        with open(f'gateway/static/images/{filename}', 'wb') as image:
+            files = request.FILES["photo"].read()
+            image.write(files)
+        new_hotel = requests.post("http://localhost:8004/api/v1/hotels/",
                                   json={'title': form.data['title'], 'short_text': form.data['short_text'],
-                                        'rooms': form.data['rooms'], 'cost': form.data['cost'], 'cities': form.data['cities'],
-                                        'location': form.data['location']}, cookies=request.COOKIES)
+                                        'rooms': form.data['rooms'], 'cost': form.data['cost'],
+                                        'cities': form.data['cities'],
+                                        'location': form.data['location'], 'file': f'images/{filename}'},
+                                  cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 200:
             error = new_hotel.json()['message']
@@ -669,7 +663,7 @@ def delete_hotel_admin(request):
     if request.method == "POST":
         form = DeleteHotel(data=request.POST)
         new_hotel = requests.delete('http://localhost:8005/api/v1/hotels/{}'.format(form.data['hotel_uid']),
-                                  cookies=request.COOKIES)
+                                    cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 204:
             try:
@@ -781,10 +775,17 @@ def registration(request):
             return render(request, 'signup.html', {'form': form, 'error': 'Password mismatch'})
         if not re.compile("^([A-Za-z0-9]+)+$").match(form.data['username']):
             return render(request, 'signup.html', {'form': form, 'error': 'No valid login'})
+        if len(request.FILES) == 0:
+            return render(request, 'signup.html', {'form': form, 'error': 'No Photo'})
+        # сохраним фото в gateway/static/images/avatars
+        filename = ''.join(choices(ascii_letters + digits, k=10)) + '.jpg'
+        with open(f'gateway/static/images/avatars/{filename}', 'wb') as image:
+            files = request.FILES["avatar"].read()
+            image.write(files)
         session = requests.post('http://localhost:8005/api/v1/register',
                                 json={"username": form.data['username'], "name": form.data['first_name'],
                                       "last_name": form.data['last_name'], "password": form.data['password'],
-                                      "email": form.data['email']})
+                                      "email": form.data['email'], "avatar": f'images/avatars/{filename}'})
         error = 'success'
         if session.status_code != 200:
             session = session.content.decode('utf8').replace("'", '"')

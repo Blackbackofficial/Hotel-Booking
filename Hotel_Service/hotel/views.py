@@ -66,7 +66,8 @@ def all_hotels_or_add_hotel(request):
                 return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
             new_hotel = {"title": request.data["title"], "short_text": request.data["short_text"],
                          "rooms": request.data["rooms"], "cities": request.data["cities"],
-                         "location": request.data["location"], "cost": request.data["cost"]}
+                         "location": request.data["location"], "cost": request.data["cost"],
+                         "photo": request.data["file"]}
             serializer = HotelsSerializer(data=new_hotel)
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -161,6 +162,7 @@ def filter_date(request):
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# не используется
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['PATCH'])
 def change_rooms(request, hotel_uid):
