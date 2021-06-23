@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render
 from django.template import context
 from rest_framework.exceptions import AuthenticationFailed
@@ -738,12 +740,12 @@ def balance(request):
     for s in sort:
         payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
                          .format(s['payment_uid']), cookies=session.cookies).json()
-        if datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.now() and payment['status'] == 'NEW':
+        if datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'NEW':
             ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
                          .format(s['hotel_uid']), cookies=session.cookies).json()
             curr.append(s)
             currhotel.append(ch)
-        elif datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.now() and payment['status'] == 'PAID':
+        elif datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'PAID':
             ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
                          .format(s['hotel_uid']), cookies=session.cookies).json()
             curr.append(s)

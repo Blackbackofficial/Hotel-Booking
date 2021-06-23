@@ -52,7 +52,14 @@
             <div class = "font my-4 p-2">
                 <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
                 <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
-                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                <div class="row">
+                    <div class="col-8">
+                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                    </div>
+                    <div class="col-4">
+                        <p>Создано {{ book.date_create }}</p>
+                    </div>
+                </div>
             </div>
         {% endfor %}
     </div>
