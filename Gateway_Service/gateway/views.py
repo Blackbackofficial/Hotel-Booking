@@ -564,8 +564,7 @@ def del_booking(request, booking_uid):
             delbook = requests.delete("http://localhost:8003/api/v1/booking/canceled/{}"
                                  .format(booking_uid), cookies=request.COOKIES)
             if delbook.status_code == 200:
-                success = "Бронь удалена"
-                response = render(request, 'user_booking.html', {'suc':success, 'user': data})
+                response = HttpResponseRedirect('/balance')
             else:
                 error = "Что-то пошло не так, повторите попытку"
                 response = render(request, 'user_booking.html', {'error':error, 'user': data})
@@ -576,8 +575,7 @@ def del_booking(request, booking_uid):
                 delbook = requests.delete("http://localhost:8003/api/v1/booking/canceled/{}"
                                      .format(booking_uid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
-                    success = "Бронь удалена"
-                    response = render(request, 'user_booking.html', {'suc':success, 'user': data})
+                    response = HttpResponseRedirect('/balance')
                 else:
                     error = "Ошибка снятия бронирования"
                     response = render(request, 'user_booking.html', {'error':error, 'user': data})
@@ -732,7 +730,7 @@ def balance(request):
                         cookies=request.COOKIES).json()
     _allbook = requests.get("http://localhost:8003/api/v1/booking/", cookies=request.COOKIES).json()
 
-    sort = sorted(_allbook, key=lambda x:x['date_end'], reverse=True)
+    sort = sorted(_allbook, key=lambda x: (x['date_create'], x['date_end']), reverse=True)
     curr = []
     hist = []
     currhotel = []
