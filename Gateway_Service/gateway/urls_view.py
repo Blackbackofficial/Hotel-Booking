@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import index, make_login, make_logout, registration, balance, add_hotel_admin, admin, delete_hotel_admin,\
-    all_users, users_static, all_booking_static
+    all_users, users_static, all_booking_static, static_booking
 
 urlpatterns = [
     # VIEW
@@ -15,4 +15,5 @@ urlpatterns = [
     path('all-users', all_users, name="all_users"),
     path('users-static', users_static, name="users_static"),
     path('all-booking-static', all_booking_static, name="all_booking_static"),
+    path('static_booking', static_booking, name="static_booking"),
 ]

@@ -527,6 +527,31 @@ def admin(request):
     return response
 
 
+def static_booking(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+
+    report = requests.get("http://localhost:8006/api/v1/reports/booking", cookies=session.cookies)
+    if report.status_code == 200:
+        report = report.content.decode('utf8').replace("'", '"')
+        report = json.loads(report)
+        dictlist = list()
+        for key, value in report.items():
+            temp = [key, value]
+            dictlist.append(temp)
+    else:
+        dictlist = None
+
+    response = render(request, 'static_booking.html', {'static_booking': dictlist, 'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
 def delete_hotel_admin(request):
     error = None
     is_authenticated, request, session = cookies(request)
