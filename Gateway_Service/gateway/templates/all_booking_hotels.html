@@ -6,43 +6,57 @@
 {% endblock %}
 
 {% block content %}
-    <h3 style="text-align: center; margin-bottom: 30px; margin-right: -120px">All booking hotel</h3>
-    <table class="table" style="margin-left: -400px;">
-        <tr>
-            <th><h5>Booking UUID:</h5></th>
-            <th><h5>Hotel UUID:</h5></th>
-            <th><h5>Payment UUID:</h5></th>
-            <th><h5>Date start<br>booking:</h5></th>
-            <th><h5>Date end<br>booking:</h5></th>
-            <th><h5>Date create<br>booking:</h5></th>
-            <th><h5>Comment<br>booking:</h5></th>
-
-            <th><h5>Name:</h5></th>
-            <th><h5>Surname:</h5></th>
-            <th><h5>Registration:</h5></th>
-            <th><h5>User UUID:</h5></th>
-            <th><h5>Role:</h5></th>
-            <th><h5>E-mail:</h5></th>
-            <th><h5>Username:</h5></th>
-        </tr>
+    <h3 style="text-align: center; margin-bottom: 30px; margin-right: -400px;">All booking hotel</h3>
+    <table class="table table-bordered" style="margin-left: -394px;">
+		<tr>
+			<th colspan="5" style="text-align: center;">Booking</th>
+			<th colspan="3" style="text-align: center;">Payment</th>
+            <th colspan="6" style="text-align: center;">Hotel</th>
+            <th colspan="2" style="text-align: center;">Loyalty</th>
+            <th colspan="3" style="text-align: center;">User</th>
+		</tr>
+		<tr style="text-align: center; font-size: 15px;">
+			<td><b>UUID</b></td>
+			<td><b>Date start</b></td>
+			<td><b>Date end</b></td>
+            <td><b>Date create</b></td>
+            <td><b>Comment</b></td>
+            <td><b>UUID</b></td>
+            <td><b>Status</b></td>
+            <td><b>Price</b></td>
+            <td><b>UUID</b></td>
+            <td><b>Name</b></td>
+            <td><b>Description</b></td>
+            <td><b>Location</b></td> <!-- city + location -->
+            <td><b>Rooms</b></td>
+            <td><b>Cost</b></td>
+            <td><b>Status</b></td>
+            <td><b>Discount</b></td>
+            <td><b>UUID</b></td>
+            <td><b>Username</b></td>
+            <td><b>E-mail</b></td>
+		</tr>
         {% for booking in all_booking %}
-            <tr>
+            <tr style="font-size: 13px;">
                 <td>{{ booking.booking_uid }}</td>
-                <td>{{ booking.hotel_uid }}</td>
-                <td>{{ booking.payment_uid }}</td>
                 <td>{{ booking.date_start }}</td>
                 <td>{{ booking.date_end }}</td>
                 <td>{{ booking.date_create }}</td>
                 <td>{{ booking.comment }}</td>
-
-
-                <td>{{ booking.name }}</td>
-                <td>{{ booking.last_name }}</td>
-                <td>{{ booking.date_joined }}</td>
+                <td>{{ booking.payment_uid }}</td>
+                <td>{{ booking.status }}</td>
+                <td>{{ booking.price }}</td>
+                <td>{{ booking.hotel_uid }}</td>
+                <td>{{ booking.title }}</td>
+                <td>{{ booking.short_text }}</td>
+                <td>{{ booking.cities }} {{ booking.location }}</td>
+                <td>{{ booking.rooms }}</td>
+                <td>{{ booking.cost }}</td>
+                <td>{{ booking.status }}</td>
+                <td>{{ booking.discount }}%</td>
                 <td>{{ booking.user_uid }}</td>
-                <td>{{ booking.role }}</td>
-                <td>{{ booking.email }}</td>
                 <td>{{ booking.username }}</td>
+                <td>{{ booking.email }}</td>
             </tr>
         {% endfor %}
     </table>
