@@ -588,6 +588,25 @@ def users_static(request):
     return response
 
 
+def all_booking_static(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    try:
+        static_booking = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+        static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+    except Exception:
+        static_booking = None
+
+    response = render(request, 'all_booking_hotels.html', {'all_booking': static_booking, 'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
 def make_logout(request):
     session = requests.get("http://localhost:8005/api/v1/logout", cookies=request.COOKIES)
     if session.status_code == 200:

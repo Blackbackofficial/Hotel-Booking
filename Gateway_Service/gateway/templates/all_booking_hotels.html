@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    All booking hotel
+{% endblock %}
+
+{% block content %}
+    <h3 style="text-align: center; margin-bottom: 30px; margin-right: -120px">All booking hotel</h3>
+    <table class="table" style="margin-left: -400px;">
+        <tr>
+            <th><h5>Booking UUID:</h5></th>
+            <th><h5>Hotel UUID:</h5></th>
+            <th><h5>Payment UUID:</h5></th>
+            <th><h5>Date start<br>booking:</h5></th>
+            <th><h5>Date end<br>booking:</h5></th>
+            <th><h5>Date create<br>booking:</h5></th>
+            <th><h5>Comment<br>booking:</h5></th>
+
+            <th><h5>Name:</h5></th>
+            <th><h5>Surname:</h5></th>
+            <th><h5>Registration:</h5></th>
+            <th><h5>User UUID:</h5></th>
+            <th><h5>Role:</h5></th>
+            <th><h5>E-mail:</h5></th>
+            <th><h5>Username:</h5></th>
+        </tr>
+        {% for booking in all_booking %}
+            <tr>
+                <td>{{ booking.booking_uid }}</td>
+                <td>{{ booking.hotel_uid }}</td>
+                <td>{{ booking.payment_uid }}</td>
+                <td>{{ booking.date_start }}</td>
+                <td>{{ booking.date_end }}</td>
+                <td>{{ booking.date_create }}</td>
+                <td>{{ booking.comment }}</td>
+
+
+                <td>{{ booking.name }}</td>
+                <td>{{ booking.last_name }}</td>
+                <td>{{ booking.date_joined }}</td>
+                <td>{{ booking.user_uid }}</td>
+                <td>{{ booking.role }}</td>
+                <td>{{ booking.email }}</td>
+                <td>{{ booking.username }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
