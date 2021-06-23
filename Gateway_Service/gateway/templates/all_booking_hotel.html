@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Баланс
+{% endblock %}
+
+{% block content %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th style="border-color: white;" colspan="3">
+                <h3 style="text-align: center">Sky <b>ID</b></h3>
+            </th>
+        </tr>
+        </thead>
+        <tbody class="font">
+        <tr>
+            <td>
+                <div style="margin: 10px;">
+                    <h3 style="margin-bottom: 20px;">{{ user.last_name }} {{ user.name }}</h3>
+                    <hr style="margin-left: -21px; margin-right: -400px;">
+                    <h4><b>E-mail:</b></h4>
+                    <h4><b>Status:</b></h4>
+                    <h4><b>To next level loyalty:</b></h4>
+                </div>
+            <td>
+            <td>
+            <div style="margin-top: 80px;">
+                <h4>{{ user.email }}</h4>
+                <h4>{{ loyalty.status }}</h4>
+                <h4>{{ loyalty.discount }}</h4>
+            </div>
+            </td>
+        </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="text-center">
+        <h3 style="color: #e6d16c; font-weight: bold">Мои бронирования</h3>
+    </div>
+    {% if error == 'success' %}
+        <div class="alert alert-success"> Добавлен </div>
+    {% elif error %}
+        <div class="alert alert-success">{{ error }}</div>
+    {% endif %}
+    <h5>Действующие бронирования</h5>
+    <button class="btn btn-info" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Скрыть</button>
+    <button class="btn btn-info" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Показать</button>
+    <div id="example_2" style="display: none">
+        {% for book, hotel in currbookhot %}
+            <div class = "font my-4 p-2">
+                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                <div class="row">
+                    <div class="col-8">
+                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                    </div>
+                    <div class="col-4">
+                        <p>Создано {{ book.date_create }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+    <h5>История бронирований</h5>
+    <button class="btn btn-success" id="example_4_4" onclick=" document.getElementById('example_4').style.display='none'; document.getElementById('example_4_4').style.display='none'; document.getElementById('example_4_3').style.display='block';" style="display:none;">Скрыть</button>
+    <button class="btn btn-success" id="example_4_3" onclick="document.getElementById('example_4').style.display='block'; document.getElementById('example_4_3').style.display='none'; document.getElementById('example_4_4').style.display='block';">Показать</button>
+    <div id="example_4" style="display: none">
+        {% for book, hotel in histbookhot %}
+            <div class = "font my-4 p-2">
+                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+            </div>
+        {% endfor %}
+    </div>
