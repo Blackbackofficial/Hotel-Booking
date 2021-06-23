@@ -22,7 +22,6 @@ TIMEOUT = 6
 @api_view(['GET', 'DELETE'])
 def about_or_delete(request, hotel_uid):
     try:
-        data = auth(request)
         if request.method == 'GET':
             hotels = Hotels.objects.filter(hotel_uid=hotel_uid)
             if len(hotels) == 0:
@@ -30,6 +29,7 @@ def about_or_delete(request, hotel_uid):
             hotels = json.loads(serializers.serialize('json', hotels))
             return JsonResponse(hotels[0]['fields'], status=status.HTTP_200_OK, safe=False)
         else:  # DELETE only admin
+            data = auth(request)
             if 'admin' not in data['role']:
                 return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
             hotel = Hotels.objects.get(hotel_uid=hotel_uid)
