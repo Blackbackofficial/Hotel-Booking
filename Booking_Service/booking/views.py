@@ -8,13 +8,18 @@ from Booking_Service.settings import JWT_KEY
 from .serializers import BookingSerializer
 from django.forms.models import model_to_dict
 from rest_framework import status
+from datetime import datetime as dt
 import requests
 import datetime
 import json
 import jwt
+import pytz
 
 FAILURES = 3
 TIMEOUT = 6
+
+# Time zone
+tz_MOS = pytz.timezone('Europe/Moscow')
 
 
 # API
@@ -46,8 +51,9 @@ def create_or_all(request):
             serializer = BookingSerializer(data=new_reservation)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            reservations = model_to_dict(Reservations.objects.latest('id'))
-            return JsonResponse(reservations, status=status.HTTP_200_OK, safe=False)
+            reservations_dict = model_to_dict(Reservations.objects.latest('id'))
+            reservations_dict.update({"date_create": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
+            return JsonResponse(reservations_dict, status=status.HTTP_200_OK, safe=False)
         elif request.method == 'GET':
             reservations = Reservations.objects.filter(user_uid=data["user_uid"])
             users_reservations = json.loads(serializers.serialize('json', reservations))

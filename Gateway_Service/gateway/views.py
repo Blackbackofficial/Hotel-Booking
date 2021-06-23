@@ -10,7 +10,7 @@ from django.core import serializers
 from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
 from confluent_kafka import Producer
-from datetime import datetime
+from datetime import datetime as dt
 from random import choices
 from string import ascii_letters, digits
 import base64, pytz, sys, os, requests, json, jwt, re
@@ -51,7 +51,7 @@ def login(request):  #
     response = JsonResponse({'success': 'logined'}, status=status.HTTP_200_OK)
     q_session = session.json()
     q_session.update({"username": request.data["username"],
-                      "date": datetime.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
+                      "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
     producer(q_session, '41pfiknb-users')
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
@@ -79,7 +79,7 @@ def register(request):  #
     if loyalty.status_code != 200:
         return JsonResponse(loyalty.json(), status=status.HTTP_400_BAD_REQUEST)
     q_session = {"username": request.data["username"], "detail": 'Register',
-                 "date": datetime.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
+                 "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
     producer(q_session, '41pfiknb-users')
     return JsonResponse({'success': 'register & create loyalty'}, status=status.HTTP_200_OK)
 
@@ -98,7 +98,7 @@ def logout(request):  #
     user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(session.json()["user_uid"]),
                         cookies=request.COOKIES).json()
     q_session = {"username": user["username"], "detail": 'Logout',
-                 "date": datetime.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
+                 "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
     producer(q_session, '41pfiknb-users')
     response.delete_cookie('jwt')
     return response
