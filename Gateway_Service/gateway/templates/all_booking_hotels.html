@@ -37,7 +37,13 @@
             <td><b>E-mail</b></td>
 		</tr>
         {% for booking in all_booking %}
-            <tr style="font-size: 13px;">
+            {% if booking.status == 'REVERSED' or booking.status == 'CANCELED'%}
+                <tr style="font-size: 13px; background-color: #ffd5d5;">
+            {% elif booking.status == 'PAID' %}
+                    <tr style="font-size: 13px; background-color: #e4fccf;">
+            {% else %}
+                <tr style="font-size: 13px;">
+            {% endif %}
                 <td>{{ booking.booking_uid }}</td>
                 <td>{{ booking.date_start }}</td>
                 <td>{{ booking.date_end }}</td>
@@ -52,7 +58,7 @@
                 <td>{{ booking.cities }} {{ booking.location }}</td>
                 <td>{{ booking.rooms }}</td>
                 <td>{{ booking.cost }}</td>
-                <td>{{ booking.status }}</td>
+                <td>{{ booking.status_loyalty }}</td>
                 <td>{{ booking.discount }}%</td>
                 <td>{{ booking.user_uid }}</td>
                 <td>{{ booking.username }}</td>

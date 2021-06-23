@@ -237,7 +237,7 @@ def create_booking_or_all(request):
         l_status = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=session.cookies)
         if l_status.status_code != 200:
             return JsonResponse(l_status.json(), status=status.HTTP_400_BAD_REQUEST)
-        l_status = l_status.json()['status']
+        l_status = l_status.json()['status_loyalty']
 
         # Up Loyalty
         if 20 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
