@@ -4,43 +4,59 @@
 {% block content %}
 
         <div class="p-2 my-3">
-        <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Бронирование отеля Hotelname</h4>
+        <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Бронирование отеля {{ hotel.title }}</h4>
     </div>
     <div class="alert alert-light font">
+    {% if suc %}
+        <div class="alert alert-success"> {{ suc }} </div>
+    {% else %}
+        {% if success %}
+            <div class="alert alert-success"> {{ success }} </div>
+        {% elif error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
         <table class = "table">
             <tr>
                 <th scope="col" class="w-25" style="border: none;">Город:</th>
-                <td style="border: none;">London</td>
+                <td style="border: none;">{{ hotel.cities }}</td>
             </tr>
             <tr>
                 <th scope="col" class="w-25">Адрес:</th>
-                <td>Baker street 221B</td>
+                <td>{{ hotel.location }}</td>
             </tr>
             <tr>
                 <th scope="col" class="w-25">Дата заезда:</th>
-                <td>06.01.1854</td>
+                <td>{{ booking.date_start }}</td>
             </tr>
             <tr>
                 <th scope="col" class="w-25">Дата выезда:</th>
-                <td>04.05.1891</td>
+                <td>{{ booking.date_end }}</td>
             </tr>
             <tr>
                 <th scope="col" class="w-25">Ваш комментарий:</th>
-                <td>None</td>
+                <td>{{ booking.comment }}</td>
             </tr>
             <tr>
                 <th scope="col" class="w-25">Статус:</th>
-                <td>не оплачено</td>
+                <td>{{ payment.status }}</td>
             </tr>
         </table>
-        <form action="{% url 'pay_room' %}" method="post">
-            <input type="hidden" name="booking_id" value="{# booking_uid #}">
-            <input type="submit" class="btn btn-info mr-2" value="Оплатить">
-        </form>
-        <form action="{% url 'del_booking' %}" method="post">
-            <input type="hidden" name="booking_id" value="{# booking_uid #}">
-            <input type="submit" class="btn btn-danger" value="Отменить бронь">
-        </form>
+        {% if payment.status == "NEW" %}
+            <h3>К оплате: {{ payment.price }}</h3>
+            <form id="payment" action="{% url 'pay_room' payment.payment_uid %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="booking_uid" value="{{ booking.booking_uid }}">
+                <input type="submit" class="btn btn-info mr-2" value="Оплатить">
+            </form>
+        {% endif %}
+        {% if payment.status == "NEW" or payment.status == "PAID" %}
+            <form id="del" action="{% url 'del_booking' booking.booking_uid %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="{{ payment.status }}">
+                <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+            </form>
+        {% endif %}
+    {% endif %}
     </div>
 
 {% endblock %}

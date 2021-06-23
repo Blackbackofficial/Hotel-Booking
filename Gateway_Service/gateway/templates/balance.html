@@ -39,17 +39,37 @@
     <div class="text-center">
         <h3 style="color: #e6d16c; font-weight: bold">Мои бронирования</h3>
     </div>
-{#    {% if user_booking %}#}
-{#        {% for booking in user_booking %}#}
+    {% if error == 'success' %}
+        <div class="alert alert-success"> Добавлен </div>
+    {% elif error %}
+        <div class="alert alert-success">{{ error }}</div>
+    {% endif %}
+    <h5>Действующие бронирования</h5>
+    <div id="example_2" style="display: none">
+        {% for book, hotel in currbookhot %}
             <div class = "font my-4 p-2">
-                <a href={% url 'booking_info' {# booking.booking_uid #}%}><h3>Бронирование отеля HotelName</h3></a>
-                <p class="d-inline-block text-truncate" style="max-width:800px;">01.07.2021 - 08.07.2021</p>
-                <p>Статус: требуется оплата</p>
+                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
             </div>
-{#        {% endfor %}#}
-{#    {% else %}#}
-{#        <div class="row">#}
-{#            <p>У вас нет текущих бронирований</p>#}
-{#        </div>#}
-{#    {% endif %}#}
+        {% endfor %}
+    </div>
+    <button class="btn btn-info" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Скрыть</button>
+    <button class="btn btn-info" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Показать</button>
+    <br>
+    <br>
+    <h5>История бронирований</h5>
+    <div id="example_4" style="display: none">
+        {% for book, hotel in histbookhot %}
+            <div class = "font my-4 p-2">
+                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    <button class="btn btn-success" id="example_4_4" onclick=" document.getElementById('example_4').style.display='none'; document.getElementById('example_4_4').style.display='none'; document.getElementById('example_4_3').style.display='block';" style="display:none;">Скрыть</button>
+    <button class="btn btn-success" id="example_4_3" onclick="document.getElementById('example_4').style.display='block'; document.getElementById('example_4_3').style.display='none'; document.getElementById('example_4_4').style.display='block';">Показать</button>
+
+
 {% endblock %}

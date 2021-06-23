@@ -31,13 +31,15 @@
         {% if request.COOKIES.jwt %}
             <div id="example_2" style="display: none">
                 <form action="{% url 'add_booking' %}" method="post">
-                    <input type="hidden" name="hotel_uid" value="">
+                    {% csrf_token %}
+                    <input type="hidden" name="hotel_uid" value="{{ hotel_info.hotel_uid }}">
                     <label>Дата заезда</label>
                     <input type="date" name="date_start" id="date_start" class="form-control"><br>
                     <label>Дата выезда</label>
                     <input type="date" name="date_end" id="date_end" class="form-control"><br>
                     <label>Комментарий</label>
-                    <input type="text" name="date_end" id="date_end" class="form-control"><br>
+                    <input type="text" name="comment" id="comment" class="form-control"><br>
+                    <input type="hidden" name="price" value="{{ hotel_info.cost }}">
                     <input type="submit" class="btn btn-info" value="Забронировать">
                 </form>
             </div>
