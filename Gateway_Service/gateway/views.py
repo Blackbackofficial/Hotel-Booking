@@ -237,7 +237,7 @@ def create_booking_or_all(request):
         l_status = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=session.cookies)
         if l_status.status_code != 200:
             return JsonResponse(l_status.json(), status=status.HTTP_400_BAD_REQUEST)
-        l_status = l_status.json()['status']
+        l_status = l_status.json()['status_loyalty']
 
         # Up Loyalty
         if 20 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
@@ -583,6 +583,25 @@ def users_static(request):
         dictlist = None
 
     response = render(request, 'users_static.html', {'all_users': dictlist, 'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+
+def all_booking_static(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    try:
+        static_booking = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+        static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+    except Exception:
+        static_booking = None
+
+    response = render(request, 'all_booking_hotels.html', {'all_booking': static_booking, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response
