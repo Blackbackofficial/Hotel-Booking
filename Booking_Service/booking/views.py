@@ -22,6 +22,15 @@ TIMEOUT = 6
 tz_MOS = pytz.timezone('Europe/Moscow')
 
 
+def utc_to_local(utc_dt):
+    local_dt = utc_dt.replace(tzinfo=pytz.utc).astimezone(tz_MOS)
+    return tz_MOS.normalize(local_dt)  # .normalize might be unnecessary
+
+
+def aslocaltimestr(utc_dt):
+    return utc_to_local(utc_dt).strftime('%Y-%m-%d %H:%M:%S')
+
+
 # API
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['POST', 'GET'])
@@ -129,7 +138,11 @@ def about_one(request, booking_uid):
     try:
         auth(request)
         reservations = Reservations.objects.get(booking_uid=booking_uid)
+        date_create = aslocaltimestr(dt(reservations.date_create.year, reservations.date_create.month,
+                                              reservations.date_create.day, reservations.date_create.hour,
+                                              reservations.date_create.minute))
         reservations = model_to_dict(reservations)
+        reservations.update({"date_create": date_create})
         hotel = requests.get("http://localhost:8002/api/v1/hotel/status/{}".format(reservations["hotel_uid"]),
                              cookies=request.COOKIES)  # нужно доделать
         if hotel.status_code == 200:
