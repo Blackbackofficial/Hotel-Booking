@@ -51,8 +51,9 @@ def create_or_all(request):
             serializer = BookingSerializer(data=new_reservation)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            new_reservation.update({"date_create": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
-            return JsonResponse(new_reservation, status=status.HTTP_200_OK, safe=False)
+            reservations_dict = model_to_dict(Reservations.objects.latest('id'))
+            reservations_dict.update({"date_create": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
+            return JsonResponse(reservations_dict, status=status.HTTP_200_OK, safe=False)
         elif request.method == 'GET':
             reservations = Reservations.objects.filter(user_uid=data["user_uid"])
             users_reservations = json.loads(serializers.serialize('json', reservations))
