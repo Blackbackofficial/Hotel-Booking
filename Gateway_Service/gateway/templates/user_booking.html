@@ -7,12 +7,10 @@
         <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Бронирование отеля {{ hotel.title }}</h4>
     </div>
     <div class="alert alert-light font">
-    {% if suc %}
-        <div class="alert alert-success"> {{ suc }} </div>
+    {% if suc or success %}
+        <div class="alert alert-success">{{ suc }}{{ success }}</div>
     {% else %}
-        {% if success %}
-            <div class="alert alert-success"> {{ success }} </div>
-        {% elif error %}
+        {% if error %}
             <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
         <table class = "table">
@@ -50,6 +48,9 @@
             <form id="payment" action="{% url 'pay_room' payment.payment_uid %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="booking_uid" value="{{ booking.booking_uid }}">
+                <input type="hidden" name="booking" value="{{ booking }}">
+                <input type="hidden" name="hotel" value="{{ hotel }}">
+                <input type="hidden" name="payment" value="{{ payment }}">
                 <input type="submit" class="btn btn-info mr-2" value="Оплатить">
             </form>
         {% endif %}
@@ -57,10 +58,13 @@
             <form id="del" action="{% url 'del_booking' booking.booking_uid %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="status" value="{{ payment.status }}">
+                <input type="hidden" name="booking" value="{{ booking }}">
+                <input type="hidden" name="hotel" value="{{ hotel }}">
+                <input type="hidden" name="payment" value="{{ payment }}">
                 <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
             </form>
         {% endif %}
     {% endif %}
     </div>
-
+    <a href="{% url 'balance' %}" class="btn btn-info">Мои бронирования</a>
 {% endblock %}

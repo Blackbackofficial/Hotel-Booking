@@ -37,74 +37,86 @@
         </tbody>
     </table>
     <div class="text-center">
-        <h3 style="color: #e6d16c; font-weight: bold">Мои бронирования</h3>
+        <h3 style="font-weight: bold">Мои бронирования</h3>
     </div>
-    <div class="row">
-        <div class="col-6">
-            <button class="btn btn-info active" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none';
-                                                                    document.getElementById('example_2_2').style.display='none';
-                                                                    document.getElementById('example_2_1').style.display='block';
-                                                                    document.getElementById('example_4_3').style.display='block';
-                                                                    document.getElementById('example_4_4').style.display='none';"
-                                                                            style="display:none;">Действующие брони</button>
-            <button class="btn btn-info" id="example_2_1" onclick=" document.getElementById('example_2').style.display='block';
+    <div class="btn-group btn-block px-1">
+        <button class="btn btn-info active" id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
                                                                     document.getElementById('example_4').style.display='none';
-                                                                    document.getElementById('example_2_1').style.display='none';
-                                                                    document.getElementById('example_4_3').style.display='block';
-                                                                    document.getElementById('example_4_4').style.display='none';
-                                                                    document.getElementById('example_2_2').style.display='block';">Действующие брони</button>
-        </div>
-        <div class="col-6">
-            <button class="btn btn-info active" id="example_4_4" onclick=" document.getElementById('example_4').style.display='none';
-                                                                    document.getElementById('example_4_4').style.display='none';
-                                                                    document.getElementById('example_2_2').style.display='none';
-                                                                    document.getElementById('example_2_1').style.display='block';
-                                                                    document.getElementById('example_4_3').style.display='block';" style="display:none;">История бронирований</button>
-            <button class="btn btn-info" id="example_4_3" onclick=" document.getElementById('example_4').style.display='block';
-                                                                    document.getElementById('example_2').style.display='none';
-                                                                    document.getElementById('example_4_3').style.display='none';
-                                                                    document.getElementById('example_2_1').style.display='block';
-                                                                    document.getElementById('example_2_2').style.display='none';
-                                                                    document.getElementById('example_4_4').style.display='block';">История бронирований</button>
-        </div>
+                                                                    document.getElementById('example_2_2').class='btn btn-info active';
+                                                                    document.getElementById('example_4_4').class='btn btn-info'"
+                                                                    >Действующие бронирования</button>
+        <button class="btn btn-info" id="example_4_4" onclick=" document.getElementById('example_2').style.display='none';
+                                                                    document.getElementById('example_4').style.display='block';
+                                                                    document.getElementById('example_2_2').class='btn btn-info';
+                                                                    document.getElementById('example_4_4').class='btn btn-info active'"
+                                                                    >История бронирований</button>
     </div>
-    {% if error == 'success' %}
-        <div class="alert alert-success"> Добавлен </div>
-    {% elif error %}
-        <div class="alert alert-success">{{ error }}</div>
-    {% endif %}
-    <div id="example_2" style="display: none">
+    <div id="example_2" style="display: block">
     <hr>
-        {% for book, hotel in currbookhot %}
+        {% for book, hotel, pay in currbookhot %}
+            {% if pay.status == "NEW" %}
             <div class = "font my-4 p-2">
                 <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
                 <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
                 <div class="row">
                     <div class="col-8">
                         <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                        <p style="font-weight: bold">Требуется оплата</p>
                     </div>
                     <div class="col-4">
                         <p>Создано {{ book.date_create }}</p>
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div class = "font my-4 p-2">
+                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                <div class="row">
+                    <div class="col-8">
+                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                        <p style="font-weight: bold">Оплачено</p>
+                    </div>
+                    <div class="col-4">
+                        <p>Создано {{ book.date_create }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         {% endfor %}
     </div>
     <div id="example_4" style="display: none">
     <hr>
-        {% for book, hotel in histbookhot %}
+        {% for book, hotel, pay in histbookhot %}
+            {% if pay.status == "CANCELED" %}
             <div class = "font my-4 p-2">
                 <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
                 <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
                 <div class="row">
                     <div class="col-8">
                         <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                        <p style="font-weight: bold">Отменено</p>
                     </div>
                     <div class="col-4">
                         <p>Создано {{ book.date_create }}</p>
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div class = "font my-4 p-2">
+                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                <div class="row">
+                    <div class="col-8">
+                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                        <p style="font-weight: bold">Средства возвращены</p>
+                    </div>
+                    <div class="col-4">
+                        <p>Создано {{ book.date_create }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         {% endfor %}
     </div>
 
