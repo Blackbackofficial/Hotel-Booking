@@ -38,8 +38,17 @@
                             <td>{{ hotel_info.cost }}</td>
                         </tr>
                     </table>
-                    <button class="btn btn-info" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Отмена</button>
-                    <button class="btn btn-info" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Забронировать</button>
+                    {% if request.COOKIES.jwt %}
+                        <button class="btn btn-info" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Отмена</button>
+                        <button class="btn btn-info" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Забронировать</button>
+                    {% else %}
+                        <p>
+                            <a href="{% url 'login' %}">Войдите</a>
+                            или
+                            <a href="{% url 'signup' %}">зарегистрируйтесь</a>
+                            , чтобы забронировать номер!
+                        </p>
+                    {% endif %}
                 </div>
                 <div class="col-6">
                     <a href="{% static hotel_info.photo %}" data-fancybox data-caption="Отель {{ hotel_info.title }}">
@@ -62,13 +71,6 @@
                         <input type="submit" class="btn btn-info" value="Забронировать">
                     </form>
                 </div>
-            {% else %}
-                <p>
-                    <a href="{% url 'login' %}">Войдите</a>
-                    или
-                    <a href="{% url 'signup' %}">зарегистрируйтесь</a>
-                    , чтобы забронировать номер!
-                </p>
             {% endif %}
         </div>
     </div>

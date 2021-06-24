@@ -6,29 +6,32 @@
 {% endblock %}
 
 {% block content %}
-    <h3 style="text-align: center; margin-bottom: 30px; margin-right: -120px">Users</h3>
-    <table class="table">
-        <tr>
-            <th><h5>Name:</h5></th>
-            <th><h5>Surname:</h5></th>
-            <th><h5>Registration:</h5></th>
-            <th><h5>UUID:</h5></th>
-            <th><h5>Role:</h5></th>
-            <th><h5>E-mail:</h5></th>
-            <th><h5>Username:</h5></th>
-        </tr>
-        {% for users in all_users %}
+    <div class="container">
+        <h3 class="text-center" style="margin-top: 30px; font-weight: bold">Users</h3>
+        <br>
+        <table class="table">
             <tr>
-                <td>{{ users.name }}</td>
-                <td>{{ users.last_name }}</td>
-                <td>{{ users.date_joined }}</td>
-                <td>{{ users.user_uid }}</td>
-                <td>{{ users.role }}</td>
-                <td>{{ users.email }}</td>
-                <td>{{ users.username }}</td>
+                <th><h5>Name:</h5></th>
+                <th><h5>Surname:</h5></th>
+                <th><h5>Registration:</h5></th>
+                <th><h5>UUID:</h5></th>
+                <th><h5>Role:</h5></th>
+                <th><h5>E-mail:</h5></th>
+                <th><h5>Username:</h5></th>
             </tr>
-        {% endfor %}
-    </table>
+            {% for users in all_users %}
+                <tr>
+                    <td>{{ users.name }}</td>
+                    <td>{{ users.last_name }}</td>
+                    <td>{{ users.date_joined }}</td>
+                    <td>{{ users.user_uid }}</td>
+                    <td>{{ users.role }}</td>
+                    <td>{{ users.email }}</td>
+                    <td>{{ users.username }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}
 
 {% block sidebar %}

@@ -6,8 +6,8 @@
         <div class="text-center">
             <h3 style="font-weight: bold">{{ title }}</h3>
         </div>
-
-        {% for hotel in allhotels %}
+    {% if allhotels %}
+        {% for hotel in page_obj %}
             <div class = "font my-4 p-2">
                 <a href={% url 'hotel_info' hotel.hotel_uid %}><h3>{{hotel.title}}</h3></a>
                 <p class="d-inline-block text-truncate" style="max-width:800px;">{{hotel.short_text}}</p>
@@ -22,10 +22,10 @@
                 </div>
             </div>
         {% endfor %}
-
         {%block pagination%}
             {% include "pagination.html" %}
         {%endblock%}
+    {% endif %}
     </div>
 {% endblock %}
 

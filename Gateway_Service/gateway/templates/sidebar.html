@@ -4,11 +4,11 @@
         <form action="{% url 'search' %}" method="POST">
             {% csrf_token %}
             <label>Введите город</label>
-            <input type="text" name="city" id="city" class="form-control bg-light" placeholder="Город"><br>
+            <input type="text" name="city" id="city" class="form-control bg-light" placeholder="Город" required><br>
             <label>Дата заезда</label>
-            <input type="date" name="date_start" id="date_start" class="form-control bg-light"><br>
+            <input type="date" name="date_start" id="date_start" class="form-control bg-light" required><br>
             <label>Дата выезда</label>
-            <input type="date" name="date_end" id="date_end" class="form-control bg-light"><br>
+            <input type="date" name="date_end" id="date_end" class="form-control bg-light" required><br>
             <input type="submit" class="btn btn-info" value="Найти">
         </form>
     </div>

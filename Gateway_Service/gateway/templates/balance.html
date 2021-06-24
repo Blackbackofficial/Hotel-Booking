@@ -41,16 +41,16 @@
         <h3 style="font-weight: bold">Мои бронирования</h3>
     </div>
     <div class="btn-group btn-block px-1">
-        <button class="btn btn-info active" id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
+        <button id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
                                                                     document.getElementById('example_4').style.display='none';
                                                                     document.getElementById('example_2_2').class='btn btn-info active';
-                                                                    document.getElementById('example_4_4').class='btn btn-info'"
-                                                                    >Действующие брони</button>
-        <button class="btn btn-info" id="example_4_4" onclick=" document.getElementById('example_2').style.display='none';
+                                                                    document.getElementById('example_4_4').class='btn btn-info';"
+                                                                    class="btn btn-info active">Действующие брони</button>
+        <button id="example_4_4" onclick="document.getElementById('example_2').style.display='none';
                                                                     document.getElementById('example_4').style.display='block';
-                                                                    document.getElementById('example_2_2').class='btn btn-info';
-                                                                    document.getElementById('example_4_4').class='btn btn-info active'"
-                                                                    >История бронирований</button>
+                                                                    document.getElementById('example_4_4').class='btn btn-info active';
+                                                                    document.getElementById('example_2_2').class='btn btn-info';"
+                                                                    class="btn btn-info">История бронирований</button>
     </div>
     <div id="example_2" style="display: block">
     <hr>

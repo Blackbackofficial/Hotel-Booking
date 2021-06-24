@@ -6,58 +6,60 @@
 {% endblock %}
 
 {% block content %}
-    <h3 style="text-align: center; margin-bottom: 30px;">Static create booking</h3>
-    {% if static_booking %}
-    <table class="table table-bordered" style="margin-left: -394px;">
-        <tr style="text-align: center; font-size: 15px;">
-            <th>Booking UUID:</th>
-            <th>Hotel UUID:</th>
-            <th>User UUID:</th>
-            <th>Payment UUID:</th>
-            <th>User UUID:</th>
-            <th>Date start:</th>
-            <th>Date end:</th>
-            <th>Date create:</th>
-            <th>Comment:</th>
-            <th>Status:</th>
-            <th>Price:</th>
-            <th>Name:</th>
-            <th>Description:</th>
-            <th>Location:</th>
-            <th>Rooms:</th>
-            <th>Cost:</th>
-            <th>Username:</th>
-            <th>Email:</th>
-            <th>Status loyalty:</th>
-            <th>Discount:</th>
-        </tr>
-        {% for booking in static_booking %}
-            <tr style="font-size: 13px; text-align: center;">
-                <td>{{ booking.1.booking_uid }}</td>
-                <td>{{ booking.1.hotel_uid }}</td>
-                <td>{{ booking.1.user_uid }}</td>
-                <td>{{ booking.1.payment_uid }}</td>
-                <td>{{ booking.1.date_start }}</td>
-                <td>{{ booking.1.date_end }}</td>
-                <td>{{ booking.1.date_create }}</td>
-                <td>{{ booking.1.comment }}</td>
-                <td>{{ booking.1.status }}</td>
-                <td>{{ booking.1.price }}</td>
-                <td>{{ booking.1.title }}</td>
-                <td>{{ booking.1.short_text }}</td>
-                <td>{{ booking.1.cities }} {{ booking.1.location }}</td>
-                <td>{{ booking.1.rooms }}</td>
-                <td>{{ booking.1.cost }}</td>
-                <td>{{ booking.1.username }}</td>
-                <td>{{ booking.1.email }}</td>
-                <td>{{ booking.1.status_loyalty }}</td>
-                <td>{{ booking.1.discount }}</td>
+    <div class="container">
+        <h3 class="text-center" style="margin-top: 30px; font-weight: bold">Static create booking</h3>
+        {% if static_booking %}
+        <table class="table table-bordered" style="margin-left: -394px;">
+            <tr style="text-align: center; font-size: 15px;">
+                <th>Booking UUID:</th>
+                <th>Hotel UUID:</th>
+                <th>User UUID:</th>
+                <th>Payment UUID:</th>
+                <th>User UUID:</th>
+                <th>Date start:</th>
+                <th>Date end:</th>
+                <th>Date create:</th>
+                <th>Comment:</th>
+                <th>Status:</th>
+                <th>Price:</th>
+                <th>Name:</th>
+                <th>Description:</th>
+                <th>Location:</th>
+                <th>Rooms:</th>
+                <th>Cost:</th>
+                <th>Username:</th>
+                <th>Email:</th>
+                <th>Status loyalty:</th>
+                <th>Discount:</th>
             </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-        <h3 style="text-align: center; margin-bottom: 30px;">No static booking</h3>
-    {% endif %}
+            {% for booking in static_booking %}
+                <tr style="font-size: 13px; text-align: center;">
+                    <td>{{ booking.1.booking_uid }}</td>
+                    <td>{{ booking.1.hotel_uid }}</td>
+                    <td>{{ booking.1.user_uid }}</td>
+                    <td>{{ booking.1.payment_uid }}</td>
+                    <td>{{ booking.1.date_start }}</td>
+                    <td>{{ booking.1.date_end }}</td>
+                    <td>{{ booking.1.date_create }}</td>
+                    <td>{{ booking.1.comment }}</td>
+                    <td>{{ booking.1.status }}</td>
+                    <td>{{ booking.1.price }}</td>
+                    <td>{{ booking.1.title }}</td>
+                    <td>{{ booking.1.short_text }}</td>
+                    <td>{{ booking.1.cities }} {{ booking.1.location }}</td>
+                    <td>{{ booking.1.rooms }}</td>
+                    <td>{{ booking.1.cost }}</td>
+                    <td>{{ booking.1.username }}</td>
+                    <td>{{ booking.1.email }}</td>
+                    <td>{{ booking.1.status_loyalty }}</td>
+                    <td>{{ booking.1.discount }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <h3 style="text-align: center; margin-bottom: 30px;">No static booking</h3>
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block sidebar %}

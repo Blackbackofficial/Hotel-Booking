@@ -3,8 +3,6 @@ import datetime
 
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
-from django.template import context
-from django.urls import reverse
 from rest_framework.exceptions import AuthenticationFailed
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
@@ -459,44 +457,22 @@ def report_hotels(request):
 
 
 # VIEW
-def paginate(request, qs, url=None):
-    try:
-        limit = int(request.GET.get('limit', 5))
-    except ValueError:
-        limit = 5
-    if limit > 100:
-        limit = 5
-    try:
-        page = int(request.GET.get('page', 1))
-    except ValueError:
-        raise Http404
-    paginator = Paginator(qs, limit)
-    try:
-        page = paginator.page(page)
-    except EmptyPage:
-        page = paginator.page(paginator.num_pages)
-    if url == 'index':
-        paginator.baseurl = '/index/?page='
-    elif url == 'search':
-        paginator.baseurl = '/search/?page='
-    elif url == 'balance':
-        paginator.baseurl = '/balance/?page='
-    else:
-        paginator.baseurl = '/?page='
-    paginator.startdiv = page.number - 2
-    paginator.enddiv = page.number + 2
-    return page
-
-
 def index(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
-    title = "Our hotels"
     _allhotels = requests.get("http://localhost:8004/api/v1/hotels", cookies=request.COOKIES).json()
 
-    page = paginate(request, _allhotels, 'index')
-    response = render(request, 'index.html', {'allhotels': page.object_list, 'page': page, 'paginator': page.paginator, \
+    if len(_allhotels) != 0:
+        title = "Our hotels"
+        paginator = Paginator(_allhotels, 3)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        response = render(request, 'index.html', {'allhotels': _allhotels, 'page_obj': page_obj, \
                                               'title': title, 'user': data})
+
+    else:
+        title = "По Вашему запросу ничего не найдено"
+        response = render(request, 'index.html', {'title': title, 'user': data})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
@@ -644,8 +620,11 @@ def search_hotel_booking(request):
                                       "city": data["city"]}, cookies=request.COOKIES)
         if len(search.json()) != 0:
             title = "Доступные отели в городе "+str(data["city"])+" c "+str(data["date_start"])+" по "+str(data["date_end"])
-            page = paginate(request, search.json(), 'search')
-            response = render(request, 'index.html', {'allhotels': page.object_list, 'page': page, 'paginator':page.paginator, \
+
+            paginator = Paginator(search.json(), 3)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+            response = render(request, 'index.html', {'allhotels': search, 'page_obj': page_obj, \
                                                       'title': title, 'user': user})
         else:
             title = "По Вашему запросу ничего не найдено"
