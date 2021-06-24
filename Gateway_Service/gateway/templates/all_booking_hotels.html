@@ -8,6 +8,51 @@
 {% block content %}
     <div class="container">
         <h3 class="text-center" style="margin-top: 30px; font-weight: bold">All booking hotel</h3>
+            {% if uid %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div>
+                            <label>Hotel UID: </label>
+                        </div>
+                        <div class="mx-3">
+                            <input type="text" name="hotel_uid" id="hotel_uid" class="form-control" value="{{ uid }}">
+                        </div>
+                        <div>
+                            <label>Booking status:</label>
+                            <select class="btn btn-info mx-2" id="selecttheme" style="height: 40px">
+                                <option value="all" onclick="document.getElementById('status').value='all';">All</option>
+                                <option value="N/p" onclick="document.getElementById('status').value='new/paid';">New/paid</option>
+                                <option value="C/r" onclick="document.getElementById('status').value='canceled/reversed';">Canceled/reversed</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="status" id="status" class="form-control" value="all">
+                        <input type="submit" class="btn btn-info" value="Найти">
+                    </div>
+                </form>
+            {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div>
+                            <label>Hotel UID: </label>
+                        </div>
+                        <div class="mx-3">
+                            <input type="text" name="hotel_uid" id="hotel_uid" class="form-control">
+                        </div>
+                        <div>
+                            <label>Booking status:</label>
+                            <select class="btn btn-info mx-2" id="selecttheme" style="height: 40px">
+                                <option value="all" onclick="document.getElementById('status').value='all';">All</option>
+                                <option value="N/p" onclick="document.getElementById('status').value='new/paid';">New/paid</option>
+                                <option value="C/r" onclick="document.getElementById('status').value='canceled/reversed';">Canceled/reversed</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="status" id="status" class="form-control" value="all">
+                        <input type="submit" class="btn btn-info" value="Найти">
+                    </div>
+                </form>
+            {% endif %}
         <table class="table table-bordered" style="margin-left: -394px;">
             <tr>
                 <th colspan="5" style="text-align: center;">Booking</th>
