@@ -6,43 +6,45 @@
 {% endblock %}
 
 {% block content %}
-    <table class="table">
-        <thead>
-        <tr>
-            <th style="border-color: white;" colspan="3">
-                <h3 style="text-align: center">Новый отель</h3>
-            </th>
-        </tr>
-        </thead>
-        <tbody style="background-color: white; padding: 20px;">
-        <tr>
-            <td>
-                <div style="margin: 10px;">
-                    {% if error == 'success' %}
-                        <div class="alert alert-success"> Добавлен </div>
-                    {% elif error %}
-                        <div class="alert alert-danger">{{ error }}</div>
-                    {% endif %}
-                    <form enctype="multipart/form-data" class="form-horizontal" method="post">
-                        {% csrf_token %}
-                        <fieldset>
-                            {% for field in form %}
-                                <div class="control_group my-2"
-                                     {% if field.errors %}has-error{% endif %}>
-                                    <label class="control-label">{{ field.label }}</label>
-                                    <div class="controls">{{ field }}</div>
-                                </div>
-                            {% endfor %}
-                        </fieldset>
-                        <div class="flex-box my-4 ">
-                            <button type="submit" class="btn btn-success">
-                                Сохранить
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            <td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="col-8 mt-3">
+        <table class="table">
+            <thead>
+            <tr>
+                <th style="border-color: white;" colspan="3">
+                    <h3 style="text-align: center">Новый отель</h3>
+                </th>
+            </tr>
+            </thead>
+            <tbody style="background-color: white; padding: 20px;">
+            <tr>
+                <td>
+                    <div style="margin: 10px;">
+                        {% if error == 'success' %}
+                            <div class="alert alert-success"> Добавлен </div>
+                        {% elif error %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+                        <form enctype="multipart/form-data" class="form-horizontal" method="post">
+                            {% csrf_token %}
+                            <fieldset>
+                                {% for field in form %}
+                                    <div class="control_group my-2"
+                                         {% if field.errors %}has-error{% endif %}>
+                                        <label class="control-label">{{ field.label }}</label>
+                                        <div class="controls">{{ field }}</div>
+                                    </div>
+                                {% endfor %}
+                            </fieldset>
+                            <div class="flex-box my-4 ">
+                                <button type="submit" class="btn btn-success">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                <td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

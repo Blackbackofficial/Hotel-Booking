@@ -1,8 +1,8 @@
 # Booking Service
 
 ## Описание API
-1. `POST /api/v1/booking` – создать резерв;
-2. `POST /api/v1/booking` – все резервы пользователя (по куки);
+1. `POST /api/v1/booking/` – создать резерв;
+2. `POST /api/v1/booking/` – все резервы пользователя (по куки);
 3. `DELETE /api/v1/booking/canceled/{booking_uid}` – отменить бронь;
 4. `POST /api/v1/booking/pay/{booking_uid}` – оплатить бронь;
 5. `DELETE /api/v1/booking/reversed/{booking_uid}` – вернуть деньги по заказу.

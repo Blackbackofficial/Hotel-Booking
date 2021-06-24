@@ -81,18 +81,13 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-8 mt-3">
-
-            {% block content %}
-            {% endblock %}
-
-        </div>
-
-{#        <div class="col-3 mt-2">#}
-{#            {%block sidebar%}#}
-{#                {% include "sidebar.html" %}#}
-{#            {%endblock%}#}
-{#        </div>#}
+        {% block content %}
+        {% endblock %}
+        {%block sidebar%}
+            <div class="col-3 mt-2">
+                {% include "sidebar.html" %}
+            </div>
+        {%endblock%}
     </div>
 </div>
 
@@ -104,6 +99,6 @@
     </div>
 </footer>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-<!--<script src="{% static 'js/ajax.js' %}"></script>-->
+<script src="{% static 'js/ajax.js' %}"></script>
 </body>
 </html>
