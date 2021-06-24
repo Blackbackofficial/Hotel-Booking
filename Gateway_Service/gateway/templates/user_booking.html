@@ -4,8 +4,8 @@
 {% block content %}
 <div class="col-8 mt-3">
     {% if bookerror %}
-        <div class="alert alert-danger">{{ bookerror }}</div>
-        <input type="button" class="btn btn-info" onclick="history.back();" value="Назад"/>
+        <div class="alert alert-success">{{ bookerror }}</div>
+        <a href="{% url 'index' %}" class="btn btn-info">На главную</a>
     {% else %}
         <div class="p-2 my-3">
             <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Бронирование отеля
@@ -48,9 +48,15 @@
                     <th scope="col" class="w-25">Статус:</th>
                     <td>{{ payment.status }}</td>
                 </tr>
+                {% if payment.status == "PAID" %}
+                    <tr>
+                        <th scope="col" class="w-25">Оплачено:</th>
+                        <td>{{ totalcost }}</td>
+                    </tr>
+                {% endif %}
             </table>
             {% if payment.status == "NEW" %}
-                <h3>К оплате: {{ payment.price }}</h3>
+                <h3>К оплате: {{ totalcost }}</h3>
                 <form id="payment" action="{% url 'pay_room' payment.payment_uid %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="booking_uid" value="{{ booking.booking_uid }}">

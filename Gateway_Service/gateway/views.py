@@ -547,7 +547,12 @@ def booking_info(request, booking_uid):
                              .format(booking['hotel_uid']), cookies=session.cookies).json()
         payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
                              .format(booking['payment_uid']), cookies=session.cookies).json()
-        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data})
+        date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
+        date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
+        period = date_end - date_start
+        totalcost = int(hotel['cost'])*(period.days+1)
+        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data,\
+                                                         'totalcost': totalcost})
     except:
         bookerror = "Ошибка бронирования"
         response = render(request, 'user_booking.html', {'bookerror': bookerror, 'user': data})
@@ -592,7 +597,7 @@ def del_booking(request, booking_uid):
                                  .format(booking_uid), cookies=request.COOKIES)
             if delbook.status_code == 200:
                 success = "Бронирование удалено"
-                response = render(request, 'user_booking.html', {'success':success, 'user': data})
+                response = render(request, 'user_booking.html', {'bookerror':success, 'user': data})
                 # response = HttpResponseRedirect('/balance')
             else:
                 error = "Что-то пошло не так, повторите попытку"
@@ -606,7 +611,7 @@ def del_booking(request, booking_uid):
                                      .format(booking_uid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
                     success = "Бронирование удалено"
-                    response = render(request, 'user_booking.html', {'success':success, 'user': data})
+                    response = render(request, 'user_booking.html', {'bookerror':success, 'user': data})
                 else:
                     error = "Ошибка снятия бронирования"
                     response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot, \
