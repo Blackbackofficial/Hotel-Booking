@@ -1,5 +1,4 @@
 from rest_framework.exceptions import AuthenticationFailed
-from django.shortcuts import render
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Payment_Service.settings import JWT_KEY

@@ -1,5 +1,4 @@
-from rest_framework.exceptions import AuthenticationFailed, ValidationError, ParseError
-from django.shortcuts import render
+from rest_framework.exceptions import AuthenticationFailed
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Hotel_Service.settings import JWT_KEY
