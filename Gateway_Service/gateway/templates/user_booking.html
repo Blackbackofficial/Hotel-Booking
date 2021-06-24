@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block content %}
-
-        <div class="p-2 my-3">
+<div class="col-8 mt-3">
+    <div class="p-2 my-3">
         <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Бронирование отеля {{ hotel.title }}</h4>
     </div>
     <div class="alert alert-light font">
@@ -67,4 +67,5 @@
     {% endif %}
     </div>
     <a href="{% url 'balance' %}" class="btn btn-info">Мои бронирования</a>
+</div>
 {% endblock %}

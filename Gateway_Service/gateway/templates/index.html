@@ -2,30 +2,30 @@
 {% load static %}
 
 {% block content %}
+    <div class="col-8 mt-3">
+        <div class="text-center">
+            <h3 style="font-weight: bold">{{ title }}</h3>
+        </div>
 
-    <div class="text-center">
-        <h3 style="font-weight: bold">{{ title }}</h3>
-    </div>
-
-    {% for hotel in allhotels %}
-        <div class = "font my-4 p-2">
-            <a href={% url 'hotel_info' hotel.hotel_uid %}><h3>{{hotel.title}}</h3></a>
-            <p class="d-inline-block text-truncate" style="max-width:800px;">{{hotel.short_text}}</p>
-            <p>Город: {{ hotel.cities }}</p>
-            <div class = "row">
-                <div class = "col-8">
-                    <p>Вместимость: {{hotel.rooms}} номеров</p>
-                </div>
-                <div class = "col-4">
-                    <p class = "text-end">Стоимость за ночь: {{hotel.cost}}</p>
+        {% for hotel in allhotels %}
+            <div class = "font my-4 p-2">
+                <a href={% url 'hotel_info' hotel.hotel_uid %}><h3>{{hotel.title}}</h3></a>
+                <p class="d-inline-block text-truncate" style="max-width:800px;">{{hotel.short_text}}</p>
+                <p>Город: {{ hotel.cities }}</p>
+                <div class = "row">
+                    <div class = "col-8">
+                        <p>Вместимость: {{hotel.rooms}} номеров</p>
+                    </div>
+                    <div class = "col-4">
+                        <p class = "text-end">Стоимость за ночь: {{hotel.cost}}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
 
-    {%block pagination%}
-        {% include "pagination.html" %}
-    {%endblock%}
-
+        {%block pagination%}
+            {% include "pagination.html" %}
+        {%endblock%}
+    </div>
 {% endblock %}
 

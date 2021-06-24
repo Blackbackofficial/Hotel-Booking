@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="col-8 mt-3">
     <table class="table">
         <thead>
         <tr>
@@ -44,7 +45,7 @@
                                                                     document.getElementById('example_4').style.display='none';
                                                                     document.getElementById('example_2_2').class='btn btn-info active';
                                                                     document.getElementById('example_4_4').class='btn btn-info'"
-                                                                    >Действующие бронирования</button>
+                                                                    >Действующие брони</button>
         <button class="btn btn-info" id="example_4_4" onclick=" document.getElementById('example_2').style.display='none';
                                                                     document.getElementById('example_4').style.display='block';
                                                                     document.getElementById('example_2_2').class='btn btn-info';
@@ -119,5 +120,5 @@
             {% endif %}
         {% endfor %}
     </div>
-
+</div>
 {% endblock %}

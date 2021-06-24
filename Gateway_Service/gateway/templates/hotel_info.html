@@ -9,65 +9,67 @@
 {% endblock %}
 
 {% block content %}
-    <div class="p-2 my-3">
-        <h4 class=" text-center text-wrap text-break" style="font-weight: bold">{{ hotel_info.title }}</h4>
-    </div>
-    <div class="alert alert-light font">
-        <div class="row">
-            <div class="col-6">
-                <table class = "table">
-                    <tr>
-                        <th scope="col" class="w-25" style="border: none;">Информация:</th>
-                        <td class="text-wrap" style="border: none;">{{ hotel_info.short_text }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="col" class="w-25">Город:</th>
-                        <td>{{ hotel_info.cities }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="col" class="w-25">Адрес:</th>
-                        <td>{{ hotel_info.location }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="col" class="w-25">Вместимость:</th>
-                        <td>{{ hotel_info.rooms }} номеров</td>
-                    </tr>
-                    <tr>
-                        <th scope="col" class="w-25">Стоимость:</th>
-                        <td>{{ hotel_info.cost }}</td>
-                    </tr>
-                </table>
-                <button class="btn btn-info" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Отмена</button>
-                <button class="btn btn-info" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Забронировать</button>
-            </div>
-            <div class="col-6">
-                <a href="{% static hotel_info.photo %}" data-fancybox data-caption="Отель {{ hotel_info.title }}">
-                    <img id="hotel-img" src="{% static hotel_info.photo %}" style="width: 100%; height: 300px; object-fit: cover;"/>
-                </a>
-            </div>
+    <div class="col-8 mt-3">
+        <div class="p-2 my-3">
+            <h4 class=" text-center text-wrap text-break" style="font-weight: bold">{{ hotel_info.title }}</h4>
         </div>
-        {% if request.COOKIES.jwt %}
-            <div id="example_2" style="display: none">
-                <form action="{% url 'add_booking' %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="hotel_uid" value="{{ hotel_info.hotel_uid }}">
-                    <label>Дата заезда</label>
-                    <input type="date" name="date_start" id="date_start" class="form-control"><br>
-                    <label>Дата выезда</label>
-                    <input type="date" name="date_end" id="date_end" class="form-control"><br>
-                    <label>Комментарий</label>
-                    <input type="text" name="comment" id="comment" class="form-control"><br>
-                    <input type="hidden" name="price" value="{{ hotel_info.cost }}">
-                    <input type="submit" class="btn btn-info" value="Забронировать">
-                </form>
+        <div class="alert alert-light font">
+            <div class="row">
+                <div class="col-6">
+                    <table class = "table">
+                        <tr>
+                            <th scope="col" class="w-25" style="border: none;">Информация:</th>
+                            <td class="text-wrap" style="border: none;">{{ hotel_info.short_text }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">Город:</th>
+                            <td>{{ hotel_info.cities }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">Адрес:</th>
+                            <td>{{ hotel_info.location }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">Вместимость:</th>
+                            <td>{{ hotel_info.rooms }} номеров</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">Стоимость:</th>
+                            <td>{{ hotel_info.cost }}</td>
+                        </tr>
+                    </table>
+                    <button class="btn btn-info" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Отмена</button>
+                    <button class="btn btn-info" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Забронировать</button>
+                </div>
+                <div class="col-6">
+                    <a href="{% static hotel_info.photo %}" data-fancybox data-caption="Отель {{ hotel_info.title }}">
+                        <img id="hotel-img" src="{% static hotel_info.photo %}" style="width: 100%; height: 300px; object-fit: cover;"/>
+                    </a>
+                </div>
             </div>
-        {% else %}
-            <p>
-                <a href="{% url 'login' %}">Войдите</a>
-                или
-                <a href="{% url 'signup' %}">зарегистрируйтесь</a>
-                , чтобы забронировать номер!
-            </p>
-        {% endif %}
+            {% if request.COOKIES.jwt %}
+                <div id="example_2" style="display: none">
+                    <form action="{% url 'add_booking' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="hotel_uid" value="{{ hotel_info.hotel_uid }}">
+                        <label>Дата заезда</label>
+                        <input type="date" name="date_start" id="date_start" class="form-control"><br>
+                        <label>Дата выезда</label>
+                        <input type="date" name="date_end" id="date_end" class="form-control"><br>
+                        <label>Комментарий</label>
+                        <input type="text" name="comment" id="comment" class="form-control"><br>
+                        <input type="hidden" name="price" value="{{ hotel_info.cost }}">
+                        <input type="submit" class="btn btn-info" value="Забронировать">
+                    </form>
+                </div>
+            {% else %}
+                <p>
+                    <a href="{% url 'login' %}">Войдите</a>
+                    или
+                    <a href="{% url 'signup' %}">зарегистрируйтесь</a>
+                    , чтобы забронировать номер!
+                </p>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

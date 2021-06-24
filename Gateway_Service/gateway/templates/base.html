@@ -81,18 +81,13 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-8 mt-3">
-
-            {% block content %}
-            {% endblock %}
-
-        </div>
-
-        <div class="col-3 mt-2">
-            {%block sidebar%}
+        {% block content %}
+        {% endblock %}
+        {%block sidebar%}
+            <div class="col-3 mt-2">
                 {% include "sidebar.html" %}
-            {%endblock%}
-        </div>
+            </div>
+        {%endblock%}
     </div>
 </div>
 

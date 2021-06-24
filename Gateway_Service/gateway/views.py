@@ -665,20 +665,22 @@ def add_hotel_admin(request):
     if request.method == "POST":
         form = NewHotel(data=request.POST)
         # сохраним фото в gateway/static/images/
-        filename = ''.join(choices(ascii_letters + digits, k=10)) + '.jpg'
-        with open(f'gateway/static/images/{filename}', 'wb') as image:
-            files = request.FILES["photo"].read()
-            image.write(files)
-        new_hotel = requests.post("http://localhost:8004/api/v1/hotels/",
-                                  json={'title': form.data['title'], 'short_text': form.data['short_text'],
-                                        'rooms': form.data['rooms'], 'cost': form.data['cost'],
-                                        'cities': form.data['cities'],
-                                        'location': form.data['location'], 'file': f'images/{filename}'},
-                                  cookies=request.COOKIES)
-        error = 'success'
-        if new_hotel.status_code != 200:
-            error = new_hotel.json()['message']
-
+        try:
+            filename = ''.join(choices(ascii_letters + digits, k=10)) + '.jpg'
+            with open(f'gateway/static/images/{filename}', 'wb') as image:
+                files = request.FILES["photo"].read()
+                image.write(files)
+            new_hotel = requests.post("http://localhost:8004/api/v1/hotels/",
+                                      json={'title': form.data['title'], 'short_text': form.data['short_text'],
+                                            'rooms': form.data['rooms'], 'cost': form.data['cost'],
+                                            'cities': form.data['cities'],
+                                            'location': form.data['location'], 'file': f'images/{filename}'},
+                                      cookies=request.COOKIES)
+            error = 'success'
+            if new_hotel.status_code != 200:
+                error = new_hotel.json()['message']
+        except:
+            error = 'No photo'
     response = render(request, 'new_hotel.html', {'form': form, 'user': data, 'error': error})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
