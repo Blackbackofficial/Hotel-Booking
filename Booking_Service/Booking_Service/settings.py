@@ -57,6 +57,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Booking_Service.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
