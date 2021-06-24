@@ -1,18 +1,20 @@
 from django.shortcuts import render
-from rest_framework.exceptions import AuthenticationFailed
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
-from django.forms.models import model_to_dict
 from .forms import LoginForm, UserRegistrationForm, NewHotel, DeleteHotel
-from django.core import serializers
 from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
 from confluent_kafka import Producer
 from datetime import datetime as dt
 from random import choices
 from string import ascii_letters, digits
-import base64, pytz, sys, os, requests, json, jwt, re
+import pytz
+import sys
+import requests
+import json
+import jwt
+import re
 
 FAILURES = 3
 TIMEOUT = 6

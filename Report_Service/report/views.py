@@ -9,7 +9,6 @@ import requests
 import json
 import jwt
 import sys
-import os
 
 FAILURES = 3
 TIMEOUT = 6

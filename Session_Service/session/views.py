@@ -11,7 +11,6 @@ from rest_framework import status
 import json
 import datetime
 import jwt
-import requests
 
 
 # API

@@ -6,7 +6,6 @@ from .models import UserLoyalty
 from Loyalty_Service.settings import JWT_KEY
 from .serializers import LoyaltySerializer
 from rest_framework import status
-import requests
 import jwt
 
 FAILURES = 3
