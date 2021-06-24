@@ -778,6 +778,7 @@ def users_static(request):
 def all_booking_static(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
+    uid = None
     if data['role'] != 'admin':
         response = HttpResponseRedirect('/index')
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
@@ -787,8 +788,78 @@ def all_booking_static(request):
         static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
     except Exception:
         static_booking = None
+    if request.method == "POST":
+        if len(request.POST['hotel_uid']) > 0:
+            if request.POST['status'] == "all":
+                try:
+                    s = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    static_booking = []
+                    for static in s:
+                        if static['hotel_uid'] == request.POST['hotel_uid']:
+                            static_booking.append(static)
+                    static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+                    uid = request.POST['hotel_uid']
+                except Exception:
+                    static_booking = None
 
-    response = render(request, 'all_booking_hotels.html', {'all_booking': static_booking, 'user': data})
+            if request.POST['status'] == "new/paid":
+                try:
+                    s = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    static_booking = []
+                    for static in s:
+                        if static['hotel_uid'] == request.POST['hotel_uid'] and static['status'] == "NEW":
+                            static_booking.append(static)
+                        elif static['hotel_uid'] == request.POST['hotel_uid'] and static['status'] == "PAID":
+                            static_booking.append(static)
+                    static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+                    uid = request.POST['hotel_uid']
+                except Exception:
+                    static_booking = None
+
+            if request.POST['status'] == "canceled/reversed":
+                try:
+                    s = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    static_booking = []
+                    for static in s:
+                        if static['hotel_uid'] == request.POST['hotel_uid'] and static['status'] == "CANCELED":
+                            static_booking.append(static)
+                        elif static['hotel_uid'] == request.POST['hotel_uid'] and static['status'] == "REVERSED":
+                            static_booking.append(static)
+                    static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+                    uid = request.POST['hotel_uid']
+                except Exception:
+                    static_booking = None
+        else:
+            if request.POST['status'] == "all":
+                try:
+                    static_booking = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+                except Exception:
+                    static_booking = None
+
+            if request.POST['status'] == "new/paid":
+                try:
+                    s = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    static_booking = []
+                    for static in s:
+                        if static['status'] == "NEW" or static['status'] == "PAID":
+                            static_booking.append(static)
+                    static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+                except Exception:
+                    static_booking = None
+
+            if request.POST['status'] == "canceled/reversed":
+                try:
+                    s = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    static_booking = []
+                    for static in s:
+                        if static['status'] == "CANCELED" or static['status'] == "REVERSED":
+                            static_booking.append(static)
+                    static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
+                except Exception:
+                    static_booking = None
+
+    response = render(request, 'all_booking_hotels.html', {'all_booking': static_booking, 'user': data, 'uid': uid})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response
