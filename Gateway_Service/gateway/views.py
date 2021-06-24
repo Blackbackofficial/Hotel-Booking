@@ -1,3 +1,7 @@
+import ast
+import datetime
+
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
@@ -462,7 +466,7 @@ def index(request):
 
     if len(_allhotels) != 0:
         title = "Our hotels"
-        paginator = Paginator(_allhotels, 3)
+        paginator = Paginator(_allhotels, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         response = render(request, 'index.html', {'allhotels': _allhotels, 'page_obj': page_obj, \
@@ -628,7 +632,7 @@ def search_hotel_booking(request):
         if len(search.json()) != 0:
             title = "Доступные отели в городе "+str(data["city"])+" c "+str(data["date_start"])+" по "+str(data["date_end"])
 
-            paginator = Paginator(search.json(), 3)
+            paginator = Paginator(search.json(), 10)
             page_number = request.GET.get('page')
             page_obj = paginator.get_page(page_number)
             response = render(request, 'index.html', {'allhotels': search, 'page_obj': page_obj, \
