@@ -20,7 +20,7 @@ class UserRegistrationForm(forms.Form):
     email = forms.EmailField(label="E-mail", widget=forms.EmailInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label='Повторите пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    avatar = forms.ImageField(label='Аватар:', required=False)
+    avatar = forms.ImageField(label='Аватар:', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
 
 
 class NewHotel(forms.Form):
@@ -30,7 +30,7 @@ class NewHotel(forms.Form):
     cities = forms.CharField(label='Город:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     location = forms.CharField(label='Адрес:', widget=forms.TextInput(attrs={'class': 'form-control'}))
     cost = forms.IntegerField(label="Стоимость номера:", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    photo = forms.ImageField(label='Фото отеля:', required=False)
+    photo = forms.ImageField(label='Фото отеля:', widget=forms.FileInput(attrs={'class': 'form-control'}), required=False)
 
 
 class DeleteHotel(forms.Form):

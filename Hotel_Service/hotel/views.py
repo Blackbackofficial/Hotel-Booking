@@ -51,7 +51,6 @@ def all_hotels_or_add_hotel(request):
           } only admin
     """
     try:
-        data = auth(request)
         if request.method == 'GET':
             hotels = Hotels.objects.all()
             hotels = json.loads(serializers.serialize('json', hotels))
@@ -61,6 +60,7 @@ def all_hotels_or_add_hotel(request):
                 hotel.update(fields)
             return JsonResponse(hotels, status=status.HTTP_200_OK, safe=False)
         elif request.method == 'POST':  # only admin
+            data = auth(request)
             if 'admin' not in data['role']:
                 return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
             new_hotel = {"title": request.data["title"], "short_text": request.data["short_text"],

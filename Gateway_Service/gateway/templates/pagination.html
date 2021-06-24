@@ -1,23 +1,29 @@
 {% block pagination %}
     <div>
-        <ul class="pagination my-4 align-content-center">
-            <li class="page-item">
-                <a class="page-link" href="{{ paginator.baseurl }}1"> << </a>
-            </li>
-
-            {% for p in paginator.page_range %}
-                {% if p >= paginator.startdiv %}
-                    {% if p <= paginator.enddiv %}
-                        <li class="page-item">
-                            <a class="page-link" href="{{ paginator.baseurl }}{{ p }}">{{ p }}</a>
+        <nav>
+            <ul class="pagination justify-content-left">
+                {% if page_obj.has_previous %}
+                    <li class="page_item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+                    </li>
+                {% endif %}
+                {% for p in page_obj.paginator.page_range %}
+                    {% if page_obj.number == p %}
+                        <li class = "page-item active">
+                            <a class="page-link bg-info" href="?page={{ p }}">{{ p }}</a>
+                        </li>
+                    {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+                        <li class = "page-item">
+                            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
                         </li>
                     {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page_item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">&gt;</a>
+                    </li>
                 {% endif %}
-            {% endfor %}
-
-            <li class="page-item">
-                <a class="page-link" href="{{ paginator.baseurl }}{{ paginator.num_pages }}"> >> </a>
-            </li>
-        </ul>
+            </ul>
+        </nav>
     </div>
 {% endblock %}
