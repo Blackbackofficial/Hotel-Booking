@@ -1,0 +1,9 @@
+version: '3.7'
+services:
+  web:
+    build: ./Booking_Service/
+    command:  python3.9 manage.py runserver 0.0.0.0:8001
+    volumes:
+      - ./Booking_Service/:/usr/src/Booking_Service
+    ports:
+      - '8001:8001'
