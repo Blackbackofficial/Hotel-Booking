@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=booking
+      - POSTGRES_USER=ivan
+      - POSTGRES_PASSWORD=password
+  web:
+    build: ./Booking_Service/
+    command:  python3.9 ./manage.py runserver 0.0.0.0:8001
+    volumes:
+      - ./Booking_Service/:/usr/src/Booking_Service
+    ports:
+      - '8001:8001'
