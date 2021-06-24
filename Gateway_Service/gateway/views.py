@@ -471,7 +471,7 @@ def index(request):
                                               'title': title, 'user': data})
 
     else:
-        title = "По Вашему запросу ничего не найдено"
+        title = "Нет отелей :("
         response = render(request, 'index.html', {'title': title, 'user': data})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
@@ -501,9 +501,13 @@ def make_login(request):
 def hotel_info(request, hotel_uid):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
-    hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                         .format(hotel_uid), cookies=request.COOKIES).json()
-    response = render(request, 'hotel_info.html', {'hotel_info': hotel, 'user': data})
+    try:
+        hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(hotel_uid), cookies=request.COOKIES).json()
+        response = render(request, 'hotel_info.html', {'hotel_info': hotel, 'user': data})
+    except:
+        error = "Ошибка отображения отеля"
+        response = render(request, 'hotel_info.html', {'error': error, 'user': data})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
@@ -521,9 +525,11 @@ def add_booking(request):
                                       "date_end": data["date_end"],
                                       "comment": data["comment"],
                                       "price": int(data["price"])}, cookies=request.COOKIES)
-
-        response = HttpResponseRedirect('/booking_info/{}'.format(booking.json()['booking_uid']))
-
+        if booking.status_code == 200:
+            response = HttpResponseRedirect('/booking_info/{}'.format(booking.json()['booking_uid']))
+        else:
+            error = "Что-то пошло не так. Повторите попытку позже"
+            response = render(request, 'hotel_info.html', {'error': error, 'user': data})
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
         return response
@@ -532,14 +538,17 @@ def add_booking(request):
 def booking_info(request, booking_uid):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
-    booking = requests.get("http://localhost:8003/api/v1/booking/{}"
-                         .format(booking_uid), cookies=session.cookies).json()
-    hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                         .format(booking['hotel_uid']), cookies=session.cookies).json()
-    payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
-                         .format(booking['payment_uid']), cookies=session.cookies).json()
-    response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data})
-
+    try:
+        booking = requests.get("http://localhost:8003/api/v1/booking/{}"
+                             .format(booking_uid), cookies=session.cookies).json()
+        hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(booking['hotel_uid']), cookies=session.cookies).json()
+        payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
+                             .format(booking['payment_uid']), cookies=session.cookies).json()
+        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data})
+    except:
+        bookerror = "Ошибка бронирования"
+        response = render(request, 'user_booking.html', {'bookerror': bookerror, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response
@@ -797,44 +806,48 @@ def make_logout(request):
 def balance(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
-    loyalty = requests.get("http://localhost:8000/api/v1/loyalty/status/{}".format(data['user_uid']),
-                           cookies=request.COOKIES).json()
-    user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(data['user_uid']),
-                        cookies=request.COOKIES).json()
-    _allbook = requests.get("http://localhost:8003/api/v1/booking/", cookies=request.COOKIES).json()
+    try:
+        loyalty = requests.get("http://localhost:8000/api/v1/loyalty/status/{}".format(data['user_uid']),
+                               cookies=request.COOKIES).json()
+        user = requests.get("http://localhost:8001/api/v1/session/user/{}".format(data['user_uid']),
+                            cookies=request.COOKIES).json()
+        _allbook = requests.get("http://localhost:8003/api/v1/booking/", cookies=request.COOKIES).json()
 
-    sort = sorted(_allbook, key=lambda x: (x['date_create'], x['date_end']), reverse=True)
-    curr = []
-    hist = []
-    currhotel = []
-    histhotel = []
-    currpay = []
-    histpay = []
-    for s in sort:
-        payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
-                         .format(s['payment_uid']), cookies=session.cookies).json()
-        if datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'NEW':
-            ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                         .format(s['hotel_uid']), cookies=session.cookies).json()
-            curr.append(s)
-            currhotel.append(ch)
-            currpay.append(payment)
-        elif datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'PAID':
-            ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                         .format(s['hotel_uid']), cookies=session.cookies).json()
-            curr.append(s)
-            currhotel.append(ch)
-            currpay.append(payment)
-        else:
-            hh = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                         .format(s['hotel_uid']), cookies=session.cookies).json()
-            hist.append(s)
-            histhotel.append(hh)
-            histpay.append(payment)
-    currbookhot = zip(curr, currhotel, currpay)
-    histbookhot = zip(hist, histhotel, histpay)
-    response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user, 'currbookhot': currbookhot, \
-                                                'histbookhot': histbookhot})
+        sort = sorted(_allbook, key=lambda x: (x['date_create'], x['date_end']), reverse=True)
+        curr = []
+        hist = []
+        currhotel = []
+        histhotel = []
+        currpay = []
+        histpay = []
+        for s in sort:
+            payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
+                             .format(s['payment_uid']), cookies=session.cookies).json()
+            if datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'NEW':
+                ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(s['hotel_uid']), cookies=session.cookies).json()
+                curr.append(s)
+                currhotel.append(ch)
+                currpay.append(payment)
+            elif datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'PAID':
+                ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(s['hotel_uid']), cookies=session.cookies).json()
+                curr.append(s)
+                currhotel.append(ch)
+                currpay.append(payment)
+            else:
+                hh = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(s['hotel_uid']), cookies=session.cookies).json()
+                hist.append(s)
+                histhotel.append(hh)
+                histpay.append(payment)
+        currbookhot = zip(curr, currhotel, currpay)
+        histbookhot = zip(hist, histhotel, histpay)
+        response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user, 'currbookhot': currbookhot, \
+                                                    'histbookhot': histbookhot})
+    except:
+        usererror = "Не удалось отобразить данные. Попробуйте позднее"
+        response = render(request, 'balance.html', {'user': user, 'usererror': usererror})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response

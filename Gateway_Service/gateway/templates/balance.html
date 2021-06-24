@@ -6,119 +6,124 @@
 {% endblock %}
 
 {% block content %}
-<div class="col-8 mt-3">
-    <table class="table">
-        <thead>
-        <tr>
-            <th style="border-color: white;" colspan="3">
-                <h3 style="text-align: center">Sky <b>ID</b></h3>
-            </th>
-        </tr>
-        </thead>
-        <tbody class="font">
-        <tr>
-            <td>
-                <div style="margin: 10px;">
-                    <h3 style="margin-bottom: 20px;">{{ user.last_name }} {{ user.name }}</h3>
-                    <hr style="margin-left: -21px; margin-right: -400px;">
-                    <h4><b>E-mail:</b></h4>
-                    <h4><b>Status:</b></h4>
-                    <h4><b>Level discount:</b></h4>
-                </div>
-            <td>
-            <td>
-            <div style="margin-top: 80px;">
-                <h4>{{ user.email }}</h4>
-                <h4>{{ loyalty.status_loyalty }}</h4>
-                <h4>{{ loyalty.discount }}</h4>
+    {% if usererror %}
+        <div class="alert alert-danger">{{ usererror }}</div>
+        <input type="button" class="btn btn-info" onclick="history.back();" value="Назад"/>
+    {% else %}
+        <div class="col-8 mt-3">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th style="border-color: white;" colspan="3">
+                        <h3 style="text-align: center">Sky <b>ID</b></h3>
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="font">
+                <tr>
+                    <td>
+                        <div style="margin: 10px;">
+                            <h3 style="margin-bottom: 20px;">{{ user.last_name }} {{ user.name }}</h3>
+                            <hr style="margin-left: -21px; margin-right: -400px;">
+                            <h4><b>E-mail:</b></h4>
+                            <h4><b>Status:</b></h4>
+                            <h4><b>Level discount:</b></h4>
+                        </div>
+                    <td>
+                    <td>
+                    <div style="margin-top: 80px;">
+                        <h4>{{ user.email }}</h4>
+                        <h4>{{ loyalty.status_loyalty }}</h4>
+                        <h4>{{ loyalty.discount }}</h4>
+                    </div>
+                    </td>
+                </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="text-center">
+                <h3 style="font-weight: bold">Мои бронирования</h3>
             </div>
-            </td>
-        </td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="text-center">
-        <h3 style="font-weight: bold">Мои бронирования</h3>
-    </div>
-    <div class="btn-group btn-block px-1">
-        <button id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
-                                                                    document.getElementById('example_4').style.display='none';
-                                                                    document.getElementById('example_2_2').class='btn btn-info active';
-                                                                    document.getElementById('example_4_4').class='btn btn-info';"
-                                                                    class="btn btn-info active">Действующие брони</button>
-        <button id="example_4_4" onclick="document.getElementById('example_2').style.display='none';
-                                                                    document.getElementById('example_4').style.display='block';
-                                                                    document.getElementById('example_4_4').class='btn btn-info active';
-                                                                    document.getElementById('example_2_2').class='btn btn-info';"
-                                                                    class="btn btn-info">История бронирований</button>
-    </div>
-    <div id="example_2" style="display: block">
-    <hr>
-        {% for book, hotel, pay in currbookhot %}
-            {% if pay.status == "NEW" %}
-            <div class = "font my-4 p-2">
-                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
-                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
-                <div class="row">
-                    <div class="col-8">
-                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                        <p style="font-weight: bold">Требуется оплата</p>
-                    </div>
-                    <div class="col-4">
-                        <p>Создано {{ book.date_create }}</p>
-                    </div>
-                </div>
+            <div class="btn-group btn-block px-1">
+                <button id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
+                                                                            document.getElementById('example_4').style.display='none';
+                                                                            document.getElementById('example_2_2').class='btn btn-info active';
+                                                                            document.getElementById('example_4_4').class='btn btn-info';"
+                                                                            class="btn btn-info active">Действующие брони</button>
+                <button id="example_4_4" onclick="document.getElementById('example_2').style.display='none';
+                                                                            document.getElementById('example_4').style.display='block';
+                                                                            document.getElementById('example_4_4').class='btn btn-info active';
+                                                                            document.getElementById('example_2_2').class='btn btn-info';"
+                                                                            class="btn btn-info">История бронирований</button>
             </div>
-            {% else %}
-            <div class = "font my-4 p-2">
-                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
-                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
-                <div class="row">
-                    <div class="col-8">
-                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                        <p style="font-weight: bold">Оплачено</p>
+            <div id="example_2" style="display: block">
+            <hr>
+                {% for book, hotel, pay in currbookhot %}
+                    {% if pay.status == "NEW" %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                                <p style="font-weight: bold">Требуется оплата</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Создано {{ book.date_create }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <p>Создано {{ book.date_create }}</p>
+                    {% else %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                                <p style="font-weight: bold">Оплачено</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Создано {{ book.date_create }}</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-    <div id="example_4" style="display: none">
-    <hr>
-        {% for book, hotel, pay in histbookhot %}
-            {% if pay.status == "CANCELED" %}
-            <div class = "font my-4 p-2">
-                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
-                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
-                <div class="row">
-                    <div class="col-8">
-                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                        <p style="font-weight: bold">Отменено</p>
+            <div id="example_4" style="display: none">
+            <hr>
+                {% for book, hotel, pay in histbookhot %}
+                    {% if pay.status == "CANCELED" %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                                <p style="font-weight: bold">Отменено</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Создано {{ book.date_create }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <p>Создано {{ book.date_create }}</p>
+                    {% else %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
+                                <p style="font-weight: bold">Средства возвращены</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Создано {{ book.date_create }}</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-            {% else %}
-            <div class = "font my-4 p-2">
-                <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
-                <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
-                <div class="row">
-                    <div class="col-8">
-                        <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                        <p style="font-weight: bold">Средства возвращены</p>
-                    </div>
-                    <div class="col-4">
-                        <p>Создано {{ book.date_create }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
+        </div>
+    {% endif %}
 {% endblock %}
