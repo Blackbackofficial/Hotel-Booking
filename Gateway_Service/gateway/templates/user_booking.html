@@ -4,7 +4,7 @@
 {% block content %}
 <div class="col-8 mt-3">
     {% if bookdel %}
-        <div class="alert alert-success">{{ bookerror }}</div>
+        <div class="alert alert-success">{{ bookdel }}</div>
         <a href="{% url 'index' %}" class="btn btn-info">На главную</a>
         <a href="{% url 'balance' %}" class="btn btn-info">Личный кабинет</a>
     {% elif bookerror %}
