@@ -16,17 +16,10 @@
 <body>
 <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container col-md-5">
+        <div class="container col-md-7">
             <a class="navbar-brand" title="Все вопросы" href="{% url 'index' %}" style="font-size: 24px;">
                 <img class="py-2 px-1" src="https://img.icons8.com/officel/30/000000/share.png" alt="Аватар"> Sky Hotel
             </a>
-        </div>
-
-        <div class="container">
-            <form class="form-inline my-2 my-lg-0 col">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0 top-cover" type="submit">Search</button>
-            </form>
         </div>
 
         <div class="container avatar-container col-md-4">
@@ -84,7 +77,7 @@
         {% block content %}
         {% endblock %}
         {%block sidebar%}
-            <div class="col-3 mt-2">
+            <div class="col-4 mt-2" style="padding-top: 40px; padding-left: 70px;">
                 {% include "sidebar.html" %}
             </div>
         {%endblock%}
