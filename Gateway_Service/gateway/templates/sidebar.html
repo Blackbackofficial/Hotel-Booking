@@ -4,7 +4,7 @@
         <form action="{% url 'search' %}" method="POST">
             {% csrf_token %}
             <label>Enter city</label>
-            <input type="text" name="city" id="city" class="form-control bg-light" placeholder="Город" required><br>
+            <input type="text" name="city" id="city" class="form-control bg-light" placeholder="City" required><br>
             <label>Arrival date</label>
             <input type="date" name="date_start" id="date_start" class="form-control bg-light" required><br>
             <label>Departure date</label>
