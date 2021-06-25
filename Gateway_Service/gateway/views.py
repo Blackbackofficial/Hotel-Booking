@@ -643,7 +643,7 @@ def search_hotel_booking(request):
             response = render(request, 'index.html', {'allhotels': search, 'page_obj': page_obj, \
                                                       'title': title, 'user': user})
         else:
-            title = "По Вашему запросу ничего не найдено"
+            title = "No results were found for your search."
             response = render(request, 'index.html', {'title': title, 'user': user})
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
