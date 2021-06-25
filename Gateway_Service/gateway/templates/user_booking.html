@@ -5,8 +5,8 @@
 <div class="col-8 mt-3">
     {% if bookdel %}
         <div class="alert alert-success">{{ bookdel }}</div>
-        <a href="{% url 'index' %}" class="btn btn-info">На главную</a>
-        <a href="{% url 'balance' %}" class="btn btn-info">Личный кабинет</a>
+        <a href="{% url 'index' %}" class="btn btn-info">To start page</a>
+        <a href="{% url 'balance' %}" class="btn btn-info">Personal Area</a>
     {% elif bookerror %}
         <div class="alert alert-danger">{{ bookerror }}</div>
             <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="Назад"/>
