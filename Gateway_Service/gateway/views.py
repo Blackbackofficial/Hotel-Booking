@@ -529,7 +529,8 @@ def add_booking(request):
     user = auth(request)
     if request.method == 'POST':
         data = request.POST
-        if datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") > datetime.datetime.strptime(request.POST['date_end'], "%Y-%m-%d") or \
+        if datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") > datetime.datetime.strptime(
+                request.POST['date_end'], "%Y-%m-%d") or \
                 datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") < datetime.datetime.now():
             dateerror = "Invalid date entry"
             hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
@@ -561,13 +562,14 @@ def booking_info(request, booking_uid):
         hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                              .format(booking['hotel_uid']), cookies=session.cookies).json()
         payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
-                             .format(booking['payment_uid']), cookies=session.cookies).json()
+                               .format(booking['payment_uid']), cookies=session.cookies).json()
         date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
         date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
         period = date_end - date_start
-        totalcost = int(hotel['cost'])*(period.days+1)
-        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data,\
-                                                         'totalcost': totalcost})
+        totalcost = int(hotel['cost']) * (period.days + 1)
+        response = render(request, 'user_booking.html',
+                          {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data,
+                           'totalcost': totalcost})
     except:
         bookerror = "Failed to display booking, try again"
         response = render(request, 'user_booking.html', {'bookerror': bookerror, 'user': data})
@@ -593,8 +595,8 @@ def pay_room(request, payment_uid):
         else:
             error = "Failed to pay!"
             response = render(request, 'user_booking.html',
-                      {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data, \
-                       'totalcost': request.POST['totalcost']})
+                              {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data,
+                               'totalcost': request.POST['totalcost']})
 
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
@@ -613,7 +615,7 @@ def del_booking(request, booking_uid):
                                       .format(booking_uid), cookies=request.COOKIES)
             if delbook.status_code == 200:
                 success = "Booking deleted"
-                response = render(request, 'user_booking.html', {'bookdel':success, 'user': data})
+                response = render(request, 'user_booking.html', {'bookdel': success, 'user': data})
                 # response = HttpResponseRedirect('/balance')
             else:
                 error = "Something went wrong, please try again"
@@ -627,7 +629,7 @@ def del_booking(request, booking_uid):
                                           .format(booking_uid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
                     success = "Booking deleted"
-                    response = render(request, 'user_booking.html', {'bookdel':success, 'user': data})
+                    response = render(request, 'user_booking.html', {'bookdel': success, 'user': data})
                 else:
                     error = "Booking cancellation error"
                     response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
@@ -658,8 +660,8 @@ def search_hotel_booking(request):
                                          "date_end": data["date_end"],
                                          "city": data["city"]}, cookies=request.COOKIES)
             if len(search.json()) != 0:
-                title = "Available hotels in the city " + str(data["city"]) + " from " + str(data["date_start"]) + " to " + str(
-                    data["date_end"])
+                title = "Available hotels in the city " + str(data["city"]) + " from " + str(
+                    data["date_start"]) + " to " + str(data["date_end"])
 
                 paginator = Paginator(search.json(), 10)
                 page_number = request.GET.get('page')
