@@ -473,7 +473,7 @@ def index(request):
     _allhotels = requests.get("http://localhost:8004/api/v1/hotels", cookies=request.COOKIES).json()
 
     if len(_allhotels) != 0:
-        title = "Our hotels"
+        title = "Amazing Sky Hotels"
         paginator = Paginator(_allhotels, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)

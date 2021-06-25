@@ -47,8 +47,7 @@ def create_or_all(request):
         data = auth(request)
         if request.method == 'POST':
             payBalance = requests.post("http://localhost:8002/api/v1/payment/create",
-                                       json={"price": request.data["price"]},
-                                       cookies=request.COOKIES)
+                                       json={"price": request.data["price"]}, cookies=request.COOKIES)
             if payBalance.status_code != 200:
                 return JsonResponse({'error': 'Error in payment'}, status=status.HTTP_400_BAD_REQUEST)
             payBalance = payBalance.json()
