@@ -54,13 +54,13 @@
                 </tr>
                 {% if payment.status == "PAID" %}
                     <tr>
-                        <th scope="col" class="w-25">Оплачено:</th>
+                        <th scope="col" class="w-25">Paid:</th>
                         <td>{{ totalcost }}</td>
                     </tr>
                 {% endif %}
             </table>
             {% if payment.status == "NEW" %}
-                <h3>К оплате: {{ totalcost }}</h3>
+                <h3>To pay: {{ totalcost }}</h3>
             {% endif %}
             <div class="row">
                 {% if payment.status == "NEW" %}
@@ -69,7 +69,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="booking_uid" value="{{ booking.booking_uid }}">
                             <input type="hidden" name="totalcost" value="{{ totalcost }}">
-                            <input type="submit" class="btn btn-success mr-2" value="Оплатить">
+                            <input type="submit" class="btn btn-success mr-2" value="Pay">
                         </form>
                     </div>
                 {% endif %}

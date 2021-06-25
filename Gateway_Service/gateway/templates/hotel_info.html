@@ -14,73 +14,73 @@
             <div class="alert alert-danger">{{ error }}</div>
             <input type="button" class="btn btn-info" onclick="history.back();" value="Назад"/>
         {% else %}
-            <div class="p-2 my-3">
-                <h4 class=" text-center text-wrap text-break" style="font-weight: bold">{{ hotel_info.title }}</h4>
-            </div>
-            <div class="alert alert-light font">
-                <div class="row">
-                    <div class="col-6">
-                        <table class = "table">
-                            <tr>
-                                <th scope="col" class="w-25" style="border: none;">Description:</th>
-                                <td class="text-wrap" style="border: none;">{{ hotel_info.short_text }}</td>
-                            </tr>
-                            <tr>
-                                <th scope="col" class="w-25">City:</th>
-                                <td>{{ hotel_info.cities }}</td>
-                            </tr>
-                            <tr>
-                                <th scope="col" class="w-25">Addres:</th>
-                                <td>{{ hotel_info.location }}</td>
-                            </tr>
-                            <tr>
-                                <th scope="col" class="w-25">Capacity:</th>
-                                <td>{{ hotel_info.rooms }} rooms</td>
-                            </tr>
-                            <tr>
-                                <th scope="col" class="w-25">The cost:</th>
-                                <td>{{ hotel_info.cost }}</td>
-                            </tr>
-                        </table>
-                        {% if request.COOKIES.jwt %}
-                            <button class="btn btn-outline-secondary" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Отмена</button>
-                            <button class="btn btn-outline-primary" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Забронировать</button>
-                        {% else %}
-                            <p>
-                                <a href="{% url 'login' %}">Login</a>
-                                or
-                                <a href="{% url 'signup' %}">register</a>
-                                , to reserve the room!
-                            </p>
-                        {% endif %}
-                    </div>
-                    <div class="col-6">
-                        <a href="{% static hotel_info.photo %}" data-fancybox data-caption="Hotel {{ hotel_info.title }}">
-                            <img id="hotel-img" src="{% static hotel_info.photo %}" style="width: 100%; height: 300px; object-fit: cover;"/>
-                        </a>
-                    </div>
+        <div class="p-1 my-1">
+            <h4 class=" text-center text-wrap text-break" style="font-weight: bold; margin-bottom: 11px;">{{ hotel_info.title }}</h4>
+        </div>
+        <div class="alert alert-light font">
+            <div class="row">
+                <div class="col-6">
+                    <table class = "table">
+                        <tr>
+                            <th scope="col" class="w-25" style="border: none;">Description:</th>
+                            <td class="text-wrap" style="border: none;">{{ hotel_info.short_text }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">City:</th>
+                            <td>{{ hotel_info.cities }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">Addres:</th>
+                            <td>{{ hotel_info.location }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">Capacity:</th>
+                            <td>{{ hotel_info.rooms }} rooms</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" class="w-25">The cost:</th>
+                            <td>{{ hotel_info.cost }}</td>
+                        </tr>
+                    </table>
+                    {% if request.COOKIES.jwt %}
+                        <button class="btn btn-outline-secondary" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Cancel</button>
+                        <button class="btn btn-outline-primary" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Reserved</button>
+                    {% else %}
+                        <p>
+                            <a href="{% url 'login' %}">Login</a>
+                            or
+                            <a href="{% url 'signup' %}">register</a>
+                            , to reserve the room!
+                        </p>
+                    {% endif %}
                 </div>
-                {% if request.COOKIES.jwt %}
-                    <div id="example_2" style="display: none">
-                        <form action="{% url 'add_booking' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="hotel_uid" value="{{ hotel_info.hotel_uid }}">
-                            <label>Arrival date</label>
-                            <input type="date" name="date_start" id="date_start" class="form-control" required><br>
-                            <label>Departure date</label>
-                            <input type="date" name="date_end" id="date_end" class="form-control" required><br>
-                            <label>Comment</label>
-                            <input type="text" name="comment" id="comment" class="form-control"><br>
-                            <input type="hidden" name="price" value="{{ hotel_info.cost }}">
-                            <input type="submit" class="btn btn-outline-primary" value="Забронировать">
-                        </form>
-                    </div>
-                        <br>
-                        {% if dateerror %}
-                            <div class="alert alert-danger">{{ dateerror }}</div>
-                        {% endif %}
-                {% endif %}
+                <div class="col-6">
+                    <a href="{% static hotel_info.photo %}" data-fancybox data-caption="Hotel {{ hotel_info.title }}">
+                        <img id="hotel-img" src="{% static hotel_info.photo %}" style="width: 100%; height: 300px; object-fit: cover;"/>
+                    </a>
+                </div>
             </div>
+            {% if request.COOKIES.jwt %}
+                <div id="example_2" style="display: none">
+                    <form action="{% url 'add_booking' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="hotel_uid" value="{{ hotel_info.hotel_uid }}">
+                        <label>Arrival date</label>
+                        <input type="date" name="date_start" id="date_start" class="form-control" required><br>
+                        <label>Departure date</label>
+                        <input type="date" name="date_end" id="date_end" class="form-control" required><br>
+                        <label>Comment</label>
+                        <input type="text" name="comment" id="comment" class="form-control"><br>
+                        <input type="hidden" name="price" value="{{ hotel_info.cost }}">
+                        <input type="submit" class="btn btn-outline-primary" value="Reserved">
+                    </form>
+                </div>
+                    <br>
+                    {% if dateerror %}
+                        <div class="alert alert-danger">{{ dateerror }}</div>
+                    {% endif %}
+            {% endif %}
+        </div>
         {% endif %}
     </div>
 {% endblock %}

@@ -11,33 +11,28 @@
         <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="Назад"/>
     {% else %}
         <div class="col-8 mt-3">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th style="border-color: white;" colspan="3">
-                        <h3 style="text-align: center">Sky <b>ID</b></h3>
-                    </th>
-                </tr>
-                </thead>
+            <div class="p-1 my-1">
+                <h3 style="text-align: center; margin-bottom: 6px;">Sky <b>ID</b></h3>
+            </div>
+            <table class="table" style="border-color: white;">
                 <tbody class="font">
                 <tr>
-                    <td>
+                    <td style="border-color: #efeeee;">
                         <div style="margin: 10px;">
                             <h3 style="margin-bottom: 20px;">{{ user.last_name }} {{ user.name }}</h3>
-                            <hr style="margin-left: -21px; margin-right: -400px;">
                             <h4><b>E-mail:</b></h4>
                             <h4><b>Status:</b></h4>
                             <h4><b>Level discount:</b></h4>
                         </div>
-                    <td>
-                    <td>
+
+                    <td style="border-color: #efeeee;">
                     <div style="margin-top: 80px;">
                         <h4>{{ user.email }}</h4>
                         <h4>{{ loyalty.status_loyalty }}</h4>
                         <h4>{{ loyalty.discount }}</h4>
                     </div>
                     </td>
-                </td>
+
                 </tr>
                 </tbody>
             </table>
@@ -49,12 +44,12 @@
                                                  document.getElementById('example_4').style.display='none';
                                                  document.getElementById('example_2_2').className='btn btn-outline-secondary active';
                                                  document.getElementById('example_4_4').className='btn btn-outline-secondary';"
-                                                 class="btn btn-outline-secondary active">Действующие брони</button>
+                                                 class="btn btn-outline-secondary active">Valid reservations</button>
                 <button id="example_4_4" onclick="document.getElementById('example_2').style.display='none';
                                                   document.getElementById('example_4').style.display='block';
                                                   document.getElementById('example_4_4').className='btn btn-outline-secondary active';
                                                   document.getElementById('example_2_2').className='btn btn-outline-secondary';"
-                                                  class="btn btn-outline-secondary">История бронирований</button>
+                                                  class="btn btn-outline-secondary">History reservations</button>
             </div>
             <div id="example_2" style="display: block">
             <hr>
