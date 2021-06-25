@@ -919,7 +919,7 @@ def balance(request):
         _allbook = requests.get("http://localhost:8003/api/v1/booking/", cookies=request.COOKIES).json()
 
         sort = sorted(_allbook, key=lambda x: (x['date_create'], x['date_end']), reverse=True)
-        curr = hist = currhotel = histhotel = currpay = histpay = []
+        curr, hist, currhotel, histhotel, currpay, histpay = (list() for _ in range(6))
         for s in sort:
             payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
                                    .format(s['payment_uid']), cookies=session.cookies).json()
