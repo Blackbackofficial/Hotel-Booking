@@ -458,6 +458,14 @@ def report_hotels(request):
     return JsonResponse({"detail": "No content in queue or error"}, status=status.HTTP_204_NO_CONTENT)
 
 
+def cities(request):
+    dict_cities = requests.get("http://localhost:8006/api/v1/hotels/cities")
+    if dict_cities.status_code == 200:
+        dict_cities = dict_cities.json()
+        return JsonResponse(dict_cities, status=status.HTTP_200_OK, safe=False)
+    return JsonResponse({"detail": "No content"}, status=status.HTTP_204_NO_CONTENT)
+
+
 # VIEW
 def index(request):
     is_authenticated, request, session = cookies(request)
@@ -469,8 +477,8 @@ def index(request):
         paginator = Paginator(_allhotels, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        response = render(request, 'index.html', {'allhotels': _allhotels, 'page_obj': page_obj, \
-                                              'title': title, 'user': data})
+        response = render(request, 'index.html', {'allhotels': _allhotels, 'page_obj': page_obj,
+                                                  'title': title, 'user': data})
 
     else:
         title = "Нет отелей :("
@@ -542,17 +550,17 @@ def booking_info(request, booking_uid):
     data = auth(request)
     try:
         booking = requests.get("http://localhost:8003/api/v1/booking/{}"
-                             .format(booking_uid), cookies=session.cookies).json()
+                               .format(booking_uid), cookies=session.cookies).json()
         hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                              .format(booking['hotel_uid']), cookies=session.cookies).json()
         payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
-                             .format(booking['payment_uid']), cookies=session.cookies).json()
+                               .format(booking['payment_uid']), cookies=session.cookies).json()
         date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
         date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
         period = date_end - date_start
-        totalcost = int(hotel['cost'])*(period.days+1)
-        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data,\
-                                                         'totalcost': totalcost})
+        totalcost = int(hotel['cost']) * (period.days + 1)
+        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment,
+                                                         'user': data, 'totalcost': totalcost})
     except:
         bookerror = "Ошибка бронирования"
         response = render(request, 'user_booking.html', {'bookerror': bookerror, 'user': data})
@@ -566,19 +574,19 @@ def pay_room(request, payment_uid):
     data = auth(request)
     if request.method == 'POST':
         booking = requests.get("http://localhost:8003/api/v1/booking/{}"
-                             .format(request.POST['booking_uid']), cookies=session.cookies).json()
+                               .format(request.POST['booking_uid']), cookies=session.cookies).json()
         hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                              .format(booking['hotel_uid']), cookies=session.cookies).json()
         payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
-                             .format(booking['payment_uid']), cookies=session.cookies).json()
+                               .format(booking['payment_uid']), cookies=session.cookies).json()
         pay = requests.post("http://localhost:8002/api/v1/payment/pay/{}"
-                               .format(payment_uid), cookies=request.COOKIES)
+                            .format(payment_uid), cookies=request.COOKIES)
         if pay.status_code == 200:
             response = HttpResponseRedirect('/booking_info/{}'.format(request.POST['booking_uid']))
         else:
             error = "Не удалось провести оплату!"
             response = render(request, 'user_booking.html',
-                      {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data})
+                              {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data})
 
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
@@ -594,36 +602,37 @@ def del_booking(request, booking_uid):
         pay = ast.literal_eval(request.POST['payment'])
         if request.POST['status'] == "NEW":
             delbook = requests.delete("http://localhost:8003/api/v1/booking/canceled/{}"
-                                 .format(booking_uid), cookies=request.COOKIES)
+                                      .format(booking_uid), cookies=request.COOKIES)
             if delbook.status_code == 200:
                 success = "Бронирование удалено"
-                response = render(request, 'user_booking.html', {'bookerror':success, 'user': data})
+                response = render(request, 'user_booking.html', {'bookerror': success, 'user': data})
                 # response = HttpResponseRedirect('/balance')
             else:
                 error = "Что-то пошло не так, повторите попытку"
-                response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot, \
-                                                                 'payment': pay, 'error':error, 'user': data})
+                response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
+                                                                 'payment': pay, 'error': error, 'user': data})
         else:
             payment = requests.post("http://localhost:8003/api/v1/booking/reversed/{}"
-                                 .format(booking_uid), cookies=request.COOKIES)
+                                    .format(booking_uid), cookies=request.COOKIES)
             if payment.status_code == 200:
                 delbook = requests.delete("http://localhost:8003/api/v1/booking/canceled/{}"
-                                     .format(booking_uid), cookies=request.COOKIES)
+                                          .format(booking_uid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
                     success = "Бронирование удалено"
-                    response = render(request, 'user_booking.html', {'bookerror':success, 'user': data})
+                    response = render(request, 'user_booking.html', {'bookerror': success, 'user': data})
                 else:
                     error = "Ошибка снятия бронирования"
-                    response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot, \
-                                                                 'payment': pay, 'error':error, 'user': data})
+                    response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
+                                                                     'payment': pay, 'error': error, 'user': data})
             else:
                 error = "Ошибка возврата средств"
-                response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot, \
-                                                                 'payment': pay, 'error':error, 'user': data})
+                response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
+                                                                 'payment': pay, 'error': error, 'user': data})
 
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
         return response
+
 
 def search_hotel_booking(request):
     is_authenticated, request, session = cookies(request)
@@ -631,11 +640,12 @@ def search_hotel_booking(request):
     if request.method == 'POST':
         data = request.POST
         search = requests.post("http://localhost:8004/api/v1/hotels/date",
-                                json={"date_start": data["date_start"],
-                                      "date_end": data["date_end"],
-                                      "city": data["city"]}, cookies=request.COOKIES)
+                               json={"date_start": data["date_start"],
+                                     "date_end": data["date_end"],
+                                     "city": data["city"]}, cookies=request.COOKIES)
         if len(search.json()) != 0:
-            title = "Доступные отели в городе "+str(data["city"])+" c "+str(data["date_start"])+" по "+str(data["date_end"])
+            title = "Доступные отели в городе " + str(data["city"]) + " c " + str(data["date_start"]) + " по " + str(
+                data["date_end"])
 
             paginator = Paginator(search.json(), 10)
             page_number = request.GET.get('page')
@@ -839,7 +849,8 @@ def all_booking_static(request):
         else:
             if request.POST['status'] == "all":
                 try:
-                    static_booking = requests.get("http://localhost:8006/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    static_booking = requests.get("http://localhost:8006/api/v1/reports/hotels",
+                                                  cookies=request.COOKIES).json()
                     static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
                 except Exception:
                     static_booking = None
@@ -900,28 +911,30 @@ def balance(request):
         histpay = []
         for s in sort:
             payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
-                             .format(s['payment_uid']), cookies=session.cookies).json()
-            if datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'NEW':
+                                   .format(s['payment_uid']), cookies=session.cookies).json()
+            if datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() \
+                    and payment['status'] == 'NEW':
                 ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                             .format(s['hotel_uid']), cookies=session.cookies).json()
+                                  .format(s['hotel_uid']), cookies=session.cookies).json()
                 curr.append(s)
                 currhotel.append(ch)
                 currpay.append(payment)
-            elif datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() and payment['status'] == 'PAID':
+            elif datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() \
+                    and payment['status'] == 'PAID':
                 ch = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                             .format(s['hotel_uid']), cookies=session.cookies).json()
+                                  .format(s['hotel_uid']), cookies=session.cookies).json()
                 curr.append(s)
                 currhotel.append(ch)
                 currpay.append(payment)
             else:
                 hh = requests.get("http://localhost:8004/api/v1/hotels/{}"
-                             .format(s['hotel_uid']), cookies=session.cookies).json()
+                                  .format(s['hotel_uid']), cookies=session.cookies).json()
                 hist.append(s)
                 histhotel.append(hh)
                 histpay.append(payment)
         currbookhot = zip(curr, currhotel, currpay)
         histbookhot = zip(hist, histhotel, histpay)
-        response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user, 'currbookhot': currbookhot, \
+        response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user, 'currbookhot': currbookhot,
                                                     'histbookhot': histbookhot})
     except:
         usererror = "Не удалось отобразить данные. Попробуйте позднее"

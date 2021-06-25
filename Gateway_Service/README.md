@@ -18,6 +18,7 @@
 15. `GET /api/v1/reports/booking` – статистика бронирования по пользователям; (Kafka)
 16. `GET /api/v1/reports/users` – статистика логирования, разлогирования пользователей; (Kafka)
 17. `GET /api/v1/reports/hotels-filling` – статистика наполнения отелей
+18. `GET /api/v1/cities` – динамические города (информация из отелей)
 
 ## Pages Hotel Booking
 
