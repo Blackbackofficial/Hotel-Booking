@@ -1,7 +1,8 @@
 {% block sidebar %}
-    <div class = "font my-4 p-2">
+    <div class = "font my-4 p-3">
         <p class="mr-3 h2 text-center">Find hotel:</p>
-        <select class="btn btn-outline-secondary mx-2 mb-2" id="selecttheme" style="height: 40px; width: 95%;">
+        <select class="btn btn-outline-secondary" id="selecttheme"
+                style="height: 40px; width: 100%; background-color: #f8f9fa; border-color: #dce0e5;">
             <option onclick="document.getElementById('city').value='';">Choose city</option>
             {% for city in cities %}
                 <option onclick="document.getElementById('city').value='{{ city.cities }}';">{{ city.cities }}</option>
