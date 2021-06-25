@@ -23,7 +23,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install dj-database-url
-        pip install -r requirements.txt
+        pip install -r Booking_Service/requirements.txt
 
     - name: Migrate Booking
       run: |
