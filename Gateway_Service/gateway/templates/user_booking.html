@@ -3,9 +3,13 @@
 
 {% block content %}
 <div class="col-8 mt-3">
-    {% if bookerror %}
+    {% if bookdel %}
         <div class="alert alert-success">{{ bookerror }}</div>
-        <a href="{% url 'index' %}" class="btn btn-info">Start page</a>
+        <a href="{% url 'index' %}" class="btn btn-info">На главную</a>
+        <a href="{% url 'balance' %}" class="btn btn-info">Личный кабинет</a>
+    {% elif bookerror %}
+        <div class="alert alert-danger">{{ bookerror }}</div>
+            <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="Назад"/>
     {% else %}
         <div class="p-2 my-3">
             <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Hotel reservation
@@ -50,32 +54,50 @@
                 </tr>
                 {% if payment.status == "PAID" %}
                     <tr>
-                        <th scope="col" class="w-25">Paid:</th>
+                        <th scope="col" class="w-25">Оплачено:</th>
                         <td>{{ totalcost }}</td>
                     </tr>
                 {% endif %}
             </table>
             {% if payment.status == "NEW" %}
-                <h3>To pay: {{ totalcost }}</h3>
-                <form id="payment" action="{% url 'pay_room' payment.payment_uid %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="booking_uid" value="{{ booking.booking_uid }}">
-                    <input type="hidden" name="booking" value="{{ booking }}">
-                    <input type="hidden" name="hotel" value="{{ hotel }}">
-                    <input type="hidden" name="payment" value="{{ payment }}">
-                    <input type="submit" class="btn btn-info mr-2" value="Pay">
-                </form>
+                <h3>К оплате: {{ totalcost }}</h3>
             {% endif %}
-            {% if payment.status == "NEW" or payment.status == "PAID" %}
-                <form id="del" action="{% url 'del_booking' booking.booking_uid %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="status" value="{{ payment.status }}">
-                    <input type="hidden" name="booking" value="{{ booking }}">
-                    <input type="hidden" name="hotel" value="{{ hotel }}">
-                    <input type="hidden" name="payment" value="{{ payment }}">
-                    <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Canceled booking">
-                </form>
-            {% endif %}
+            <div class="row">
+                {% if payment.status == "NEW" %}
+                    <div class="col-6">
+                        <form id="payment" action="{% url 'pay_room' payment.payment_uid %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="booking_uid" value="{{ booking.booking_uid }}">
+                            <input type="hidden" name="totalcost" value="{{ totalcost }}">
+                            <input type="submit" class="btn btn-success mr-2" value="Оплатить">
+                        </form>
+                    </div>
+                {% endif %}
+                {% if payment.status == "NEW" %}
+                    <div class="col-6">
+                        <form class="d-flex justify-content-end" id="del" action="{% url 'del_booking' booking.booking_uid %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="{{ payment.status }}">
+                            <input type="hidden" name="booking" value="{{ booking }}">
+                            <input type="hidden" name="hotel" value="{{ hotel }}">
+                            <input type="hidden" name="payment" value="{{ payment }}">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+                        </form>
+                    </div>
+                {% elif payment.status == "PAID" %}
+                    <div class="col-12">
+                        <form class="d-flex justify-content-end" id="del" action="{% url 'del_booking' booking.booking_uid %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="{{ payment.status }}">
+                            <input type="hidden" name="booking" value="{{ booking }}">
+                            <input type="hidden" name="hotel" value="{{ hotel }}">
+                            <input type="hidden" name="payment" value="{{ payment }}">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+
         {% endif %}
         </div>
         <a href="{% url 'balance' %}" class="btn btn-info">My reservations</a>
