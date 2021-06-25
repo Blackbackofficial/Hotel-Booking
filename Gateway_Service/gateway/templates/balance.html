@@ -8,7 +8,7 @@
 {% block content %}
     {% if usererror %}
         <div class="alert alert-danger">{{ usererror }}</div>
-        <input type="button" class="btn btn-info" onclick="history.back();" value="Назад"/>
+        <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="Назад"/>
     {% else %}
         <div class="col-8 mt-3">
             <table class="table">
@@ -47,14 +47,14 @@
             <div class="btn-group btn-block px-1">
                 <button id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
                                                  document.getElementById('example_4').style.display='none';
-                                                 document.getElementById('example_2_2').className='btn btn-info active';
-                                                 document.getElementById('example_4_4').className='btn btn-info';"
-                                                 class="btn btn-info active">The operating reservations</button>
+                                                 document.getElementById('example_2_2').className='btn btn-outline-secondary active';
+                                                 document.getElementById('example_4_4').className='btn btn-outline-secondary';"
+                                                 class="btn btn-outline-secondary active">Действующие брони</button>
                 <button id="example_4_4" onclick="document.getElementById('example_2').style.display='none';
                                                   document.getElementById('example_4').style.display='block';
-                                                  document.getElementById('example_4_4').className='btn btn-info active';
-                                                  document.getElementById('example_2_2').className='btn btn-info';"
-                                                  class="btn btn-info">History reservations</button>
+                                                  document.getElementById('example_4_4').className='btn btn-outline-secondary active';
+                                                  document.getElementById('example_2_2').className='btn btn-outline-secondary';"
+                                                  class="btn btn-outline-secondary">История бронирований</button>
             </div>
             <div id="example_2" style="display: block">
             <hr>

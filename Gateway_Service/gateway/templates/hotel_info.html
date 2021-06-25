@@ -43,8 +43,8 @@
                             </tr>
                         </table>
                         {% if request.COOKIES.jwt %}
-                            <button class="btn btn-info" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Cancel</button>
-                            <button class="btn btn-info" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Reserve</button>
+                            <button class="btn btn-outline-secondary" id="example_2_2" onclick=" document.getElementById('example_2').style.display='none'; document.getElementById('example_2_2').style.display='none'; document.getElementById('example_2_1').style.display='block';" style="display:none;">Отмена</button>
+                            <button class="btn btn-outline-primary" id="example_2_1" onclick="document.getElementById('example_2').style.display='block'; document.getElementById('example_2_1').style.display='none'; document.getElementById('example_2_2').style.display='block';">Забронировать</button>
                         {% else %}
                             <p>
                                 <a href="{% url 'login' %}">Login</a>
@@ -72,9 +72,13 @@
                             <label>Comment</label>
                             <input type="text" name="comment" id="comment" class="form-control"><br>
                             <input type="hidden" name="price" value="{{ hotel_info.cost }}">
-                            <input type="submit" class="btn btn-info" value="Reserve">
+                            <input type="submit" class="btn btn-outline-primary" value="Забронировать">
                         </form>
                     </div>
+                        <br>
+                        {% if dateerror %}
+                            <div class="alert alert-danger">{{ dateerror }}</div>
+                        {% endif %}
                 {% endif %}
             </div>
         {% endif %}
