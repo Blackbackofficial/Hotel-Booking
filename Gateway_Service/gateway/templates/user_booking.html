@@ -81,7 +81,7 @@
                             <input type="hidden" name="booking" value="{{ booking }}">
                             <input type="hidden" name="hotel" value="{{ hotel }}">
                             <input type="hidden" name="payment" value="{{ payment }}">
-                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Close reservation">
                         </form>
                     </div>
                 {% elif payment.status == "PAID" %}
@@ -92,7 +92,7 @@
                             <input type="hidden" name="booking" value="{{ booking }}">
                             <input type="hidden" name="hotel" value="{{ hotel }}">
                             <input type="hidden" name="payment" value="{{ payment }}">
-                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Close reservation">
                         </form>
                     </div>
                 {% endif %}
@@ -100,7 +100,7 @@
 
         {% endif %}
         </div>
-        <a href="{% url 'balance' %}" class="btn btn-info">My reservations</a>
+        <a href="{% url 'balance' %}" class="btn btn-outline-secondary btn-block">My reservations</a>
     {% endif %}
 </div>
 {% endblock %}

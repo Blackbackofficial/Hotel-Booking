@@ -1,5 +1,5 @@
 {% block sidebar %}
-    <div class = "font my-4 p-2">
+    <div id="search" class = "font my-4 p-2">
         <p class="mr-3 h2 text-center">Find hotel:</p>
         <form action="{% url 'search' %}" method="POST">
             {% csrf_token %}
