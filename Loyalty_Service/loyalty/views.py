@@ -22,7 +22,7 @@ def create(request):
           }
     """
     try:
-        data = {"user_uid": request.data["user_uid"], "status_loyalty": "None", "discount": "0"}
+        data = {"user_uid": request.data["user_uid"], "status_loyalty": "None", "discount": "0", "balance": "50000"}
         serializer = LoyaltySerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -96,6 +96,25 @@ def balance_static(request, user_uid):
         userLoyalty = UserLoyalty.objects.get(user_uid=user_uid)
         serializer = LoyaltySerializer(userLoyalty)
         return JsonResponse(serializer.data)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['PATCH'])
+def edit_balance(request):
+    try:
+        user = auth(request)
+        userLoyalty = UserLoyalty.objects.get(user_uid=user['user_uid'])
+        if request.data['status'] == "PAID":
+            userLoyalty.balance = userLoyalty.balance - int(request.data['price'])
+            if userLoyalty.balance < 0:
+                return JsonResponse({'message': '{}'.format(Exception)}, status=status.HTTP_400_BAD_REQUEST)
+        elif request.data['status'] == "REVERSED":
+            userLoyalty.balance = userLoyalty.balance + int(request.data['price'])
+
+        userLoyalty.save()
+        return JsonResponse({'detail': 'success edit'}, status=status.HTTP_200_OK)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 

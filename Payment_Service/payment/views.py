@@ -41,6 +41,11 @@ def pay(request, payment_uid):
         auth(request)
         payment = Payment.objects.get(payment_uid=payment_uid)
         payment.status = "PAID"
+        pay_loyalty = requests.patch("http://localhost:8000/api/v1/loyalty/edit_balance",
+                                     json={'status': payment.status, 'price': request.data['price']},
+                                     cookies=request.COOKIES)
+        if pay_loyalty.status_code != 200:
+            return JsonResponse({'error': 'Error in loyalty'}, status=status.HTTP_400_BAD_REQUEST)
         payment.save()
         return JsonResponse({'detail': 'PAID'}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -54,6 +59,11 @@ def reversed(request, payment_uid):
         auth(request)
         payment = Payment.objects.get(payment_uid=payment_uid)
         payment.status = "REVERSED"
+        pay_loyalty = requests.patch("http://localhost:8000/api/v1/loyalty/edit_balance",
+                                     json={'status': payment.status, 'price': request.data['price']},
+                                     cookies=request.COOKIES)
+        if pay_loyalty.status_code != 200:
+            return JsonResponse({'error': 'Error in loyalty'}, status=status.HTTP_400_BAD_REQUEST)
         payment.save()
         return JsonResponse({'detail': 'REVERSED'}, status=status.HTTP_200_OK)
     except Exception as e:

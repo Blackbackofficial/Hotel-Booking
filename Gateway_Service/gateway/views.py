@@ -571,7 +571,7 @@ def booking_info(request, booking_uid):
         date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
         date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
         period = date_end - date_start
-        totalcost = int(hotel['cost']) * (period.days + 1)
+        totalcost = int(hotel['cost']) * (period.days)
         response = render(request, 'user_booking.html',
                           {'booking': booking, 'hotel': hotel, 'payment': payment, 'cities': cities, 'user': data,
                            'totalcost': totalcost})
@@ -594,8 +594,12 @@ def pay_room(request, payment_uid):
                              .format(booking['hotel_uid']), cookies=session.cookies).json()
         payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
                                .format(booking['payment_uid']), cookies=session.cookies).json()
+        date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
+        date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
+        period = date_end - date_start
+        totalcost = int(hotel['cost']) * (period.days)
         pay = requests.post("http://localhost:8002/api/v1/payment/pay/{}"
-                            .format(payment_uid), cookies=request.COOKIES)
+                            .format(payment_uid), json={'price': totalcost}, cookies=request.COOKIES)
         if pay.status_code == 200:
             response = HttpResponseRedirect('/booking_info/{}'.format(request.POST['booking_uid']))
         else:
@@ -629,8 +633,16 @@ def del_booking(request, booking_uid):
                 response = render(request, 'user_booking.html', {'booking': book, 'cities': cities, 'hotel': hot,
                                                                  'payment': pay, 'error': error, 'user': data})
         else:
-            payment = requests.post("http://localhost:8003/api/v1/booking/reversed/{}"
-                                    .format(booking_uid), cookies=request.COOKIES)
+            booking = requests.get("http://localhost:8003/api/v1/booking/{}"
+                               .format(booking_uid), cookies=session.cookies).json()
+            hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                             .format(booking['hotel_uid']), cookies=session.cookies).json()
+            date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
+            date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
+            period = date_end - date_start
+            totalcost = int(hotel['cost']) * (period.days)
+            payment = requests.post("http://localhost:8002/api/v1/payment/reversed/{}"
+                                    .format(booking['payment_uid']), json={'price': totalcost}, cookies=request.COOKIES)
             if payment.status_code == 200:
                 delbook = requests.delete("http://localhost:8003/api/v1/booking/canceled/{}"
                                           .format(booking_uid), cookies=request.COOKIES)
