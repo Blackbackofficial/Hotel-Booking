@@ -1,17 +1,15 @@
 {% block sidebar %}
     <div class = "font my-4 p-2">
         <p class="mr-3 h2 text-center">Find hotel:</p>
+        <select class="btn btn-outline-secondary mx-2 mb-2" id="selecttheme" style="height: 40px; width: 95%;">
+            <option onclick="document.getElementById('city').value='';">Choose city</option>
+            {% for city in cities %}
+                <option onclick="document.getElementById('city').value='{{ city.cities }}';">{{ city.cities }}</option>
+            {% endfor %}
+        </select>
         <form action="{% url 'search' %}" method="POST">
             {% csrf_token %}
-            <select class="btn btn-outline-secondary mx-2" id="selecttheme" style="height: 40px">
-                    <option onclick="document.getElementById('city').value='';
-                                    document.getElementById('city').style.display='none';">Choose city</option>
-                {% for city in cities %}
-                    <option onclick="document.getElementById('city').value='{{ city }}';
-                                    document.getElementById('city').style.display='block';">{{ city }}</option>
-                {% endfor %}
-            </select>
-            <input type="text" name="city" id="city" class="form-control bg-light" value="" style="display: none" disabled/><br>
+            <input type="hidden" name="city" id="city" class="form-control bg-light" value="" style="display: none"/><br>
             <label>Arrival date</label>
             <input type="date" name="date_start" id="date_start" class="form-control bg-light" required/><br>
             <label>Departure date</label>

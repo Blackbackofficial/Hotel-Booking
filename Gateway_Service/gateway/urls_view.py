@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import index, make_login, make_logout, registration, balance, add_hotel_admin, admin, delete_hotel_admin,\
     all_users, users_static, hotel_info, search_hotel_booking, add_booking, pay_room, del_booking, booking_info, \
-    all_booking_static, static_booking, cities
+    all_booking_static, static_booking
 
 urlpatterns = [
     # VIEW
