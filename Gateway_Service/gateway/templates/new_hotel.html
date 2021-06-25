@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    Новый отель
+    New hotel
 {% endblock %}
 
 {% block content %}
@@ -11,7 +11,7 @@
             <thead>
             <tr>
                 <th style="border-color: white;" colspan="3">
-                    <h3 style="text-align: center">Новый отель</h3>
+                    <h3 style="text-align: center">New hotel</h3>
                 </th>
             </tr>
             </thead>
@@ -20,7 +20,7 @@
                 <td>
                     <div style="margin: 10px;">
                         {% if error == 'success' %}
-                            <div class="alert alert-success"> Добавлен </div>
+                            <div class="alert alert-success"> Added </div>
                         {% elif error %}
                             <div class="alert alert-danger">{{ error }}</div>
                         {% endif %}
@@ -37,7 +37,7 @@
                             </fieldset>
                             <div class="flex-box my-4 ">
                                 <button type="submit" class="btn btn-success">
-                                    Сохранить
+                                    Save
                                 </button>
                             </div>
                         </form>

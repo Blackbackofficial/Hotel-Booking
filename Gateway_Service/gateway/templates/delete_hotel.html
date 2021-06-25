@@ -11,7 +11,7 @@
             <thead>
             <tr>
                 <th style="border-color: white;" colspan="3">
-                    <h3 style="text-align: center">Удалить отель</h3>
+                    <h3 style="text-align: center">Delete hotel</h3>
                 </th>
             </tr>
             </thead>
@@ -20,7 +20,7 @@
                 <td>
                     <div style="margin: 10px;">
                         {% if error == 'success' %}
-                            <div class="alert alert-success"> Удален </div>
+                            <div class="alert alert-success"> Deleted </div>
                         {% elif error %}
                             <div class="alert alert-danger">{{ error }}</div>
                         {% endif %}
@@ -37,7 +37,7 @@
                             </fieldset>
                             <div class="flex-box my-4">
                                 <button type="submit" class="btn btn-danger">
-                                    Удалить
+                                    Delete
                                 </button>
                             </div>
                         </form>

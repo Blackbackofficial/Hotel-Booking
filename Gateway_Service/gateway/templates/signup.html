@@ -10,7 +10,7 @@
         <thead>
         <tr>
             <th style="border-color: white;" colspan="3">
-                <h3 style="text-align: center">Регистрация</h3>
+                <h3 style="text-align: center">Registration</h3>
             </th>
         </tr>
         </thead>
@@ -19,7 +19,7 @@
             <td>
                 <div style="margin: 10px;">
                     {% if error == 'success' %}
-                        <div class="alert alert-success"> Зарегистрированы </div>
+                        <div class="alert alert-success"> Registered </div>
                     {% elif error %}
                         <div class="alert alert-danger">{{ error }}</div>
                     {% endif %}
@@ -36,7 +36,7 @@
                         </fieldset>
                         <div class="flex-box my-4 ">
                             <button type="submit" class="btn btn-success">
-                                Зарегистрироваться
+                                Register
                             </button>
                         </div>
                     </form>

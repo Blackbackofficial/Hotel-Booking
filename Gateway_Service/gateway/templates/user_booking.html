@@ -5,10 +5,10 @@
 <div class="col-8 mt-3">
     {% if bookerror %}
         <div class="alert alert-success">{{ bookerror }}</div>
-        <a href="{% url 'index' %}" class="btn btn-info">На главную</a>
+        <a href="{% url 'index' %}" class="btn btn-info">Start page</a>
     {% else %}
         <div class="p-2 my-3">
-            <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Бронирование отеля
+            <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Hotel reservation
                 <a href={% url 'hotel_info' hotel.hotel_uid %}><h4 style="font-weight: bold">{{hotel.title}}</h4></a>
             </h4>
         </div>
@@ -21,49 +21,49 @@
             {% endif %}
             <table class = "table">
                 <tr>
-                    <th scope="col" class="w-25" style="border: none;">Город:</th>
+                    <th scope="col" class="w-25" style="border: none;">City:</th>
                     <td style="border: none;">{{ hotel.cities }}</td>
                 </tr>
                 <tr>
-                    <th scope="col" class="w-25">Адрес:</th>
+                    <th scope="col" class="w-25">Address:</th>
                     <td>{{ hotel.location }}</td>
                 </tr>
                 <tr>
-                    <th scope="col" class="w-25">Дата заезда:</th>
+                    <th scope="col" class="w-25">Arrival date:</th>
                     <td>{{ booking.date_start }}</td>
                 </tr>
                 <tr>
-                    <th scope="col" class="w-25">Дата выезда:</th>
+                    <th scope="col" class="w-25">Departure date:</th>
                     <td>{{ booking.date_end }}</td>
                 </tr>
                 <tr>
-                    <th scope="col" class="w-25">Ваш комментарий:</th>
+                    <th scope="col" class="w-25">Comment:</th>
                     <td>{{ booking.comment }}</td>
                 </tr>
                 <tr>
-                    <th scope="col" class="w-25">Бронь изменена:</th>
+                    <th scope="col" class="w-25">Booking changed:</th>
                     <td>{{ booking.date_create }}</td>
                 </tr>
                 <tr>
-                    <th scope="col" class="w-25">Статус:</th>
+                    <th scope="col" class="w-25">Status:</th>
                     <td>{{ payment.status }}</td>
                 </tr>
                 {% if payment.status == "PAID" %}
                     <tr>
-                        <th scope="col" class="w-25">Оплачено:</th>
+                        <th scope="col" class="w-25">Paid:</th>
                         <td>{{ totalcost }}</td>
                     </tr>
                 {% endif %}
             </table>
             {% if payment.status == "NEW" %}
-                <h3>К оплате: {{ totalcost }}</h3>
+                <h3>To pay: {{ totalcost }}</h3>
                 <form id="payment" action="{% url 'pay_room' payment.payment_uid %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="booking_uid" value="{{ booking.booking_uid }}">
                     <input type="hidden" name="booking" value="{{ booking }}">
                     <input type="hidden" name="hotel" value="{{ hotel }}">
                     <input type="hidden" name="payment" value="{{ payment }}">
-                    <input type="submit" class="btn btn-info mr-2" value="Оплатить">
+                    <input type="submit" class="btn btn-info mr-2" value="Pay">
                 </form>
             {% endif %}
             {% if payment.status == "NEW" or payment.status == "PAID" %}
@@ -73,12 +73,12 @@
                     <input type="hidden" name="booking" value="{{ booking }}">
                     <input type="hidden" name="hotel" value="{{ hotel }}">
                     <input type="hidden" name="payment" value="{{ payment }}">
-                    <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+                    <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Canceled booking">
                 </form>
             {% endif %}
         {% endif %}
         </div>
-        <a href="{% url 'balance' %}" class="btn btn-info">Мои бронирования</a>
+        <a href="{% url 'balance' %}" class="btn btn-info">My reservations</a>
     {% endif %}
 </div>
 {% endblock %}

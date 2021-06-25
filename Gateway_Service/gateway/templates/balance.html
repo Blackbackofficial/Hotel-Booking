@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    Личный кабинет
+    Personal account
 {% endblock %}
 
 {% block content %}
@@ -42,48 +42,48 @@
                 </tbody>
             </table>
             <div class="text-center">
-                <h3 style="font-weight: bold">Мои бронирования</h3>
+                <h3 style="font-weight: bold">My reservations</h3>
             </div>
             <div class="btn-group btn-block px-1">
                 <button id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
                                                  document.getElementById('example_4').style.display='none';
                                                  document.getElementById('example_2_2').className='btn btn-info active';
                                                  document.getElementById('example_4_4').className='btn btn-info';"
-                                                 class="btn btn-info active">Действующие брони</button>
+                                                 class="btn btn-info active">The operating reservations</button>
                 <button id="example_4_4" onclick="document.getElementById('example_2').style.display='none';
                                                   document.getElementById('example_4').style.display='block';
                                                   document.getElementById('example_4_4').className='btn btn-info active';
                                                   document.getElementById('example_2_2').className='btn btn-info';"
-                                                  class="btn btn-info">История бронирований</button>
+                                                  class="btn btn-info">History reservations</button>
             </div>
             <div id="example_2" style="display: block">
             <hr>
                 {% for book, hotel, pay in currbookhot %}
                     {% if pay.status == "NEW" %}
                     <div class = "font my-4 p-2">
-                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Hotel's reservations {{ hotel.title }}</h3></a>
                         <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
                         <div class="row">
                             <div class="col-8">
                                 <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                                <p style="font-weight: bold">Требуется оплата</p>
+                                <p style="font-weight: bold">Payment required</p>
                             </div>
                             <div class="col-4">
-                                <p>Создано {{ book.date_create }}</p>
+                                <p>Created {{ book.date_create }}</p>
                             </div>
                         </div>
                     </div>
                     {% else %}
                     <div class = "font my-4 p-2">
-                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Hotel's reservations {{ hotel.title }}</h3></a>
                         <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
                         <div class="row">
                             <div class="col-8">
-                                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                                <p style="font-weight: bold">Оплачено</p>
+                                <p>Address: {{ hotel.cities }}, {{ hotel.location }}</p>
+                                <p style="font-weight: bold">Paid</p>
                             </div>
                             <div class="col-4">
-                                <p>Создано {{ book.date_create }}</p>
+                                <p>Created {{ book.date_create }}</p>
                             </div>
                         </div>
                     </div>
@@ -95,29 +95,29 @@
                 {% for book, hotel, pay in histbookhot %}
                     {% if pay.status == "CANCELED" %}
                     <div class = "font my-4 p-2">
-                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Hotel's reservations {{ hotel.title }}</h3></a>
                         <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
                         <div class="row">
                             <div class="col-8">
-                                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                                <p style="font-weight: bold">Отменено</p>
+                                <p>Address: {{ hotel.cities }}, {{ hotel.location }}</p>
+                                <p style="font-weight: bold">Canceled</p>
                             </div>
                             <div class="col-4">
-                                <p>Создано {{ book.date_create }}</p>
+                                <p>Created {{ book.date_create }}</p>
                             </div>
                         </div>
                     </div>
                     {% else %}
                     <div class = "font my-4 p-2">
-                        <a href={% url 'booking_info' book.booking_uid %}><h3>Бронирование отеля {{ hotel.title }}</h3></a>
+                        <a href={% url 'booking_info' book.booking_uid %}><h3>Hotel's reservations {{ hotel.title }}</h3></a>
                         <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.date_start }} - {{ book.date_end }}</p>
                         <div class="row">
                             <div class="col-8">
-                                <p>Адрес: {{ hotel.cities }}, {{ hotel.location }}</p>
-                                <p style="font-weight: bold">Средства возвращены</p>
+                                <p>Address: {{ hotel.cities }}, {{ hotel.location }}</p>
+                                <p style="font-weight: bold">Funds reversed</p>
                             </div>
                             <div class="col-4">
-                                <p>Создано {{ book.date_create }}</p>
+                                <p>Created {{ book.date_create }}</p>
                             </div>
                         </div>
                     </div>

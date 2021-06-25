@@ -11,13 +11,13 @@
             <div class = "font my-4 p-2">
                 <a href={% url 'hotel_info' hotel.hotel_uid %}><h3>{{hotel.title}}</h3></a>
                 <p class="d-inline-block text-truncate" style="max-width:800px;">{{hotel.short_text}}</p>
-                <p>Город: {{ hotel.cities }}</p>
+                <p>City: {{ hotel.cities }}</p>
                 <div class = "row">
                     <div class = "col-8">
-                        <p>Вместимость: {{hotel.rooms}} номеров</p>
+                        <p>Capacity: {{hotel.rooms}} rooms</p>
                     </div>
                     <div class = "col-4">
-                        <p class = "text-end">Стоимость за ночь: {{hotel.cost}}</p>
+                        <p class = "text-end">Cost per night: {{hotel.cost}}</p>
                     </div>
                 </div>
             </div>
