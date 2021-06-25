@@ -1,22 +1,24 @@
 import ast
 import datetime
 
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator
 from django.shortcuts import render
-from rest_framework.exceptions import AuthenticationFailed
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
-from django.forms.models import model_to_dict
 from .forms import LoginForm, UserRegistrationForm, NewHotel, DeleteHotel
-from django.core import serializers
 from django.http import HttpResponseRedirect, JsonResponse, Http404
 from rest_framework import status
 from confluent_kafka import Producer
 from datetime import datetime as dt
 from random import choices
 from string import ascii_letters, digits
-import base64, pytz, sys, os, requests, json, jwt, re
+import pytz
+import sys
+import requests
+import json
+import jwt
+import re
 
 FAILURES = 3
 TIMEOUT = 6
@@ -464,7 +466,7 @@ def index(request):
 
     if len(_allhotels) != 0:
         title = "Our hotels"
-        paginator = Paginator(_allhotels, 3)
+        paginator = Paginator(_allhotels, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         response = render(request, 'index.html', {'allhotels': _allhotels, 'page_obj': page_obj, \
@@ -506,7 +508,7 @@ def hotel_info(request, hotel_uid):
                              .format(hotel_uid), cookies=request.COOKIES).json()
         response = render(request, 'hotel_info.html', {'hotel_info': hotel, 'user': data})
     except:
-        error = "Ошибка отображения отеля"
+        error = "Не удалось вывести информацию об отеле. Повторите попытку позже"
         response = render(request, 'hotel_info.html', {'error': error, 'user': data})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
@@ -519,17 +521,23 @@ def add_booking(request):
     user = auth(request)
     if request.method == 'POST':
         data = request.POST
-        booking = requests.post("http://localhost:8003/api/v1/booking/",
-                                json={"hotel_uid": data["hotel_uid"],
-                                      "date_start": data["date_start"],
-                                      "date_end": data["date_end"],
-                                      "comment": data["comment"],
-                                      "price": int(data["price"])}, cookies=request.COOKIES)
-        if booking.status_code == 200:
-            response = HttpResponseRedirect('/booking_info/{}'.format(booking.json()['booking_uid']))
+        if request.POST['date_start'] > request.POST['date_end'] or request.POST['date_start'] < datetime.datetime.now():
+            dateerror = "Неверный ввод дат"
+            hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
+                                 .format(request.POST['hotel_uid']), cookies=request.COOKIES).json()
+            response = render(request, 'hotel_info.html', {'dateerror': dateerror, 'hotel_info': hotel, 'user': data})
         else:
-            error = "Что-то пошло не так. Повторите попытку позже"
-            response = render(request, 'hotel_info.html', {'error': error, 'user': data})
+            booking = requests.post("http://localhost:8003/api/v1/booking/",
+                                    json={"hotel_uid": data["hotel_uid"],
+                                          "date_start": data["date_start"],
+                                          "date_end": data["date_end"],
+                                          "comment": data["comment"],
+                                          "price": int(data["price"])}, cookies=request.COOKIES)
+            if booking.status_code == 200:
+                response = HttpResponseRedirect('/booking_info/{}'.format(booking.json()['booking_uid']))
+            else:
+                error = "Что-то пошло не так. Повторите попытку позже"
+                response = render(request, 'hotel_info.html', {'error': error, 'user': data})
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
         return response
@@ -545,9 +553,14 @@ def booking_info(request, booking_uid):
                              .format(booking['hotel_uid']), cookies=session.cookies).json()
         payment = requests.get("http://localhost:8002/api/v1/payment/status/{}"
                              .format(booking['payment_uid']), cookies=session.cookies).json()
-        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data})
+        date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
+        date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
+        period = date_end - date_start
+        totalcost = int(hotel['cost'])*(period.days+1)
+        response = render(request, 'user_booking.html', {'booking': booking, 'hotel': hotel, 'payment': payment, 'user': data,\
+                                                         'totalcost': totalcost})
     except:
-        bookerror = "Ошибка бронирования"
+        bookerror = "Не удалось отобразить бронирование. Повторите попытку"
         response = render(request, 'user_booking.html', {'bookerror': bookerror, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
@@ -571,7 +584,8 @@ def pay_room(request, payment_uid):
         else:
             error = "Не удалось провести оплату!"
             response = render(request, 'user_booking.html',
-                      {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data})
+                      {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data, \
+                       'totalcost': request.POST['totalcost']})
 
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
@@ -590,7 +604,7 @@ def del_booking(request, booking_uid):
                                  .format(booking_uid), cookies=request.COOKIES)
             if delbook.status_code == 200:
                 success = "Бронирование удалено"
-                response = render(request, 'user_booking.html', {'success':success, 'user': data})
+                response = render(request, 'user_booking.html', {'bookdel':success, 'user': data})
                 # response = HttpResponseRedirect('/balance')
             else:
                 error = "Что-то пошло не так, повторите попытку"
@@ -604,7 +618,7 @@ def del_booking(request, booking_uid):
                                      .format(booking_uid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
                     success = "Бронирование удалено"
-                    response = render(request, 'user_booking.html', {'success':success, 'user': data})
+                    response = render(request, 'user_booking.html', {'bookdel':success, 'user': data})
                 else:
                     error = "Ошибка снятия бронирования"
                     response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot, \
@@ -630,7 +644,7 @@ def search_hotel_booking(request):
         if len(search.json()) != 0:
             title = "Доступные отели в городе "+str(data["city"])+" c "+str(data["date_start"])+" по "+str(data["date_end"])
 
-            paginator = Paginator(search.json(), 3)
+            paginator = Paginator(search.json(), 10)
             page_number = request.GET.get('page')
             page_obj = paginator.get_page(page_number)
             response = render(request, 'index.html', {'allhotels': search, 'page_obj': page_obj, \

@@ -20,14 +20,14 @@
                         </div>
                         <div>
                             <label>Booking status:</label>
-                            <select class="btn btn-info mx-2" id="selecttheme" style="height: 40px">
+                            <select class="btn btn-outline-secondary mx-2" id="selecttheme" style="height: 40px">
                                 <option value="all" onclick="document.getElementById('status').value='all';">All</option>
                                 <option value="N/p" onclick="document.getElementById('status').value='new/paid';">New/paid</option>
                                 <option value="C/r" onclick="document.getElementById('status').value='canceled/reversed';">Canceled/reversed</option>
                             </select>
                         </div>
                         <input type="hidden" name="status" id="status" class="form-control" value="all">
-                        <input type="submit" class="btn btn-info" value="Найти">
+                        <input type="submit" class="btn btn-outline-secondary" value="Найти">
                     </div>
                 </form>
             {% else %}
