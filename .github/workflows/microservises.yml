@@ -1,0 +1,87 @@
+name: Micro services
+
+on: [ push ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 7
+      matrix:
+        python-version: [ 3.9 ]
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        git fetch --prune --unshallow
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install dj-database-url
+        pip install -r requirements.txt
+
+    - name: Migrate Booking
+      run: |
+        cd Booking_Service/
+        python3 manage.py migrate
+    - name: Deploy Booking service
+      uses: akhileshns/heroku-deploy@v3.4.6
+      with:
+        heroku_api_key: 9bb8f29a-3dab-4878-86a3-33ab7960a1cb
+        heroku_app_name: hotels-booking-chernov
+        heroku_email: Chernov-Ivan.1997@yandex.ru
+        appdir: Booking_Service
+#
+#
+#    - name: Migrate Warehouse
+#      run: |
+#        cd warehouse_service/
+#        python3 manage.py migrate
+#    - name: Deploy Warehouse service
+#      uses: akhileshns/heroku-deploy@v3.4.6
+#      with:
+#        heroku_api_key: 9bb8f29a-3dab-4878-86a3-33ab7960a1cb
+#        heroku_app_name: warehouse-ivan
+#        heroku_email: Chernov-Ivan.1997@yandex.ru
+#        appdir: warehouse_service
+#
+#
+#    - name: Migrate Orders
+#      run: |
+#        cd order_service/
+#        python3 manage.py migrate
+#    - name: Deploy Orders service
+#      uses: akhileshns/heroku-deploy@v3.4.6
+#      with:
+#        heroku_api_key: 9bb8f29a-3dab-4878-86a3-33ab7960a1cb
+#        heroku_app_name: orders-ivan
+#        heroku_email: Chernov-Ivan.1997@yandex.ru
+#        appdir: order_service
+#
+#
+#    - name: Migrate Store
+#      run: |
+#        cd store_service/
+#        python3 manage.py migrate
+#    - name: Deploy Store service
+#      uses: akhileshns/heroku-deploy@v3.4.6
+#      with:
+#        heroku_api_key: 9bb8f29a-3dab-4878-86a3-33ab7960a1cb
+#        heroku_app_name: store-ivan
+#        heroku_email: Chernov-Ivan.1997@yandex.ru
+#        appdir: store_service
+#
+#
+#    - name: Run API Tests
+#      id: run-newman
+#      uses: anthonyvscode/newman-action@v1
+#      with:
+#        collection: postman/postman-collection.json
+#        environment: postman/postman-heroku-environment.json
+#        delayRequest: 60
+#        reporters: cli
