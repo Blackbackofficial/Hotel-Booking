@@ -5,11 +5,11 @@
 <div class="col-8 mt-3">
     {% if bookdel %}
         <div class="alert alert-success">{{ bookerror }}</div>
-        <a href="{% url 'index' %}" class="btn btn-info">На главную</a>
-        <a href="{% url 'balance' %}" class="btn btn-info">Личный кабинет</a>
+        <a href="{% url 'index' %}" class="btn btn-info">To start page</a>
+        <a href="{% url 'balance' %}" class="btn btn-info">Personal Area</a>
     {% elif bookerror %}
         <div class="alert alert-danger">{{ bookerror }}</div>
-            <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="Назад"/>
+            <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="Back"/>
     {% else %}
         <div class="p-2 my-3">
             <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Hotel reservation
@@ -81,7 +81,7 @@
                             <input type="hidden" name="booking" value="{{ booking }}">
                             <input type="hidden" name="hotel" value="{{ hotel }}">
                             <input type="hidden" name="payment" value="{{ payment }}">
-                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Cancel reservation">
                         </form>
                     </div>
                 {% elif payment.status == "PAID" %}
@@ -92,7 +92,7 @@
                             <input type="hidden" name="booking" value="{{ booking }}">
                             <input type="hidden" name="hotel" value="{{ hotel }}">
                             <input type="hidden" name="payment" value="{{ payment }}">
-                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Отменить бронь">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Cancel reservation">
                         </form>
                     </div>
                 {% endif %}
