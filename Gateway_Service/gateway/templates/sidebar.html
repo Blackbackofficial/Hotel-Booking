@@ -1,14 +1,21 @@
 {% block sidebar %}
-    <div id="search" class = "font my-4 p-2">
+    <div class = "font my-4 p-2">
         <p class="mr-3 h2 text-center">Find hotel:</p>
         <form action="{% url 'search' %}" method="POST">
             {% csrf_token %}
-            <label>Enter city</label>
-            <input type="text" name="city" id="city" class="form-control bg-light" placeholder="City" required><br>
+            <select class="btn btn-outline-secondary mx-2" id="selecttheme" style="height: 40px">
+                    <option onclick="document.getElementById('city').value='';
+                                    document.getElementById('city').style.display='none';">Choose city</option>
+                {% for city in cities %}
+                    <option onclick="document.getElementById('city').value='{{ city }}';
+                                    document.getElementById('city').style.display='block';">{{ city }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="city" id="city" class="form-control bg-light" value="" style="display: none" disabled/><br>
             <label>Arrival date</label>
-            <input type="date" name="date_start" id="date_start" class="form-control bg-light" required><br>
+            <input type="date" name="date_start" id="date_start" class="form-control bg-light" required/><br>
             <label>Departure date</label>
-            <input type="date" name="date_end" id="date_end" class="form-control bg-light" required><br>
+            <input type="date" name="date_end" id="date_end" class="form-control bg-light" required/><br>
             <input type="submit" class="btn btn-outline-secondary btn-block" value="Search">
         </form>
     </div>

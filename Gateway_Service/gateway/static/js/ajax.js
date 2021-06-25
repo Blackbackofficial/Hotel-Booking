@@ -27,8 +27,8 @@ $.ajaxSetup({
     timeout: 8000
 });
 
-$('#city').autocomplete({
-    serviceUrl: '/cities/',
+$('#search input[name="city"]').autocomplete({
+    serviceUrl: '/cities',
     minChars: 1,
-    appendTo: "#city"
+    appendTo: "#search"
 });

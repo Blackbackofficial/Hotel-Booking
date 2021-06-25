@@ -477,7 +477,7 @@ def index(request):
         paginator = Paginator(_allhotels, 10)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
-        response = render(request, 'index.html', {'allhotels': _allhotels, 'page_obj': page_obj,
+        response = render(request, 'index.html', {'allhotels': _allhotels, 'cities': cities(request),'page_obj': page_obj,
                                                   'title': title, 'user': data})
 
     else:
@@ -505,7 +505,7 @@ def make_login(request):
         else:
             session = session.content.decode('utf8').replace("'", '"')
             error = json.loads(session)['detail']
-    return render(request, 'login.html', {'form': form, 'error': error})
+    return render(request, 'login.html', {'form': form, 'error': error, 'cities': cities(request)})
 
 
 def hotel_info(request, hotel_uid):
@@ -514,10 +514,10 @@ def hotel_info(request, hotel_uid):
     try:
         hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                              .format(hotel_uid), cookies=request.COOKIES).json()
-        response = render(request, 'hotel_info.html', {'hotel_info': hotel, 'user': data})
+        response = render(request, 'hotel_info.html', {'hotel_info': hotel,'cities': cities(request), 'user': data})
     except:
         error = "Failed to display hotel information. Please try again later."
-        response = render(request, 'hotel_info.html', {'error': error, 'user': data})
+        response = render(request, 'hotel_info.html', {'error': error,'cities': cities(request), 'user': data})
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
@@ -535,7 +535,7 @@ def add_booking(request):
             dateerror = "Invalid date entry"
             hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                                  .format(request.POST['hotel_uid']), cookies=request.COOKIES).json()
-            response = render(request, 'hotel_info.html', {'dateerror': dateerror, 'hotel_info': hotel, 'user': data})
+            response = render(request, 'hotel_info.html', {'dateerror': dateerror,'cities': cities(request), 'hotel_info': hotel, 'user': data})
         else:
             booking = requests.post("http://localhost:8003/api/v1/booking/",
                                     json={"hotel_uid": data["hotel_uid"],
@@ -547,7 +547,7 @@ def add_booking(request):
                 response = HttpResponseRedirect('/booking_info/{}'.format(booking.json()['booking_uid']))
             else:
                 error = "Something went wrong. Please try again later."
-                response = render(request, 'hotel_info.html', {'error': error, 'user': data})
+                response = render(request, 'hotel_info.html', {'error': error, 'cities': cities(request),'user': data})
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
         return response
@@ -572,7 +572,7 @@ def booking_info(request, booking_uid):
                            'totalcost': totalcost})
     except:
         bookerror = "Failed to display booking, try again"
-        response = render(request, 'user_booking.html', {'bookerror': bookerror, 'user': data})
+        response = render(request, 'user_booking.html', {'bookerror': bookerror, 'cities': cities(request),'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response
@@ -595,8 +595,8 @@ def pay_room(request, payment_uid):
         else:
             error = "Failed to pay!"
             response = render(request, 'user_booking.html',
-                              {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data,
-                               'totalcost': request.POST['totalcost']})
+                      {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data, \
+                       'cities': cities(request),'totalcost': request.POST['totalcost']})
 
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
@@ -615,11 +615,11 @@ def del_booking(request, booking_uid):
                                       .format(booking_uid), cookies=request.COOKIES)
             if delbook.status_code == 200:
                 success = "Booking deleted"
-                response = render(request, 'user_booking.html', {'bookdel': success, 'user': data})
+                response = render(request, 'user_booking.html', {'bookdel': success, 'cities': cities(request), 'user': data})
                 # response = HttpResponseRedirect('/balance')
             else:
                 error = "Something went wrong, please try again"
-                response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
+                response = render(request, 'user_booking.html', {'booking': book, 'cities': cities(request),'hotel': hot,
                                                                  'payment': pay, 'error': error, 'user': data})
         else:
             payment = requests.post("http://localhost:8003/api/v1/booking/reversed/{}"
@@ -629,14 +629,14 @@ def del_booking(request, booking_uid):
                                           .format(booking_uid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
                     success = "Booking deleted"
-                    response = render(request, 'user_booking.html', {'bookdel': success, 'user': data})
+                    response = render(request, 'user_booking.html', {'bookdel':success, 'cities': cities(request),'user': data})
                 else:
                     error = "Booking cancellation error"
-                    response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
+                    response = render(request, 'user_booking.html', {'booking': book, 'cities': cities(request), 'hotel': hot,
                                                                      'payment': pay, 'error': error, 'user': data})
             else:
                 error = "Refund error"
-                response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
+                response = render(request, 'user_booking.html', {'booking': book, 'cities': cities(request), 'hotel': hot,
                                                                  'payment': pay, 'error': error, 'user': data})
 
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
@@ -653,7 +653,7 @@ def search_hotel_booking(request):
                 request.POST['date_end'], "%Y-%m-%d") or \
                 datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") < datetime.datetime.now():
             title = "Invalid Date Entry!"
-            response = render(request, 'index.html', {'title': title, 'user': user})
+            response = render(request, 'index.html', {'title': title, 'cities': cities(request), 'user': user})
         else:
             search = requests.post("http://localhost:8004/api/v1/hotels/date",
                                    json={"date_start": data["date_start"],
@@ -946,10 +946,10 @@ def balance(request):
         currbookhot = zip(curr, currhotel, currpay)
         histbookhot = zip(hist, histhotel, histpay)
         response = render(request, 'balance.html', {'loyalty': loyalty, 'user': user, 'currbookhot': currbookhot,
-                                                    'histbookhot': histbookhot})
+                                                    'cities': cities(request), 'histbookhot': histbookhot})
     except:
         usererror = "Не удалось отобразить данные. Попробуйте позднее"
-        response = render(request, 'balance.html', {'user': user, 'usererror': usererror})
+        response = render(request, 'balance.html', {'user': user, 'cities': cities(request), 'usererror': usererror})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response
