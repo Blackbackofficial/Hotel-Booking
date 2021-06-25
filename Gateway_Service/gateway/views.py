@@ -529,8 +529,9 @@ def add_booking(request):
     user = auth(request)
     if request.method == 'POST':
         data = request.POST
-        if request.POST['date_start'] > request.POST['date_end'] or request.POST['date_start'] < datetime.datetime.now():
-            dateerror = "Invalid Date Entry"
+        if datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") > datetime.datetime.strptime(request.POST['date_end'], "%Y-%m-%d") or \
+                datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") < datetime.datetime.now():
+            dateerror = "Invalid date entry"
             hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                                  .format(request.POST['hotel_uid']), cookies=request.COOKIES).json()
             response = render(request, 'hotel_info.html', {'dateerror': dateerror, 'hotel_info': hotel, 'user': data})
@@ -646,22 +647,28 @@ def search_hotel_booking(request):
     user = auth(request)
     if request.method == 'POST':
         data = request.POST
-        search = requests.post("http://localhost:8004/api/v1/hotels/date",
-                               json={"date_start": data["date_start"],
-                                     "date_end": data["date_end"],
-                                     "city": data["city"]}, cookies=request.COOKIES)
-        if len(search.json()) != 0:
-            title = "Available hotels in the city " + str(data["city"]) + " from " + str(data["date_start"]) + " to " + str(
-                data["date_end"])
-
-            paginator = Paginator(search.json(), 10)
-            page_number = request.GET.get('page')
-            page_obj = paginator.get_page(page_number)
-            response = render(request, 'index.html', {'allhotels': search, 'page_obj': page_obj, \
-                                                      'title': title, 'user': user})
-        else:
-            title = "No results were found for your search."
+        if datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") > datetime.datetime.strptime(
+                request.POST['date_end'], "%Y-%m-%d") or \
+                datetime.datetime.strptime(request.POST['date_start'], "%Y-%m-%d") < datetime.datetime.now():
+            title = "Invalid Date Entry!"
             response = render(request, 'index.html', {'title': title, 'user': user})
+        else:
+            search = requests.post("http://localhost:8004/api/v1/hotels/date",
+                                   json={"date_start": data["date_start"],
+                                         "date_end": data["date_end"],
+                                         "city": data["city"]}, cookies=request.COOKIES)
+            if len(search.json()) != 0:
+                title = "Available hotels in the city " + str(data["city"]) + " from " + str(data["date_start"]) + " to " + str(
+                    data["date_end"])
+
+                paginator = Paginator(search.json(), 10)
+                page_number = request.GET.get('page')
+                page_obj = paginator.get_page(page_number)
+                response = render(request, 'index.html', {'allhotels': search, 'page_obj': page_obj, \
+                                                          'title': title, 'user': user})
+            else:
+                title = "No results were found for your search."
+                response = render(request, 'index.html', {'title': title, 'user': user})
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
         return response
