@@ -9,12 +9,14 @@
     {% if allhotels %}
         {% for hotel in page_obj %}
             <div class = "font my-4 p-2">
-                <a href={% url 'hotel_info' hotel.hotel_uid %}><h3>{{hotel.title}}</h3></a>
-                <p class="d-inline-block text-truncate" style="max-width:800px;">{{hotel.short_text}}</p>
-                <p>City: {{ hotel.cities }}</p>
+                <a href={% url 'hotel_info' hotel.hotel_uid %}>
+                    <h3 style="padding-top: 10px; padding-left: 30px;">{{hotel.title}}</h3>
+                </a>
+                <p class="d-inline-block text-truncate" style="max-width:800px; padding-left: 30px;">{{hotel.short_text}}</p>
+                <p style="padding-left: 30px;">City: {{ hotel.cities }}</p>
                 <div class = "row">
                     <div class = "col-8">
-                        <p>Capacity: {{hotel.rooms}} rooms</p>
+                        <p style="padding-left: 30px;">Capacity: {{hotel.rooms}} rooms</p>
                     </div>
                     <div class = "col-4">
                         <p class = "text-end">Cost per night: {{hotel.cost}}</p>

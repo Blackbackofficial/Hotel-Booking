@@ -6,7 +6,7 @@
 .font {
   /*background: #f6f6f6;*/
   border-radius: 10px;
-  box-shadow: 0 2px 14px 10px rgba(122, 122, 122, 0.2);
+  box-shadow: 0 0 0px 4px rgb(173 172 172 / 20%);
 }
 
 .answer {
