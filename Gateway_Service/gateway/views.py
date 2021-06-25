@@ -459,7 +459,7 @@ def report_hotels(request):
 
 
 def cities(request):
-    dict_cities = requests.get("http://localhost:8006/api/v1/hotels/cities")
+    dict_cities = requests.get("http://localhost:8004/api/v1/hotels/cities")
     if dict_cities.status_code == 200:
         dict_cities = dict_cities.json()
         return JsonResponse(dict_cities, status=status.HTTP_200_OK, safe=False)
