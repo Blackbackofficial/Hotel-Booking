@@ -1,0 +1,1 @@
+web: gunicorn warehouse_service.wsgi --log-file -
