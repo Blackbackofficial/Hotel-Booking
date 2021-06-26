@@ -496,7 +496,7 @@ def make_login(request):
         form = LoginForm()
     if request.method == "POST":
         form = LoginForm(data=request.POST)
-        session = requests.post('https://hotels-gateway-chernov.herokuapp.com/api/v1/login',
+        session = requests.post('https://hotels-session-chernov.herokuapp.com/api/v1/session/login',
                                 json={"username": request.POST.get('username'),
                                       "password": request.POST.get('password')})
         if session.status_code == 200:
