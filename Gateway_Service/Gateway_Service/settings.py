@@ -129,6 +129,9 @@ STATIC_URL = '/static/'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # STATICFILES_DIRS = [
@@ -154,8 +157,5 @@ CORS_ALLOWED_ORIGINS = [
     "https://habr.com",
     # добавить потом
 ]
-
-# The absolute path to the directory where collectstatic will collect static files for deployment.
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
