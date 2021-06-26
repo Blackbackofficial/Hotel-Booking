@@ -95,13 +95,15 @@ def logout(request):  #
     """
     POST: in the post only JWT
     """
-    session = requests.post("https://hotels-session-chernov.herokuapp.com/api/v1/session/logout", cookies=request.COOKIES)
+    session = requests.post("https://hotels-session-chernov.herokuapp.com/api/v1/session/logout",
+                            cookies=request.COOKIES)
     if session.status_code != 200:
         return JsonResponse(session.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse({'success': 'logout'}, status=status.HTTP_200_OK)
 
-    user = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/user/{}".format(session.json()["user_uid"]),
-                        cookies=request.COOKIES).json()
+    user = requests.get(
+        "https://hotels-session-chernov.herokuapp.com/api/v1/session/user/{}".format(session.json()["user_uid"]),
+        cookies=request.COOKIES).json()
     q_session = {"username": user["username"], "detail": 'Logout',
                  "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
     producer(q_session, 'dmqj25d7-users')
@@ -115,10 +117,12 @@ def users(request):
     """
     GET: use JWT
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     _users = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/users", cookies=session.cookies)
@@ -141,13 +145,16 @@ def add_hotel(request):
           "cost": 3992
           } only admin
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    hotel = requests.post("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/", json=request.data, cookies=session.cookies)
+    hotel = requests.post("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/", json=request.data,
+                          cookies=session.cookies)
     if hotel.status_code != 200:
         return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(hotel.json(), status=status.HTTP_200_OK, safe=False)
@@ -161,13 +168,16 @@ def all_hotels(request):
     """
     GET: use JWT
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels", json=request.data, cookies=session.cookies)
+    hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels", json=request.data,
+                         cookies=session.cookies)
     if hotel.status_code != 200:
         return JsonResponse(hotel.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(hotel.json(), status=status.HTTP_200_OK, safe=False)
@@ -181,10 +191,12 @@ def one_hotel_or_delete(request, hotel_uid):
     """
     GET, DELETE: use JWT & hotel_uid
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'GET':
@@ -213,10 +225,12 @@ def create_booking_or_all(request):
           } use JWT for user_uid && "price": == cost
     GET:  all user's booking JWT
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     if request.method == 'GET':
@@ -232,53 +246,63 @@ def create_booking_or_all(request):
         hotel = hotel.json()
         request.data.update({"price": hotel["cost"]})
         #  создаем бронь
-        booking = requests.post("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/", json=request.data, cookies=session.cookies)
+        booking = requests.post("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/", json=request.data,
+                                cookies=session.cookies)
         if booking.status_code != 200:
             return JsonResponse(booking.json(), status=status.HTTP_400_BAD_REQUEST)
         #  подсчитываем количество броней для определения нужно ли повышать лояльность или нет
-        booking_all = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/", cookies=session.cookies)
+        booking_all = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/",
+                                   cookies=session.cookies)
         if booking_all.status_code != 200:
             return JsonResponse(booking_all.json(), status=status.HTTP_400_BAD_REQUEST)
         len_booking = booking_all.json()
-        l_status = requests.get("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/balance", cookies=session.cookies)
+        l_status = requests.get("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/balance",
+                                cookies=session.cookies)
         if l_status.status_code != 200:
             return JsonResponse(l_status.json(), status=status.HTTP_400_BAD_REQUEST)
         l_status = l_status.json()['status_loyalty']
 
         # Up Loyalty
         if 20 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
-            loyaltyUP = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit", json={"active": "UP"},
+            loyaltyUP = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit",
+                                       json={"active": "UP"},
                                        cookies=session.cookies)
             if loyaltyUP.status_code != 200:
                 return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
         elif 35 < len(len_booking) < 50 and l_status == 'BRONZE':  # SILVER
-            loyaltyUP = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit", json={"active": "UP"},
+            loyaltyUP = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit",
+                                       json={"active": "UP"},
                                        cookies=session.cookies)
             if loyaltyUP.status_code != 200:
                 return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
         elif 50 < len(len_booking) and l_status == 'SILVER':  # GOLD
-            loyaltyUP = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit", json={"active": "UP"},
+            loyaltyUP = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit",
+                                       json={"active": "UP"},
                                        cookies=session.cookies)
             if loyaltyUP.status_code != 200:
                 return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
         booking = booking.json()
-        payBalance = requests.get("https://hotels-payment-chernov.herokuapp.com/api/v1/payment/status/{}".format(booking.get("payment_uid")),
-                                  cookies=request.COOKIES)
+        payBalance = requests.get(
+            "https://hotels-payment-chernov.herokuapp.com/api/v1/payment/status/{}".format(booking.get("payment_uid")),
+            cookies=request.COOKIES)
         if payBalance.status_code == 200:
             payBalance = payBalance.json()
             booking.update(payBalance)
-        about_hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}".format(booking.get("hotel_uid")),
-                                   cookies=request.COOKIES)
+        about_hotel = requests.get(
+            "https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}".format(booking.get("hotel_uid")),
+            cookies=request.COOKIES)
         if about_hotel.status_code == 200:
             about_hotel = about_hotel.json()
             booking.update(about_hotel)
-        user = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/user/{}".format(booking.get("user_uid")),
-                            cookies=request.COOKIES)
+        user = requests.get(
+            "https://hotels-session-chernov.herokuapp.com/api/v1/session/user/{}".format(booking.get("user_uid")),
+            cookies=request.COOKIES)
         if user.status_code == 200:
             user = user.json()
             booking.update(user)
-        loyalty = requests.get("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/status/{}".format(booking.get("user_uid")),
-                               cookies=request.COOKIES)
+        loyalty = requests.get(
+            "https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/status/{}".format(booking.get("user_uid")),
+            cookies=request.COOKIES)
         if loyalty.status_code == 200:
             loyalty = loyalty.json()
             booking.update(loyalty)
@@ -296,13 +320,16 @@ def one_booking(request, booking_uid):
     """
     GET: use JWT && booking_uid
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    booking_one = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/{}".format(booking_uid), cookies=session.cookies)
+    booking_one = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/{}".format(booking_uid),
+                               cookies=session.cookies)
     if booking_one.status_code != 200:
         return JsonResponse(booking_one.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(booking_one.json(), status=status.HTTP_200_OK, safe=False)
@@ -316,14 +343,17 @@ def all_booking_hotels(request, hotel_uid):
     """
     GET: use JWT && booking_uid "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
-    booking_hotel = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/hotels/{}".format(hotel_uid),
-                                 cookies=session.cookies)
+    booking_hotel = requests.get(
+        "https://hotels-booking-chernov.herokuapp.com/api/v1/booking/hotels/{}".format(hotel_uid),
+        cookies=session.cookies)
     if booking_hotel.status_code != 200:
         return JsonResponse(booking_hotel.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(booking_hotel.json(), status=status.HTTP_200_OK, safe=False)
@@ -337,10 +367,12 @@ def pay_booking(request, booking_uid):
     """
     POST: use JWT && booking_uid "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     booking_status = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/{}".format(booking_uid),
@@ -349,8 +381,9 @@ def pay_booking(request, booking_uid):
         return JsonResponse(booking_status.json(), status=status.HTTP_400_BAD_REQUEST)
     if booking_status.json()["status"] == 'PAID':
         return JsonResponse({"error": "Is paid"}, status=status.HTTP_400_BAD_REQUEST)
-    booking_pay = requests.post("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/pay/{}".format(booking_uid),
-                                cookies=session.cookies)
+    booking_pay = requests.post(
+        "https://hotels-booking-chernov.herokuapp.com/api/v1/booking/pay/{}".format(booking_uid),
+        cookies=session.cookies)
     if booking_pay.status_code != 200:
         return JsonResponse(booking_pay.json(), status=status.HTTP_400_BAD_REQUEST)
     response = JsonResponse(booking_pay.json(), status=status.HTTP_200_OK, safe=False)
@@ -364,10 +397,12 @@ def close_booking(request, booking_uid):
     """
     POST: use JWT && booking_uid "hotel_uid": "80b91c03-8792-4e7b-b898-8bee843b37fa"
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     # узнаем статус
@@ -377,15 +412,17 @@ def close_booking(request, booking_uid):
         return JsonResponse(booking_status.json(), status=status.HTTP_400_BAD_REQUEST)
     booking_status = booking_status.json()["status"]
     if booking_status == 'PAID' and booking_status != 'REVERSED' and booking_status != 'CANCELED':
-        booking_r = requests.post("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/reversed/{}".format(booking_uid),
-                                  cookies=session.cookies)
+        booking_r = requests.post(
+            "https://hotels-booking-chernov.herokuapp.com/api/v1/booking/reversed/{}".format(booking_uid),
+            cookies=session.cookies)
         if booking_r.status_code != 200:
             return JsonResponse(booking_r.json(), status=status.HTTP_400_BAD_REQUEST)
         booking_status = 'REVERSED'
 
     if booking_status == 'NEW' and booking_status != 'REVERSED' and booking_status != 'CANCELED':
-        booking_r = requests.post("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/canceled/{}".format(booking_uid),
-                                  cookies=session.cookies)
+        booking_r = requests.post(
+            "https://hotels-booking-chernov.herokuapp.com/api/v1/booking/canceled/{}".format(booking_uid),
+            cookies=session.cookies)
         if booking_r.status_code != 200:
             return JsonResponse(booking_r.json(), status=status.HTTP_400_BAD_REQUEST)
         booking_status = 'CANCELED'
@@ -401,10 +438,12 @@ def report_booking(request):
     """
         GET: use JWT
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     # достаем отчет по бронированию
@@ -422,10 +461,12 @@ def report_user(request):
     """
         GET: use JWT
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     # достаем отчет по пользователям: логирование, разлогирование, регистрация
@@ -444,10 +485,12 @@ def report_hotels(request):
     """
         GET: use JWT
     """
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     # достаем отчет по пользователям: логирование, разлогирование, регистрация
@@ -472,7 +515,8 @@ def index(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
     cities = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/cities").json()
-    _allhotels = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels", cookies=request.COOKIES).json()
+    _allhotels = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels",
+                              cookies=request.COOKIES).json()
 
     if len(_allhotels) != 0:
         title = "Amazing Sky Hotels"
@@ -543,8 +587,9 @@ def add_booking(request):
             dateerror = "Invalid date entry"
             hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}"
                                  .format(request.POST['hotel_uid']), cookies=request.COOKIES).json()
-            response = render(request, 'hotel_info.html', {'dateerror': dateerror, 'cities': cities, 'hotel_info': hotel,
-                                                           'user': user})
+            response = render(request, 'hotel_info.html',
+                              {'dateerror': dateerror, 'cities': cities, 'hotel_info': hotel,
+                               'user': user})
         else:
             booking = requests.post("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/",
                                     json={"hotel_uid": data["hotel_uid"],
@@ -610,8 +655,8 @@ def pay_room(request, payment_uid):
         else:
             error = "Failed to pay!"
             response = render(request, 'user_booking.html',
-                      {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data, \
-                       'cities': cities, 'totalcost': request.POST['totalcost']})
+                              {'booking': booking, 'hotel': hotel, 'payment': payment, 'error': error, 'user': data, \
+                               'cities': cities, 'totalcost': request.POST['totalcost']})
 
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
             if is_authenticated else response.delete_cookie('jwt')
@@ -639,9 +684,9 @@ def del_booking(request, booking_uid):
                                                                  'payment': pay, 'error': error, 'user': data})
         else:
             booking = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/{}"
-                               .format(booking_uid), cookies=request.COOKIES).json()
+                                   .format(booking_uid), cookies=request.COOKIES).json()
             hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}"
-                             .format(booking['hotel_uid']), cookies=request.COOKIES).json()
+                                 .format(booking['hotel_uid']), cookies=request.COOKIES).json()
             date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
             date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
             period = date_end - date_start
@@ -653,7 +698,8 @@ def del_booking(request, booking_uid):
                                           .format(booking_uid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
                     success = "Booking deleted"
-                    response = render(request, 'user_booking.html', {'bookdel':success, 'cities': cities, 'user': data})
+                    response = render(request, 'user_booking.html',
+                                      {'bookdel': success, 'cities': cities, 'user': data})
                 else:
                     error = "Booking cancellation error"
                     response = render(request, 'user_booking.html', {'booking': book, 'cities': cities, 'hotel': hot,
@@ -781,8 +827,9 @@ def delete_hotel_admin(request):
         form = DeleteHotel()
     if request.method == "POST":
         form = DeleteHotel(data=request.POST)
-        new_hotel = requests.delete('https://hotels-gateway-chernov.herokuapp.com/api/v1/hotels/{}'.format(form.data['hotel_uid']),
-                                    cookies=request.COOKIES)
+        new_hotel = requests.delete(
+            'https://hotels-gateway-chernov.herokuapp.com/api/v1/hotels/{}'.format(form.data['hotel_uid']),
+            cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 204:
             try:
@@ -804,7 +851,8 @@ def all_users(request):
         response = HttpResponseRedirect('/index')
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
-    _users = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/users", cookies=request.COOKIES).json()
+    _users = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/users",
+                          cookies=request.COOKIES).json()
     response = render(request, 'all_users.html', {'all_users': _users, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
@@ -819,12 +867,25 @@ def users_static(request):
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
     try:
-        static_users = requests.get("https://hotels-gateway-chernov.herokuapp.com/api/v1/reports/users", cookies=request.COOKIES).json()
-        dictlist = list()
-        for key, value in static_users.items():
-            temp = [key, value]
-            dictlist.append(temp)
-    except Exception:
+        #  так нужно для Kafka heroku
+        dictlist = None
+        headers = requests.utils.default_headers()
+
+        headers.update(
+            {
+                'User-Agent': 'My User Agent 1.0',
+            }
+        )
+        static_users = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/users", headers=headers,
+                                    cookies=request.COOKIES, timeout=60)
+        if static_users.status_code == 200:
+            static_users = static_users.content.decode('utf8').replace("'", '"')
+            static_users = json.loads(static_users)
+            dictlist = list()
+            for key, value in static_users.items():
+                temp = [key, value]
+                dictlist.append(temp)
+    except Exception as e:
         dictlist = None
 
     response = render(request, 'users_static.html', {'all_users': dictlist, 'user': data})
@@ -842,7 +903,8 @@ def all_booking_static(request):
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
     try:
-        static_booking = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels", cookies=request.COOKIES).json()
+        static_booking = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels",
+                                      cookies=request.COOKIES).json()
         static_booking = sorted(static_booking, key=lambda k: k['hotel_uid'])
     except Exception:
         static_booking = None
@@ -850,7 +912,8 @@ def all_booking_static(request):
         if len(request.POST['hotel_uid']) > 0:
             if request.POST['status'] == "all":
                 try:
-                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels",
+                                     cookies=request.COOKIES).json()
                     static_booking = []
                     for static in s:
                         if static['hotel_uid'] == request.POST['hotel_uid']:
@@ -862,7 +925,8 @@ def all_booking_static(request):
 
             if request.POST['status'] == "new/paid":
                 try:
-                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels",
+                                     cookies=request.COOKIES).json()
                     static_booking = []
                     for static in s:
                         if static['hotel_uid'] == request.POST['hotel_uid'] and static['status'] == "NEW":
@@ -876,7 +940,8 @@ def all_booking_static(request):
 
             if request.POST['status'] == "canceled/reversed":
                 try:
-                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels",
+                                     cookies=request.COOKIES).json()
                     static_booking = []
                     for static in s:
                         if static['hotel_uid'] == request.POST['hotel_uid'] and static['status'] == "CANCELED":
@@ -898,7 +963,8 @@ def all_booking_static(request):
 
             if request.POST['status'] == "new/paid":
                 try:
-                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels",
+                                     cookies=request.COOKIES).json()
                     static_booking = []
                     for static in s:
                         if static['status'] == "NEW" or static['status'] == "PAID":
@@ -909,7 +975,8 @@ def all_booking_static(request):
 
             if request.POST['status'] == "canceled/reversed":
                 try:
-                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels", cookies=request.COOKIES).json()
+                    s = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/hotels",
+                                     cookies=request.COOKIES).json()
                     static_booking = []
                     for static in s:
                         if static['status'] == "CANCELED" or static['status'] == "REVERSED":
@@ -925,7 +992,8 @@ def all_booking_static(request):
 
 
 def make_logout(request):
-    session = requests.post("https://hotels-session-chernov.herokuapp.com/api/v1/session/logout", cookies=request.COOKIES)
+    session = requests.post("https://hotels-session-chernov.herokuapp.com/api/v1/session/logout",
+                            cookies=request.COOKIES)
     if session.status_code != 200:
         return render(request, 'index.html')
     user = requests.get(
@@ -945,11 +1013,14 @@ def balance(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
     try:
-        loyalty = requests.get("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/status/{}".format(data['user_uid']),
-                               cookies=request.COOKIES).json()
-        user = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/user/{}".format(data['user_uid']),
-                            cookies=request.COOKIES).json()
-        _allbook = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/", cookies=request.COOKIES).json()
+        loyalty = requests.get(
+            "https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/status/{}".format(data['user_uid']),
+            cookies=request.COOKIES).json()
+        user = requests.get(
+            "https://hotels-session-chernov.herokuapp.com/api/v1/session/user/{}".format(data['user_uid']),
+            cookies=request.COOKIES).json()
+        _allbook = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/",
+                                cookies=request.COOKIES).json()
 
         sort = sorted(_allbook, key=lambda x: (x['date_create'], x['date_end']), reverse=True)
         curr, hist, currhotel, histhotel, currpay, histpay = (list() for _ in range(6))
@@ -1015,7 +1086,8 @@ def registration(request):
             error = "email is not unique" if 'email' in session else "username is not unique"
             return render(request, 'signup.html', {'form': form, 'error': error})
         session = session.json()["user_uid"]
-        loyalty = requests.post("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/create", json={"user_uid": session})
+        loyalty = requests.post("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/create",
+                                json={"user_uid": session})
         error = 'Error in loyalty' if loyalty.status_code != 200 else 'success'
         q_session = {"username": request.POST["username"], "detail": 'Register',
                      "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
@@ -1064,10 +1136,12 @@ def auth(request):
 
 def cookies(request):
     is_authenticated = False
-    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate", cookies=request.COOKIES)
+    session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/validate",
+                           cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/refresh",
+                                   cookies=request.COOKIES)
             is_authenticated = True
         elif session.status_code == 401:
             pass
