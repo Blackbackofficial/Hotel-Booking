@@ -567,11 +567,11 @@ def booking_info(request, booking_uid):
     cities = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/cities").json()
     try:
         booking = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/{}"
-                               .format(booking_uid), cookies=session.cookies).json()
+                               .format(booking_uid), cookies=request.COOKIES).json()
         hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}"
-                             .format(booking['hotel_uid']), cookies=session.cookies).json()
+                             .format(booking['hotel_uid']), cookies=request.COOKIES).json()
         payment = requests.get("https://hotels-payment-chernov.herokuapp.com/api/v1/payment/status/{}"
-                               .format(booking['payment_uid']), cookies=session.cookies).json()
+                               .format(booking['payment_uid']), cookies=request.COOKIES).json()
         date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
         date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
         period = date_end - date_start
@@ -593,11 +593,11 @@ def pay_room(request, payment_uid):
     cities = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/cities").json()
     if request.method == 'POST':
         booking = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/{}"
-                               .format(request.POST['booking_uid']), cookies=session.cookies).json()
+                               .format(request.POST['booking_uid']), cookies=request.COOKIES).json()
         hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}"
-                             .format(booking['hotel_uid']), cookies=session.cookies).json()
+                             .format(booking['hotel_uid']), cookies=request.COOKIES).json()
         payment = requests.get("https://hotels-payment-chernov.herokuapp.com/api/v1/payment/status/{}"
-                               .format(booking['payment_uid']), cookies=session.cookies).json()
+                               .format(booking['payment_uid']), cookies=request.COOKIES).json()
         date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
         date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
         period = date_end - date_start
@@ -954,7 +954,7 @@ def balance(request):
         curr, hist, currhotel, histhotel, currpay, histpay = (list() for _ in range(6))
         for s in sort:
             payment = requests.get("https://hotels-payment-chernov.herokuapp.com/api/v1/payment/status/{}"
-                                   .format(s['payment_uid']), cookies=session.cookies).json()
+                                   .format(s['payment_uid']), cookies=request.COOKIES).json()
             if datetime.datetime.strptime(s['date_end'], "%Y-%m-%d") > datetime.datetime.now() \
                     and payment['status'] == 'NEW':
                 ch = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}"
