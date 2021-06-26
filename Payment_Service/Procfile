@@ -1,0 +1,1 @@
+web: gunicorn Payment_Service.wsgi --log-file -
