@@ -72,7 +72,7 @@ def report_by_hotels(request):
     """
     try:
         auth(request)
-        hotels = requests.get("http://localhost:8003/api/v1/booking/static", cookies=request.COOKIES)
+        hotels = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/static", cookies=request.COOKIES)
         if hotels.status_code == 200:
             hotels = hotels.content.decode('utf8').replace("'", '"')
             hotels = json.loads(hotels)

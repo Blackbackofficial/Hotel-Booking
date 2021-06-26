@@ -19,7 +19,7 @@ TIMEOUT = 6
 def create(request):
     try:
         data = auth(request)
-        loyBalance = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=request.COOKIES)
+        loyBalance = requests.get("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/balance", cookies=request.COOKIES)
         if loyBalance.status_code != 200:
             return JsonResponse({'error': 'Error in loyalty'}, status=status.HTTP_400_BAD_REQUEST)
         loyBalance = loyBalance.json()
@@ -41,7 +41,7 @@ def pay(request, payment_uid):
         auth(request)
         payment = Payment.objects.get(payment_uid=payment_uid)
         payment.status = "PAID"
-        pay_loyalty = requests.patch("http://localhost:8000/api/v1/loyalty/edit_balance",
+        pay_loyalty = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit_balance",
                                      json={'status': payment.status, 'price': request.data['price']},
                                      cookies=request.COOKIES)
         if pay_loyalty.status_code != 200:
@@ -59,7 +59,7 @@ def reversed(request, payment_uid):
         auth(request)
         payment = Payment.objects.get(payment_uid=payment_uid)
         payment.status = "REVERSED"
-        pay_loyalty = requests.patch("http://localhost:8000/api/v1/loyalty/edit_balance",
+        pay_loyalty = requests.patch("https://hotels-loyalty-chernov.herokuapp.com/api/v1/loyalty/edit_balance",
                                      json={'status': payment.status, 'price': request.data['price']},
                                      cookies=request.COOKIES)
         if pay_loyalty.status_code != 200:

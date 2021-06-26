@@ -100,7 +100,7 @@ def filter_date(request):
     """
     try:
         if "date_start" and "date_end" in request.data.keys():
-            filter_booking = requests.get("http://localhost:8003/api/v1/booking/date/{}/{}".
+            filter_booking = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/date/{}/{}".
                                           format(request.data["date_start"], request.data["date_end"]),
                                           cookies=request.COOKIES)
             if filter_booking.status_code == 204:
