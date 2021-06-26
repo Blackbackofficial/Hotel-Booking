@@ -799,7 +799,7 @@ def all_users(request):
         response = HttpResponseRedirect('/index')
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
-    _users = requests.get("https://hotels-gateway-chernov.herokuapp.com/api/v1/users", cookies=request.COOKIES).json()
+    _users = requests.get("https://hotels-session-chernov.herokuapp.com/api/v1/session/users", cookies=request.COOKIES).json()
     response = render(request, 'all_users.html', {'all_users': _users, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
@@ -920,7 +920,7 @@ def all_booking_static(request):
 
 
 def make_logout(request):
-    session = requests.get("https://hotels-gateway-chernov.herokuapp.com/api/v1/logout", cookies=request.COOKIES)
+    session = requests.post("https://hotels-session-chernov.herokuapp.com/api/v1/session/logout", cookies=request.COOKIES)
     if session.status_code == 200:
         response = HttpResponseRedirect('/index')
         response.delete_cookie('jwt')
@@ -993,7 +993,7 @@ def registration(request):
         with open(f'gateway/static/images/avatars/{filename}', 'wb') as image:
             files = request.FILES["avatar"].read()
             image.write(files)
-        session = requests.post('https://hotels-gateway-chernov.herokuapp.com/api/v1/register',
+        session = requests.post('https://hotels-session-chernov.herokuapp.com/api/v1/session/register',
                                 json={"username": form.data['username'], "name": form.data['first_name'],
                                       "last_name": form.data['last_name'], "password": form.data['password'],
                                       "email": form.data['email'], "avatar": f'images/avatars/{filename}'})
