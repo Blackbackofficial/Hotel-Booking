@@ -429,7 +429,8 @@ def report_user(request):
         else:
             return JsonResponse({"error": "Internal error"}, status=status.HTTP_400_BAD_REQUEST)
     # достаем отчет по пользователям: логирование, разлогирование, регистрация
-    report = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/users", cookies=session.cookies)
+    session = session.json()
+    report = requests.get("https://hotels-report-chernov.herokuapp.com/api/v1/reports/users", cookies=request.COOKIES)
     if report.status_code == 200:
         report = report.content.decode('utf8').replace("'", '"')
         report = json.loads(report)
@@ -638,9 +639,9 @@ def del_booking(request, booking_uid):
                                                                  'payment': pay, 'error': error, 'user': data})
         else:
             booking = requests.get("https://hotels-booking-chernov.herokuapp.com/api/v1/booking/{}"
-                               .format(booking_uid), cookies=session.cookies).json()
+                               .format(booking_uid), cookies=request.COOKIES).json()
             hotel = requests.get("https://hotels-hotel-chernov.herokuapp.com/api/v1/hotels/{}"
-                             .format(booking['hotel_uid']), cookies=session.cookies).json()
+                             .format(booking['hotel_uid']), cookies=request.COOKIES).json()
             date_start = datetime.datetime.strptime(booking['date_start'], "%Y-%m-%d")
             date_end = datetime.datetime.strptime(booking['date_end'], "%Y-%m-%d")
             period = date_end - date_start

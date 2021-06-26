@@ -57,7 +57,7 @@ def report_by_users(request):
         if len(data) != 0:
             dictOfList = {i: data[i] for i in range(0, len(data))}
             return JsonResponse(dictOfList, status=status.HTTP_200_OK)
-        return JsonResponse(data, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({"message": "No content"}, status=status.HTTP_204_NO_CONTENT, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
