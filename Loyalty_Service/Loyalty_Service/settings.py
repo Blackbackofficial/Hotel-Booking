@@ -27,7 +27,7 @@ JWT_KEY = 'django-insecure-0em@nl6y-bw)fmz*%2o!gr-b8c3%gata45=w_wg0p01qjp=j#7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 
 # Application definition
@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'Loyalty_Service.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'loyalty',
-        'USER': 'ivan',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
+        'NAME': 'dbl9n4avbu04qa',
+        'USER': 'gqxkrrbmwzqqwr',
+        'PASSWORD': '4278c4fe9a6033e2fceb938c47c7b8ab907b071627088df19da347b5e5e240d2',
+        'HOST': 'ec2-108-128-104-50.eu-west-1.compute.amazonaws.com',
         'PORT': '5432',
     }
 }
