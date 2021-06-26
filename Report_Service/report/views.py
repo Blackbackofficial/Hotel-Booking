@@ -22,8 +22,8 @@ conf = {
     'default.topic.config': {'auto.offset.reset': 'smallest'},
     'security.protocol': 'SASL_SSL',
     'sasl.mechanisms': 'SCRAM-SHA-256',
-    'sasl.username': '41pfiknb',
-    'sasl.password': '4r-NRj1TnbY-WTt5zVE-zPMhFr8qXFx9'
+    'sasl.username': 'dmqj25d7',
+    'sasl.password': 'QVIibukJD_ADQkfScp0O2V8KPiKhMgAc'
 }
 
 
@@ -36,7 +36,7 @@ def report_by_booking(request):
     """
     try:
         auth(request)
-        data = consumer('41pfiknb-payment')
+        data = consumer('dmqj25d7-payment')
         if len(data) != 0:
             dictOfList = {i: data[i] for i in range(0, len(data))}
             return JsonResponse(dictOfList, status=status.HTTP_200_OK)
@@ -53,7 +53,7 @@ def report_by_users(request):
     """
     try:
         auth(request)
-        data = consumer('41pfiknb-users')
+        data = consumer('dmqj25d7-users')
         if len(data) != 0:
             dictOfList = {i: data[i] for i in range(0, len(data))}
             return JsonResponse(dictOfList, status=status.HTTP_200_OK)
