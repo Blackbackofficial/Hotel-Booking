@@ -55,11 +55,11 @@ jobs:
       run: |
         cd Hotel_Service/
         python3 manage.py migrate
-    - name: Deploy Orders service
+    - name: Deploy Hotel service
       uses: akhileshns/heroku-deploy@v3.4.6
       with:
         heroku_api_key: 9bb8f29a-3dab-4878-86a3-33ab7960a1cb
-        heroku_app_name: orders-ivan
+        heroku_app_name: hotels-hotel-chernov
         heroku_email: Chernov-Ivan.1997@yandex.ru
         appdir: Hotel_Service
 #
