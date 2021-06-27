@@ -35,8 +35,8 @@ conf = {
     'default.topic.config': {'auto.offset.reset': 'smallest'},
     'security.protocol': 'SASL_SSL',
     'sasl.mechanisms': 'SCRAM-SHA-256',
-    'sasl.username': '41pfiknb',
-    'sasl.password': '4r-NRj1TnbY-WTt5zVE-zPMhFr8qXFx9'
+    'sasl.username': 'dmqj25d7',
+    'sasl.password': 'QVIibukJD_ADQkfScp0O2V8KPiKhMgAc'
 }
 
 
@@ -58,7 +58,7 @@ def login(request):  #
     q_session = session.json()
     q_session.update({"username": request.data["username"],
                       "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
-    producer(q_session, '41pfiknb-users')
+    producer(q_session, 'dmqj25d7-users')
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
     return response
 
@@ -86,7 +86,7 @@ def register(request):  #
         return JsonResponse(loyalty.json(), status=status.HTTP_400_BAD_REQUEST)
     q_session = {"username": request.data["username"], "detail": 'Register',
                  "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
-    producer(q_session, '41pfiknb-users')
+    producer(q_session, 'dmqj25d7-users')
     return JsonResponse({'success': 'register & create loyalty'}, status=status.HTTP_200_OK)
 
 
@@ -105,7 +105,7 @@ def logout(request):  #
                         cookies=request.COOKIES).json()
     q_session = {"username": user["username"], "detail": 'Logout',
                  "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
-    producer(q_session, '41pfiknb-users')
+    producer(q_session, 'dmqj25d7-users')
     response.delete_cookie('jwt')
     return response
 
@@ -284,7 +284,7 @@ def create_booking_or_all(request):
             loyalty = loyalty.json()
             booking.update(loyalty)
 
-    producer(booking, '41pfiknb-payment')
+    producer(booking, 'dmqj25d7-payment')
     response = JsonResponse(booking, status=status.HTTP_200_OK, safe=False)
 
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
