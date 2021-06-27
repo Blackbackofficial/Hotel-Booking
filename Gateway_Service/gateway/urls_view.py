@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import index, make_login, make_logout, registration, balance, add_hotel_admin, admin, delete_hotel_admin,\
     all_users, users_static, hotel_info, search_hotel_booking, add_booking, pay_room, del_booking, booking_info, \
-    all_booking_static, static_booking
+    all_booking_static, static_booking, add_hotlike, add_comlike, show_hotlikes, show_comlikes
 
 urlpatterns = [
     # VIEW
@@ -23,4 +23,8 @@ urlpatterns = [
     path('users-static', users_static, name="users_static"),
     path('all-booking-static', all_booking_static, name="all_booking_static"),
     path('static_booking', static_booking, name="static_booking"),
+	path('add_hotlike', add_hotlike, name='add_hotlike'),
+	path('add_comlike',add_comlike, name='add_comlike'),
+	path('show_hotlikes', show_hotlikes, name='show_hotlikes'),
+	path('show_comlikes', show_comlikes, name='show_comlikes'),
 ]

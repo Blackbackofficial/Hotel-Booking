@@ -31,6 +31,16 @@ def about_or_delete(request, hotel_uid):
             data = auth(request)
             if 'admin' not in data['role']:
                 return JsonResponse({'detail': 'You are not admin!'}, status=status.HTTP_400_BAD_REQUEST)
+            hotel_likes = requests.delete("http://localhost:8007/api/v1/rating/delete_hotel",
+                               json={'hotel_uid': hotel_uid},
+                               cookies=request.COOKIES)
+            hotel_comments = requests.delete("http://localhost:8007/api/v1/rating/delete_comment",
+                               json={'hotel_uid': hotel_uid},
+                               cookies=request.COOKIES)
+            if hotel_comments.status_code != 200:
+                return JsonResponse({'message': "Hotel comments deletion error"}, status=status.HTTP_400_BAD_REQUEST)
+            if hotel_likes.status_code != 200:
+                return JsonResponse({'message': "Hotel likes deletion error"}, status=status.HTTP_400_BAD_REQUEST)
             hotel = Hotels.objects.get(hotel_uid=hotel_uid)
             hotel.delete()
             return JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT)
@@ -71,6 +81,11 @@ def all_hotels_or_add_hotel(request):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             hotel = model_to_dict(Hotels.objects.latest('id'))
+            hotel_likes = requests.post("http://localhost:8007/api/v1/rating/create_hotel",
+                               json={"hotel_uid": str(hotel['hotel_uid'])},
+                               cookies=request.COOKIES)
+            if hotel_likes.status_code != 200:
+                return JsonResponse({'message': "Hotel likes creation error"}, status=status.HTTP_400_BAD_REQUEST)
             hotel.pop('photo')  # временно
             return JsonResponse(hotel, status=status.HTTP_200_OK, safe=False)
     except Exception as e:

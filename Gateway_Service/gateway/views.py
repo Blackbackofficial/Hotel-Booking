@@ -6,13 +6,14 @@ from django.shortcuts import render
 from circuitbreaker import circuit
 from rest_framework.decorators import api_view
 from Gateway_Service.settings import JWT_KEY
-from .forms import LoginForm, UserRegistrationForm, NewHotel, DeleteHotel
+from .forms import LoginForm, UserRegistrationForm, NewHotel, DeleteHotel, CommentForm
 from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework import status
 from confluent_kafka import Producer
 from datetime import datetime as dt
 from random import choices
 from string import ascii_letters, digits
+from django.views.decorators.csrf import csrf_exempt
 import pytz
 import sys
 import requests
@@ -466,6 +467,59 @@ def cities(request):
     return JsonResponse({"detail": "No content"}, status=status.HTTP_204_NO_CONTENT)
 
 
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+@csrf_exempt
+def add_hotlike(request):
+    auth(request)
+    hotellikes = requests.post("http://localhost:8007/api/v1/rating/add_hotlike",
+                               json={'hotel_uid': request.POST['hotel_uid'],
+                                     'like_dis': request.POST['answer']},
+                               cookies=request.COOKIES).json()
+
+    return JsonResponse({'hotlikes': hotellikes['hotlikes'], 'hotdislikes': hotellikes['hotdislikes']},
+                        status=status.HTTP_200_OK, safe=False)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+@csrf_exempt
+def add_comlike(request):
+    auth(request)
+    commentlikes = requests.post("http://localhost:8007/api/v1/rating/add_comlike",
+                               json={'comment_uid': request.POST['comment_uid'],
+                                     'like_dis': request.POST['answer']},
+                               cookies=request.COOKIES).json()
+
+    return JsonResponse({'comlikes': commentlikes['comlikes'], 'hotdislikes': commentlikes['hotdislikes']},
+                        status=status.HTTP_200_OK, safe=False)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+@csrf_exempt
+def show_hotlikes(request):
+    hotellikes = requests.get("http://localhost:8007/api/v1/rating/show_hotlikes",
+                               json={'hotel_uid': request.POST['hotel_uid']},
+                               cookies=request.COOKIES).json()
+
+    return JsonResponse({'like': hotellikes['like'], 'dislike': hotellikes['dislike']},
+                        status=status.HTTP_200_OK, safe=False)
+
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['POST'])
+@csrf_exempt
+def show_comlikes(request):
+    commentlikes = requests.get("http://localhost:8007/api/v1/rating/show_comlikes",
+                               json={'comment_uid': request.POST['comment_uid']},
+                               cookies=request.COOKIES).json()
+
+    return JsonResponse({'like': commentlikes['like'], 'dislike': commentlikes['dislike']},
+                        status=status.HTTP_200_OK, safe=False)
+
+
 # VIEW
 def index(request):
     is_authenticated, request, session = cookies(request)
@@ -514,9 +568,31 @@ def hotel_info(request, hotel_uid):
     data = auth(request)
     cities = requests.get("http://localhost:8004/api/v1/hotels/cities").json()
     try:
+        error = None
+        if request.method == 'POST':
+            form = CommentForm(data=request.POST)
+            if form.is_valid():
+                new_comment = requests.post("http://localhost:8007/api/v1/rating/create_comment",
+                                  json={'hotel_uid': hotel_uid, 'comment_text': request.POST},
+                                  cookies=request.COOKIES).json()
+                if new_comment.status_code != 200:
+                    error = "Failed to add comment!"
+        else:
+            form = CommentForm()
         hotel = requests.get("http://localhost:8004/api/v1/hotels/{}"
                              .format(hotel_uid), cookies=request.COOKIES).json()
-        response = render(request, 'hotel_info.html', {'hotel_info': hotel, 'cities': cities, 'user': data})
+        hotellikes = requests.get("http://localhost:8007/api/v1/rating/load_hotlikes",
+                                  json={'hotel_uid': hotel_uid},
+                                  cookies=request.COOKIES).json()
+        try:
+            hotel_comments = requests.get("http://localhost:8007/api/v1/rating/all_comments",
+                                  json={'hotel_uid': hotel_uid},
+                                  cookies=request.COOKIES).json()
+        except:
+            hotel_comments = None
+        response = render(request, 'hotel_info.html', {'hotel_info': hotel, 'hotel_likes': hotellikes,
+                                                       'comments': hotel_comments, 'form': form,
+                                                       'cities': cities, 'user': data, 'error': error})
     except:
         error = "Failed to display hotel information. Please try again later."
         response = render(request, 'hotel_info.html', {'error': error, 'cities': cities, 'user': data})
