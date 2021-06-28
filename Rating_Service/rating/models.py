@@ -5,10 +5,12 @@ import uuid
 # Create your models here.
 
 class CommentLikes(models.Model):
-    comment_uid = models.UUIDField(default=uuid.uuid4, null=False, unique=True)
-    hotel_uid = models.UUIDField(default=uuid.uuid4, null=False)
-    user_uid = models.UUIDField(default=uuid.uuid4, null=False)
-    comment_text = models.TextField(null=False)
+    comment_uid = models.UUIDField(default=uuid.uuid4, blank=False, unique=True)
+    hotel_uid = models.UUIDField(default=uuid.uuid4, blank=False)
+    user_uid = models.UUIDField(default=uuid.uuid4, blank=False)
+    username = models.CharField(max_length=255)
+    avatar = models.CharField(max_length=30, default="images/avatars/non.jpeg", blank=False)
+    comment_text = models.TextField(blank=False)
     comment_date = models.DateTimeField(auto_now_add=True)
     comment_likes = models.IntegerField(default=0)
     comment_dislikes = models.IntegerField(default=0)
@@ -18,7 +20,7 @@ class CommentLikes(models.Model):
 
 
 class HotelLikes(models.Model):
-    hotel_uid = models.UUIDField(default=uuid.uuid4, null=False, unique=True)
+    hotel_uid = models.UUIDField(default=uuid.uuid4, blank=False, unique=True)
     hotel_likes = models.IntegerField(default=0)
     hotel_dislikes = models.IntegerField(default=0)
 
@@ -27,8 +29,8 @@ class HotelLikes(models.Model):
 
 
 class LikeComment(models.Model):
-    comment_uid = models.UUIDField(default=uuid.uuid4, null=False)
-    user_uid = models.UUIDField(default=uuid.uuid4, null=False)
+    comment_uid = models.UUIDField(default=uuid.uuid4, blank=False)
+    user_uid = models.UUIDField(default=uuid.uuid4, blank=False)
     like = models.BooleanField(default=False)
     dislike = models.BooleanField(default=False)
 
@@ -37,8 +39,8 @@ class LikeComment(models.Model):
 
 
 class LikeHotel(models.Model):
-    user_uid = models.UUIDField(default=uuid.uuid4, null=False)
-    hotel_uid = models.UUIDField(default=uuid.uuid4, null=False)
+    user_uid = models.UUIDField(default=uuid.uuid4, blank=False)
+    hotel_uid = models.UUIDField(default=uuid.uuid4, blank=False)
     like = models.BooleanField(default=False)
     dislike = models.BooleanField(default=False)
 

@@ -31,7 +31,7 @@ class DeleteHotel(forms.Form):
 
 
 class CommentForm(forms.Form):
-    comment_text = forms.CharField(widget=forms.TextInput(attrs={
+    comment_text = forms.CharField(label="Your comment:", widget=forms.Textarea(attrs={
         'class': 'form-control',
         'rows': 4,
         'placeholder': 'Your comment'

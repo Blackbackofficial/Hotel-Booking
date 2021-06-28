@@ -94,8 +94,38 @@ $('.comlikes-button').click(function(){
             $dis.css('color', 'rgb(255, 255, 255)');
         };
     };
-    $.patch('/add_comlike', {comment_uid: comment, answer: answer}, function(data) {
+    $.post('/add_comlike', {comment_uid: comment, answer: answer}, function(data) {
         $('#likecom' + comment).text(data.comlikes);
         $('#discom' + comment).text(data.comdislikes);
     });
+});
+
+
+$('.comment_update').click(function(){
+    var ans = $(this).attr("data-ans");
+    $.ajax({
+        type: 'GET',
+        cache: 'false',
+        url: '/' + ans + '/update_comment',
+        success: function (result) {
+            $('#curcom' + ans).replaceWith(result);
+            },
+    });
+});
+
+$('.comment_delete').click(function(){
+    var dat = confirm('Are you sure you want to delete comment?');
+    var comment = $(this).attr("data-ans");
+    if(dat){
+        $.post('/delete_comment',{comment_uid: comment}, function(data) {
+            console.log(data);
+            if (data.commessage === 'success deleted'){
+                alert('Comment deleted');
+                location.reload();
+            }
+            else {
+                alert('Deletion error');
+            }
+        });
+    }
 });

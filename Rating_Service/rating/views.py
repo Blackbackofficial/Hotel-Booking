@@ -3,12 +3,14 @@ from uuid import UUID
 import jwt
 from circuitbreaker import circuit
 from django.http import JsonResponse
+from django.core import serializers
 from Rating_Service.settings import JWT_KEY
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from .serializers import HotelLikeSerializer, HotelSerializer, CommentSerializer, CommentLikeSerializer
 from .models import LikeHotel, LikeComment, HotelLikes, CommentLikes
+import json
 
 FAILURES = 3
 TIMEOUT = 6
@@ -28,8 +30,7 @@ def create_hotel(request):
         serializer = HotelSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        s = serializer.data
-        return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(serializer.data, status=status.HTTP_201_CREATED, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -46,7 +47,12 @@ def create_comment(request):
     try:
         user = auth(request)
         data = {"hotel_uid": request.data["hotel_uid"],
-                "user_uid": user["user_uid"], "comment_likes": "0", "comment_dislikes": "0"}
+                "user_uid": user["user_uid"],
+                "username": user["username"],
+                "avatar": user["avatar"],
+                "comment_text": request.data["comment_text"],
+                "comment_likes": "0",
+                "comment_dislikes": "0"}
         serializer = CommentSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -115,7 +121,7 @@ def add_comlike(request):
         like_dis = request.data['like_dis']
         cur_comment = CommentLikes.objects.get(comment_uid=comment_uid)
         try:
-            LikeComment.objects.get(user_uid=user['user_uid'], hotel_uid=comment_uid,
+            LikeComment.objects.get(user_uid=user['user_uid'], comment_uid=comment_uid,
                                   like=False, dislike=False).delete()
         except:
             pass
@@ -134,9 +140,9 @@ def add_comlike(request):
                 else:
                     commentlike.dislike = False
             commentlike.save()
-            cur_comment.hotel_likes = LikeComment.objects.filter(comment_uid=comment_uid,
+            cur_comment.comment_likes = LikeComment.objects.filter(comment_uid=comment_uid,
                                                                  like=True).count()
-            cur_comment.hotel_dislikes = LikeComment.objects.filter(comment_uid=comment_uid,
+            cur_comment.comment_dislikes = LikeComment.objects.filter(comment_uid=comment_uid,
                                                                     dislike=True).count()
             cur_comment.save()
             return JsonResponse({'comlikes': cur_comment.comment_likes, 'comdislikes': cur_comment.comment_dislikes},
@@ -164,10 +170,16 @@ def add_comlike(request):
 @api_view(['GET'])
 def all_comments(request):
     try:
-        comments = CommentLikes.objects.get(hotel_uid=request.data['hotel_uid']).all()
-        return JsonResponse({'comments': comments}, status=status.HTTP_200_OK, safe=False)
+        hot = request.data['hotel_uid']
+        comments = CommentLikes.objects.filter(hotel_uid=hot).all()
+        comments = json.loads(serializers.serialize('json', comments))
+        for comment in comments:
+            fields = comment["fields"]
+            comment.clear()
+            comment.update(fields)
+        return JsonResponse(comments, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
-        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
@@ -205,13 +217,20 @@ def show_comlikes(request):
 
 
 @circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['PATCH'])
+def update_comment(request):
+    pass
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
 @api_view(['DELETE'])
 def delete_hotel(request):
     try:
         hotel = HotelLikes.objects.get(hotel_uid=request.data['hotel_uid'])
-        hotel_likes = LikeHotel.objects.get(hotel_uid=request.data['hotel_uid']).all()
+        hotel_likes = LikeHotel.objects.filter(hotel_uid=request.data['hotel_uid']).all()
+        for h in hotel_likes:
+            h.delete()
         hotel.delete()
-        hotel_likes.delete()
         return JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -221,11 +240,23 @@ def delete_hotel(request):
 @api_view(['DELETE'])
 def delete_comment(request):
     try:
-        comment = CommentLikes.objects.get(comment_uid=request.data['hotel_uid']).all()
-        for c in comment:
-            comment_likes = LikeComment.objects.get(comment_uid=c.comment_uid).all()
-            comment_likes.delete()
+        comment = CommentLikes.objects.get(comment_uid=request.data['comment_uid'])
         comment.delete()
+        return JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@circuit(failure_threshold=FAILURES, recovery_timeout=TIMEOUT)
+@api_view(['DELETE'])
+def delete_all_comments(request):
+    try:
+        comment = CommentLikes.objects.filter(hotel_uid=request.data['hotel_uid']).all()
+        for c in comment:
+            comment_likes = LikeComment.objects.filter(comment_uid=c.comment_uid).all()
+            for like in comment_likes:
+                like.delete()
+            c.delete()
         return JsonResponse({'detail': 'success deleted'}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -245,10 +276,16 @@ def load_hotlikes(request):
 @api_view(['GET'])
 def load_comments(request):
     try:
-        a = CommentLikes.objects.get(comment_uid=request.data['hotel_uid'])
-        return JsonResponse({'comments': a}, status=status.HTTP_200_OK, safe=False)
+        hot = request.data['hotel_uid']
+        comments = CommentLikes.objects.filter(hotel_uid=hot).order_by('-comment_date')
+        comments = json.loads(serializers.serialize('json', comments))
+        for comment in comments:
+            fields = comment["fields"]
+            comment.clear()
+            comment.update(fields)
+        return JsonResponse(comments, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
-        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def auth(request):

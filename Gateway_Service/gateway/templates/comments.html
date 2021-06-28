@@ -9,7 +9,7 @@
         <form role="form" method="post">
             {% csrf_token %}
             {{ form.comment_text }}<br>
-            <button type="submit" class="btn btn-info">Comment</button>
+            <button type="submit" class="btn btn-outline-primary">Comment</button>
             <br>
             <br>
         </form>
@@ -21,65 +21,63 @@
         , to comment!
     </p>
 {% endif %}
-<div id = "answerblock">
-{% if comments.all %}
-	{% for b in page_obj %}
-        <div class="p-2 mb-4 border rounded">
+<div id = "commentblock">
+{% if comments %}
+	{% for b in comments %}
+        <div class="alert alert-light font">
             <div class="row">
                 <div class="col-2">
-                    <img class="rounded-circle m-2" src="/{{ b.answerer_name.account.user_avatar }}" style = "width: 120px">
-                    <br>
-                    <p class="text-center" style="font-weight:bold; font-size:20px">{{b.answerer_name}}</p>
+                    <img class="rounded-circle m-2" src="{% static b.avatar %}" style = "width: 80px">
+                    <p class="text-center" style="font-weight:bold; font-size:15px">{{b.username}}</p>
                 </div>
                 <div class="col-10">
-                    <div id = "curans{{ b.id }}">
+                    <div id = "curcomment{{ b.comment_uid }}">
                         <p class="text-justify text-wrap text-break">{{b.comment_text}}</p>
                     </div>
-                    <hr>
-                    <div class="row">
-                        {% if b.answerer_name == user %}
-                            <div class="col-7">
-                                <p>{{b.date_create}}</p>
-                            </div>
-                            <div class="col-1 comment_update" data-ans="{{ b.comment_uid }}"> <!--href="{% url 'comupdate' b.comment_uid%}"-->
-                                <a class="btn btn-info" type="submit"><i class="fas fa-pencil-alt" style="color:white"></i></a>
-                            </div>
-                            <div class="col-1">
-                                <form action="{% url 'comdelete' b.comment_uid%}" method="post">
-                                    {% csrf_token %}
-                                    <button class="btn btn-danger" onclick="deletecom()"><i class="fas fa-trash-alt"></i></button>
-                                </form>
-                            </div>
-                        {% else %}
-                            <div class="col-9">
-                                <p>{{b.answer_date}}</p>
-                            </div>
-                        {% endif %}
-                        <div class="col-3">
-                            <div class="row">
-                                {% if user.is_authenticated %}
-                                    <div class="col-6">
-                                        <button class="btn btn-info anslikes-button" answer="anslike" data-ans="{{ b.id }}">
-                                            <strong><i class="fas fa-thumbs-up" style="color:white" id="likeans{{ b.id }}">{{ b.answer_likes }}</i></strong>
-                                        </button>
-                                    </div>
-                                    <div class="col-6">
-                                        <button class="btn btn-info anslikes-button" answer="ansdislike" data-ans="{{ b.id }}">
-                                            <strong><i class="fas fa-thumbs-down" style="color:white" id="disans{{ b.id }}">{{ b.answer_dislikes }}</i></strong>
-                                        </button>
-                                    </div>
-                                {% else %}
-                                    <div class="col-6">
-                                        <button disabled class="btn btn-secondary anslikes-button" answer="anslike" data-ans="{{ b.id }}">
-                                            <strong><i class="fas fa-thumbs-up" style="color:white" id="likeans{{ b.id }}">{{ b.answer_likes }}</i></strong>
-                                        </button>
-                                    </div>
-                                    <div class="col-6">
-                                        <button disabled class="btn btn-secondary anslikes-button" answer="ansdislike" data-ans="{{ b.id }}">
-                                            <strong><i class="fas fa-thumbs-down" style="color:white" id="disans{{ b.id }}">{{ b.answer_dislikes }}</i></strong>
-                                        </button>
-                                    </div>
-                                {% endif %}
+                    <div style="margin-top: 50px">
+                        <hr>
+                        <div class="row">
+                            {% if user.role == 'admin' %}
+                                <div class="col-8">
+                                    <p>{{b.comment_date}}</p>
+                                </div>
+{#                                <div class="col-1 comment_update" data-ans="{{ b.comment_uid }}">#}
+{#                                    <a class="btn btn-outline-secondary"><i class="fas fa-pencil-alt"></i></a>#}
+{#                                </div>#}
+                                <div class="col-1">
+                                    <button class="btn btn-outline-danger comment_delete" data-ans="{{ b.comment_uid }}"><i class="fas fa-trash-alt"></i></button>
+                                </div>
+                            {% else %}
+                                <div class="col-9">
+                                    <p>{{b.comment_date}}</p>
+                                </div>
+                            {% endif %}
+                            <div class="col-3">
+                                <div class="row">
+                                    {% if request.COOKIES.jwt %}
+                                        <div class="col-5">
+                                            <button class="btn btn-primary comlikes-button" answer="comlike" data-ans="{{ b.comment_uid }}">
+                                                <strong><i class="fas fa-thumbs-up" style="color:white" id="likecom{{ b.comment_uid }}">{{ b.comment_likes }}</i></strong>
+                                            </button>
+                                        </div>
+                                        <div class="col-7">
+                                            <button class="btn btn-primary comlikes-button" answer="comdislike" data-ans="{{ b.comment_uid }}">
+                                                <strong><i class="fas fa-thumbs-down" style="color:white" id="discom{{ b.comment_uid }}">{{ b.comment_dislikes }}</i></strong>
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-6">
+                                            <button disabled class="btn btn-secondary comlikes-button" answer="comlike" data-ans="{{ b.comment_uid }}">
+                                                <strong><i class="fas fa-thumbs-up" style="color:white" id="likecom{{ b.comment_uid }}">{{ b.comment_likes }}</i></strong>
+                                            </button>
+                                        </div>
+                                        <div class="col-6">
+                                            <button disabled class="btn btn-secondary comlikes-button" answer="comdislike" data-ans="{{ b.comment_uid }}">
+                                                <strong><i class="fas fa-thumbs-down" style="color:white" id="discom{{ b.comment_uid }}">{{ b.comment_dislikes }}</i></strong>
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -87,35 +85,11 @@
             </div>
         </div>
     {% endfor %}
-    {% if page_obj.has_other_pages %}
-        <nav>
-            <ul class="pagination justify-content-left">
-                {% if page_obj.has_previous %}
-                    <li class="page_item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lt;</a>
-                    </li>
-                {% endif %}
-                {% for p in page_obj.paginator.page_range %}
-                    {% if page_obj.number == p %}
-                        <li class = "page-item active">
-                            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
-                        </li>
-                    {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
-                        <li class = "page-item">
-                            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                    <li class="page_item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">&gt;</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-    {% endif %}
+    {%block pagination%}
+        {% include "pagination.html" %}
+    {%endblock%}
 {% else %}
-	No comments :(
+    {{ message }}
 {% endif %}
     </div>
 

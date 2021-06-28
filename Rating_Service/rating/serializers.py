@@ -6,7 +6,8 @@ import uuid
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentLikes
-        fields = ['comment_uid', 'hotel_uid', 'user_uid', 'comment_date', 'comment_likes', 'comment_dislikes']
+        fields = ['comment_uid', 'hotel_uid', 'username', 'avatar', 'comment_text', 'comment_date', 'comment_likes',
+                  'comment_dislikes']
 
     def create(self, validated_data):
         validated_data.pop('role', None)
