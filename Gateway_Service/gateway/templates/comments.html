@@ -37,21 +37,21 @@
                     <div style="margin-top: 50px">
                         <hr>
                         <div class="row">
-                            {% if user.role == 'admin' %}
-                                <div class="col-8">
-                                    <p>{{b.comment_date}}</p>
-                                </div>
+{#                            {% if user.role == 'admin' %}#}
+{#                                <div class="col-8">#}
+{#                                    <p>{{b.comment_date}}</p>#}
+{#                                </div>#}
 {#                                <div class="col-1 comment_update" data-ans="{{ b.comment_uid }}">#}
 {#                                    <a class="btn btn-outline-secondary"><i class="fas fa-pencil-alt"></i></a>#}
 {#                                </div>#}
-                                <div class="col-1">
-                                    <button class="btn btn-outline-danger comment_delete" data-ans="{{ b.comment_uid }}"><i class="fas fa-trash-alt"></i></button>
-                                </div>
-                            {% else %}
+{#                                <div class="col-1">#}
+{#                                    <button class="btn btn-outline-danger comment_delete" data-ans="{{ b.comment_uid }}"><i class="fas fa-trash-alt"></i></button>#}
+{#                                </div>#}
+{#                            {% else %}#}
                                 <div class="col-9">
                                     <p>{{b.comment_date}}</p>
                                 </div>
-                            {% endif %}
+{#                            {% endif %}#}
                             <div class="col-3">
                                 <div class="row">
                                     {% if request.COOKIES.jwt %}
