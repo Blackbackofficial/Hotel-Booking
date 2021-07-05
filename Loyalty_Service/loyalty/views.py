@@ -59,7 +59,7 @@ def edit(request):
     i = 0
 
     while i < len(status_key):
-        if status_key[i] == userLoyalty.status:
+        if status_key[i] == userLoyalty.status_loyalty:
             break
         i += 1
 
@@ -69,7 +69,7 @@ def edit(request):
     elif request.data['active'] == 'DOWN':
         if i > 0:
             i -= 1
-    userLoyalty.status = status_key[i]
+    userLoyalty.status_loyalty = status_key[i]
     userLoyalty.discount = status_list[status_key[i]]
 
     userLoyalty.save()

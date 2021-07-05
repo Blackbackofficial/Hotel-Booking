@@ -28,3 +28,11 @@ class NewHotel(forms.Form):
 
 class DeleteHotel(forms.Form):
     hotel_uid = forms.CharField(label='Hotel UUID:', widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+
+class CommentForm(forms.Form):
+    comment_text = forms.CharField(label="Your comment:", widget=forms.Textarea(attrs={
+        'class': 'form-control',
+        'rows': 4,
+        'placeholder': 'Your comment'
+    }))
