@@ -248,7 +248,7 @@ def create_booking_or_all(request):
         l_status = l_status.json()['status_loyalty']
 
         # Up Loyalty
-        if 20 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
+        if 1 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
             loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
                                        cookies=session.cookies)
             if loyaltyUP.status_code != 200:
@@ -700,6 +700,32 @@ def pay_room(request, payment_uid):
                             .format(payment_uid), json={'price': totalcost}, cookies=request.COOKIES)
         if pay.status_code == 200:
             response = HttpResponseRedirect('/booking_info/{}'.format(request.POST['booking_uid']))
+            #  подсчитываем количество броней для определения нужно ли повышать лояльность или нет
+            booking_all = requests.get("http://localhost:8003/api/v1/booking/", cookies=session.cookies)
+            if booking_all.status_code != 200:
+                return JsonResponse(booking_all.json(), status=status.HTTP_400_BAD_REQUEST)
+            len_booking = booking_all.json()
+            l_status = requests.get("http://localhost:8000/api/v1/loyalty/balance", cookies=session.cookies)
+            if l_status.status_code != 200:
+                return JsonResponse(l_status.json(), status=status.HTTP_400_BAD_REQUEST)
+            l_status = l_status.json()['status_loyalty']
+
+            # Up Loyalty
+            if 1 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
+                loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
+                                           cookies=session.cookies)
+                if loyaltyUP.status_code != 200:
+                    return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
+            elif 35 < len(len_booking) < 50 and l_status == 'BRONZE':  # SILVER
+                loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
+                                           cookies=session.cookies)
+                if loyaltyUP.status_code != 200:
+                    return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
+            elif 50 < len(len_booking) and l_status == 'SILVER':  # GOLD
+                loyaltyUP = requests.patch("http://localhost:8000/api/v1/loyalty/edit", json={"active": "UP"},
+                                           cookies=session.cookies)
+                if loyaltyUP.status_code != 200:
+                    return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
         else:
             error = "Failed to pay!"
             response = render(request, 'user_booking.html',
