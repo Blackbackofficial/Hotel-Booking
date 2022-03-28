@@ -1,106 +1,106 @@
 # Hotels Booking System
 
-## Требования к программной реализации
+## Implementation Requirements
 
-1. Реализовать Cистему, состоящую из нескольких взаимодействующих друг с другом сервисов. 
- Каждый сервис реализует свою функциональность и взаимодействует с другими сервисами по протоколу HTTP (придерживаться нотации RESTful), либо через очередь. 
- Также для межсервисного взаимодействия допускается использовать другие протоколы, например gRPC.
+1. Implement a System consisting of several interacting services.
+ Each service implements its own functionality and interacts with other services via the HTTP protocol (follow the RESTful notation) or through a queue.
+ It is also allowed to use other protocols for inter-service communication, such as gRPC.
  
-1. Каждый сервис имеет свое собственное хранилище, если оно ему нужно.
+1. Each service has its own storage if it needs it.
  
-1. Выделить отдельный сервис Авторизации (Session Service), который хранит в себе информацию о пользователях и
- используется для пользовательской авторизации и аутентификации.
+1. Select a separate authorization service (Session Service), which stores information about users and
+ used for user authorization and authentication.
  
-1. Для авторизации пользователь отправляет login + password, в ответ получает JWT токен. Токен выдает Session Service,
- валидация токена выполняется так же на Session Service. Пароли хранить в базе в хэшированном виде. 
+1. For authorization, the user sends login + password, in response he receives a JWT token. The token is issued by the Session Service,
+ token validation is also performed on the Session Service. Passwords are stored in the database in a hashed form.
  
-1. Также выделить Gateway Service, который будет единой точкой входа в систему. Все запросы, кроме авторизации пользователя,
- проходят через него. 
+1. Also highlight the Gateway Service, which will be the single point of entry into the system. All requests, except for user authorization,
+ pass through it.
  
-1. Валидацию пользовательского JWT-токена также выполняет сервис Gateway. 
+1. Validation of the custom JWT token is also performed by the Gateway service.
  
-1. Т.к. компоненты системы смотрят в интернет, реализовать межсервисную авторизацию. Пример:
-    * если сервису A требуется сделать запрос к сервису B, то он должен получить для этого токен; 
-    * сервис A имеет некоторые clientId / clientSecret, которые он передает как basic-авторизацию в сервис B и 
-      сервис B возвращает в ответ подписанный JWT-токен;
-    * система A сохраняет этот токен у себя и все следующие запросы выполняет с ним;
-    * токен имеет время жизни, если время жизни у него закончилось, то сервис B вернет HTTP 403:Forbidden ошибку, 
-      значит сервису A нужно повторно получить токен у системы B и повторить запрос с новым токеном; 
-    * в межсервисной авторизации участвуют только системы A и B, Session Service не задействован.
+1. Because system components look at the Internet, implement cross-service authorization. Example:
+    * if service A needs to make a request to service B, then it must receive a token for this;
+    * service A has some clientId / clientSecret which it passes as basic authorization to service B and
+      service B returns a signed JWT token in response;
+    * system A retains this token and executes all subsequent requests with it;
+    * the token has a lifetime, if its lifetime is over, then service B will return an HTTP 403:Forbidden error,
+      it means that service A needs to re-obtain a token from system B and repeat the request with a new token;
+    * only systems A and B participate in interservice authorization, Session Service is not involved.
 
-1. Реализовать пользовательский интерфейс HTML+CSS, желательно SPA (react, angular, vue) или мобильный клиент.
- Использование CSS обязательно. 
+1. Implement HTML+CSS user interface, preferably SPA (react, angular, vue) or mobile client.
+ The use of CSS is required.
  
-1. Запросы от UI могут быть к только к сервису Gateway либо Session Service для получения токена. 
+1. Requests from the UI can only be to the Gateway or Session Service to obtain a token.
  
-1. Реализовать валидацию входных данных как на front-end’е, так и на back-end’е. 
+1. Implement input data validation both on the front-end and on the back-end.
  
-1. Реализовать ролевую модель, создать минимум одного пользователя с ролью Admin и одного пользователя с ролью User. 
+1. Implement the role model, create at least one user with the Admin role and one user with the User role.
  
-1. Выделить сервис статистики, туда отправлять через очередь статистику по операциям. В зависимости от задания
- по пришедшим данным строить отчет, доступ к которому должен быть только у пользователя с ролью Admin. 
+1. Select a statistics service, send statistics on operations through the queue there. Depending on the task
+ based on the received data, build a report, access to which should only be available to a user with the Admin role.
  
-1. Предусмотреть ситуацию недоступности систем, обработку таймаутов и ошибок сервисов. В случае ошибки/недоступности
- некритичного функционала выполнять деградацию функциональности. 
+1. Provide for the situation of unavailability of systems, processing of timeouts and service errors. In case of error/unavailability
+ non-critical functionality to degrade functionality.
  
-1. Весь код хранить на GitHub, автоматизировать процесс сборки, тестирования и релиза на внешней платформе.
- Для CI/CD использовать Github Actions. 
+1. Store all code on GitHub, automate the process of building, testing and releasing on an external platform.
+ For CI/CD use Github Actions.
  
-1. Каждому сервису поставить в соответствие доменное имя (возможно 3 или 4 уровня), главная страница должна открываться
- по основному имени. Например:
+1. Assign a domain name to each service (possibly 3 or 4 levels), the main page should open
+ by main name. For example:
     * UI: aero-ticket.ru
     * Gateway: gw.air-ticket.ru
     * Airport Service: airport.air-ticket.ru
 
-## Общие методы
+## Common Methods
 
-1. Авторизация.
+1. Authorization.
 ```
 header: Authorization: basic(<login>:<password>)
 POST /auth -> JWT token
 ```
-1. Проверка токена пользователя.
+1. Checking the user token.
 ```
 header: Authorization: bearer <jwt>
 POST /verify
 ```
-1. Список всех пользователей. [A][G]
+1. List of all users. [A][G]
 ```
 GET /users
 ```
-1. Добавление нового пользователя. [A][G]
+1. Adding a new user. [A][G]
 ```
 POST /users
 body: { login, password }
 ```
 
-Пояснение:
-* [S] – требуют авторизации;
-* [G] – запрос проходит через Gateway Service.
-* [A] – требуют авторизации и прав администратора;
-* [M] – операция модификации.
+Explanation:
+* [S] – require authorization;
+* [G] - the request goes through the Gateway Service.
+* [A] – require authorization and administrator rights;
+* [M] – modification operation.
 
-В блоке Структура данных описаны примерные связи между сервисами и сущностями, это не описание ER-диаграммы и не схема базы данных.
+The Data Structure block describes exemplary relationships between services and entities, this is not a description of an ER diagram or a database schema.
 
 ## Hotels Booking System
 
-Система предоставляет пользователю сервис поиска и бронирования отелей на интересующие даты. В зависимости
-от количества заказов система лояльности дает скидку пользователю на новые бронирования.
+The system provides the user with a service for searching and booking hotels for the dates of interest. depending
+Depending on the number of orders, the loyalty system gives the user a discount on new bookings.
 
-**Бизнес сервисы:**
+**Business services:**
 
-* Гостиницы (Hotel Service)
-* Система бронирования (Booking Service)
-* Платежная система (Payment Service)
-* Система лояльности (Loyalty Service)
+* Hotels (Hotel Service)
+* Booking Service
+* Payment system (Payment Service)
+* Loyalty Service
 
-**Дополнительные сервисы:**
+**Additional services:**
 
-* Gateway
-* Авторизация (Session Service)
-* Админка (Report Service)
+*Gateway
+* Authorization (Session Service)
+* Admin (Report Service)
 
-### Структуры данных
+### Data structures
 
 **User (Session Service):**
 ```
@@ -129,71 +129,71 @@ body: { login, password }
 **Payments (Payment Service):**
 ```
 + payment_uid
-+ status [NEW, PAID, REVERSED, CANCELED]
-+ price
++status [NEW, PAID, REVERSED, CANCELED]
++price
 ```
 
 **UserLoyalty (Loyalty Service):**
 ```
 + user_uid -> FK to Session Service (User::user_uid)
-+ status: [BRONZE, SILVER, GOLD]
++status: [BRONZE, SILVER, GOLD]
 + discount
 ```
 
-### Основные операции
+### Basic operations
 
-1. Список отелей. [G]
+1. List of hotels. [G]
     ```
     GET /hotels
     ```
-1. Информация об отеле. [G]
+1. Information about the hotel. [G]
     ```
     GET /hotels/{hotelUid}
     ```
-1. Забронировать номер. [S][M][G]
+1. Book a room. [S][M][G]
     ```
     header: Authorization: bearer <jwt>
     POST /booking
     body: { hotelUid, room, paymentInfo }
     ```
-1. Аннулировать бронь номера. [S][M][G]
+1. Cancel your room reservation. [S][M][G]
     ```
     header: Authorization: bearer <jwt>
     DELETE /booking/{bookingUid}
     ```
-1. Информация по бронированию. [S][G]
+1. Booking information. [S][G]
     ```
     header: Authorization: bearer <jwt>
     GET /booking/{bookingUid}
     ```
-1. Посмотреть мои бронирования. [S][G]
+1. View my bookings. [S][G]
     ```
     header: Authorization: bearer <jwt>
     GET /booking
     ```
-1. Посмотреть баланс бонусной программы. [S][G]
+1. View the balance of the bonus program. [S][G]
     ```
     header: Authorization: bearer <jwt>
     GET /loyalty
     ```
-1. Добавить отель. [A][M][G]
+1. Add a hotel. [A][M][G]
     ```
     header: Authorization: bearer <jwt>
     POST /hotels
     body: { rooms, name, address }
     ```
-1. Изменить информацию о доступности комнат. [A][M][G]
+1. Change room availability information. [A][M][G]
     ```
     header: Authorization: bearer <jwt>
     PATCH /hotels/{hotelUid}/rooms
     body: { rooms: { number, interval, status } }
     ```
-1. Посмотреть статистику бронирования по пользователям: при бронировании отеля данные отправляются в статистику. [A][G]
+1. View booking statistics by users: when booking a hotel, data is sent to statistics. [A][G]
     ```
     header: Authorization: bearer <jwt>
     GET /reports/booking
     ```
-1. Посмотреть статистику наполнения отелей: сколько мест на текущий момент свободно. [A][G]
+1. View hotel occupancy statistics: how many places are free at the moment. [A][G]
     ```
     header: Authorization: bearer <jwt>
     GET /reports/hotels-filling
